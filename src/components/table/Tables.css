@@ -1,0 +1,73 @@
+
+@media screen and (max-width: 983px) {
+  table.table-dashboard {
+    border: 0;
+  }
+
+
+  @media screen and (max-width: 983px) {
+    /* Suppression de la bordure de la table */
+    table.table-dashboard {
+      border: 0;
+    }
+
+    table.table-dashboard thead tr th:first-child, tbody tr td:first-child,
+    table.table-dashboard thead tr th:last-child, table.table tbody tr td:last-child{
+      border-radius:0 0 0 0!important;
+    }
+  
+    /* Rétablissement de la largeur automatique pour les cellules de la ligne de données */
+    table.table-dashboard tbody tr td,
+    table.table-dashboard tbody tr td:first-child,
+    table.table-dashboard tbody tr td:last-child {
+      width: auto;
+    }
+  
+    /* Modification de la taille de la légende de la table */
+    table.table-dashboard caption {
+      font-size: 1.3em;
+    }
+  
+    /* Masquage de l'en-tête de la table */
+    table.table-dashboard thead {
+      display: none;
+    }
+  
+    /* Affichage des lignes de la table en tant que blocs avec une bordure inférieure */
+    table.table-dashboard tr {
+      border-bottom: 3px solid #ddd;
+      display: block;
+      margin-bottom: 0.625em;
+    }
+  
+    /* Affichage des cellules de la table en tant que blocs avec une bordure inférieure */
+    table.table-dashboard td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: 0.8em;
+      text-align: right;
+    }
+  
+    /* Ajout d'une étiquette avant le contenu de chaque cellule */
+    table.table-dashboard td::before {
+      content: attr(data-label);
+      float: left;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  
+    /* Suppression de la bordure inférieure de la dernière cellule de chaque ligne */
+    table.table-dashboard td:last-child {
+      border-bottom: 0;
+    }
+  
+    /* Rétablissement de l'alignement à gauche et de la bordure de la première cellule de chaque ligne */
+    table.table-dashboard tbody tr td:first-child {
+      word-break: break-all !important;
+      border-radius: 0;
+      width: auto;
+      text-align: left;
+    }
+  }
+}
+  

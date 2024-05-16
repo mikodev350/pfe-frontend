@@ -1,0 +1,56 @@
+.sidenav {
+    height: 100%;
+    width: 350px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: -400px;
+    background-color: var(--primary-color) !important; /* Couleur de fond principale */
+    color: white; /* Couleur du texte */
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    display: block;
+    transition: all 0.3s ease; /* Transition douce pour toutes les propriétés */
+}
+
+.sidenav a:hover {
+    background-color: white; /* Couleur de fond au survol */
+    color: black; /* Couleur de texte au survol */
+    padding: 8px 8px 8px 32px !important; /* Réduction de la taille par la diminution du padding */
+    font-size: 18px; /* Réduction de la taille de la police */
+    border-radius: 10px;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 25px;
+    margin-left: 50px;
+}
+
+#main {
+    transition: margin-left .5s;
+}
+
+.open {
+    left: 0;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+
+    .sidenav a {
+        font-size: 16px; /* Taille de police réduite pour les écrans très petits */
+    }
+}

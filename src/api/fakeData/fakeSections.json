@@ -1,0 +1,11 @@
+{
+  "sections": [
+    { "id": 1, "name": "Mathematics", "totalresource": 10, "createdAt": "2021-04-12T12:34:56Z" },
+    { "id": 2, "name": "Physics", "totalresource": 8, "createdAt": "2021-05-15T15:00:00Z" },
+    { "id": 3, "name": "Chemistry", "totalresource": 5, "createdAt": "2021-06-20T18:30:00Z" },
+    { "id": 4, "name": "Biology", "totalresource": 12, "createdAt": "2021-07-22T20:45:00Z" },
+    { "id": 5, "name": "History", "totalresource": 7, "createdAt": "2021-08-30T22:00:00Z" }
+    
+  ],
+  "totalPages": 1
+}

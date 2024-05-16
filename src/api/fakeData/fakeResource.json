@@ -1,0 +1,95 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Resource Management Overview",
+      "type": "Text",
+      "dateOfCreation": "2024-03-20",
+      "status": "Available",
+      "isPublic": true,
+      "sectionId": 1
+    },
+    {
+      "id": 2,
+      "name": "Programming Tutorials",
+      "type": "YouTube",
+      "dateOfCreation": "2024-01-10",
+      "status": "Expired",
+      "isPublic": false,
+      "sectionId": 2
+    },
+    {
+      "id": 3,
+      "name": "Database Design Principles",
+      "type": "Image",
+      "dateOfCreation": "2024-02-15",
+      "status": "Available",
+      "isPublic": true,
+      "sectionId": 1
+    },
+    {
+      "id": 4,
+      "name": "Introduction to Algorithms",
+      "type": "Audio",
+      "dateOfCreation": "2024-03-05",
+      "status": "Coming Soon",
+      "isPublic": false,
+      "sectionId": 3
+    },
+    {
+      "id": 5,
+      "name": "Machine Learning Basics",
+      "type": "Text",
+      "dateOfCreation": "2024-04-22",
+      "status": "Available",
+      "isPublic": true,
+      "sectionId": 2
+    },
+    {
+      "id": 6,
+      "name": "Advanced Networking",
+      "type": "Text",
+      "dateOfCreation": "2024-01-15",
+      "status": "Unavailable",
+      "isPublic": false,
+      "sectionId": 4
+    },
+    {
+      "id": 7,
+      "name": "Cloud Computing Essentials",
+      "type": "Video",
+      "dateOfCreation": "2024-02-28",
+      "status": "Available",
+      "isPublic": true,
+      "sectionId": 3
+    },
+    {
+      "id": 8,
+      "name": "Cybersecurity Fundamentals",
+      "type": "Podcast",
+      "dateOfCreation": "2024-03-30",
+      "status": "Available",
+      "isPublic": false,
+      "sectionId": 4
+    },
+    {
+      "id": 9,
+      "name": "Web Development Basics",
+      "type": "Video",
+      "dateOfCreation": "2024-05-01",
+      "status": "Expired",
+      "isPublic": true,
+      "sectionId": 1
+    },
+    {
+      "id": 10,
+      "name": "Data Structures Explained",
+      "type": "Audio",
+      "dateOfCreation": "2024-05-10",
+      "status": "Coming Soon",
+      "isPublic": false,
+      "sectionId": 5
+    }
+  ],
+  "totalPages": 2
+}

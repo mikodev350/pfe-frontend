@@ -1,0 +1,781 @@
+.form-control,
+.select__control,
+input.react-datepicker-ignore-onclickoutside,
+input.date-inputs,
+.Img-brd,
+.accordion-item {
+    border-radius: 15px !important;
+}
+
+.form-control,
+.form-select,
+.btn,
+.swal2-confirm {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.btn {
+    border-radius: 15px !important;
+    height: 54px !important;
+}
+
+.btn-primary {
+    border: none !important;
+    background-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color) !important;
+}
+
+.btn-secondary {
+    border: none !important;
+    color: #7D7D7D !important;
+    background-color: #DBDBDB !important;
+}
+
+.btn,
+.InputSearch {
+    max-width: 240px !important;
+    width: 100% !important;
+}
+
+/* *:focus {
+    z-index: -1;
+    outline: none;
+} */
+
+
+
+.margin-left {
+    /* float: right; */
+    margin-left: 22px !important;
+}
+
+.margin-left button {
+    /* float: right; */
+    margin: 5px !important;
+}
+
+.margin-left button {
+    /* float: right; */
+    margin: 5px !important;
+}
+
+.margin-left button {
+    /* float: right; */
+    margin: 5px !important;
+}
+
+/********************************************************************************/
+.form-label {
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 2px !important;
+}
+
+/********************** Navbar **********************************/
+.show {
+    display: none;
+}
+
+/* .form-check-input{
+    width: 52px !important;
+    height: 32px !important;
+  
+} */
+/* Switch  for add exam */
+#custom-switch {
+    width: 52px !important;
+    height: 32px !important;
+}
+
+.btn-logout {
+    color: white !important;
+    background-color: var(--primary-color) !important;
+    border-radius: 15px !important;
+    padding: 10px 15px 10px 15px !important;
+    /* padding-left: 15px !important; 
+    padding-right: 15px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important; */
+
+}
+
+/* header  elements */
+nav div.container div.navbar-collapse div.a {
+    border-radius: 15px !important;
+    padding: 10px 15px 10px 15px !important;
+
+}
+
+
+/* answer label  */
+/* .form-check-label{
+    margin-left: 20px !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
+} */
+
+
+/* margin-left: 20px !important;
+          margin-top: 5px !important;
+          margin-bottom: 5px !important; */
+/********************************************************************************/
+
+/********************** Card **********************************/
+
+.card {
+    border-radius: 15px !important;
+}
+
+/*****************Card request********************/
+.card-header {
+    background-color: var(--primary-color) !important;
+    height: 47px;
+    color: white !important;
+    font-weight: bolder;
+    font-size: 20px;
+}
+
+/********************************************************************************/
+
+/********************** Sxal **********************************/
+.swal2-styled {
+    border-radius: 15px !important;
+    border: none !important;
+}
+
+.swal2-confirm {
+    background-color: var(--primary-color) !important;
+    outline: none !important;
+}
+
+@media screen and (max-width: 990px) {
+
+    .btn,
+    .InputSearch {
+        max-width: 100% !important;
+    }
+
+    .margin-left {
+        margin-left: 0px !important;
+    }
+
+    .margin-left button {
+        /* float: right; */
+        margin: 0px !important;
+        margin-left: 5px !important;
+    }
+
+    .margin-left button {
+        /* float: right; */
+        margin: 0px !important;
+    }
+}
+
+/*****************************************************************************/
+.Box-shadowEffect {
+    width: 250px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    text-align: center;
+}
+
+
+/****************************************************************************/
+/**************************Overite ***************************************/
+a.jodit-status-bar-link {
+    display: none;
+}
+
+div.jodit-react-container,
+.jodit-container {
+    border: 1px solid black;
+    border-radius: 15px !important;
+    /* z-index: 2 !important; */
+    /* background-color: #d7d7d721;
+        border-radius: 15px; */
+
+}
+
+.jodit-toolbar__box,
+.jodit-status-bar {
+    border-radius: 10px !important;
+}
+
+/***************************************************************************************/
+/************************************************* inputs general  ****************/
+.baground-exam {
+    background-color: white;
+    border-radius: 20px;
+}
+
+.margin-left {
+    margin-left: 15px;
+}
+
+.padding-form {
+    padding-left: 55px;
+    padding-right: 55px;
+}
+
+.Font {
+    font-size: 18px;
+}
+
+label.form-check-label {
+    padding: 6px !important;
+}
+
+input[type=text],
+input[type=email],
+input[type=password],
+input[type=number],
+textarea.form-control,
+select.form-select {
+    width: 100%;
+    /* height: 30px; */
+    padding: 15px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    border: 1px solid rgb(92, 92, 92);
+    background-color: #d7d7d721;
+    color: black;
+    resize: none;
+}
+
+input:focus {
+    outline: none !important;
+    border: 2px solid #2684ff !important;
+}
+
+/*select otion section deseigne  */
+.select__control {
+    width: 100% !important;
+    ;
+    height: 53px !important;
+    ;
+    background-color: #d7d7d721 !important;
+}
+
+.css-1rhbuit-multiValue {
+    background-color: #007cd41f !important;
+    border-radius: 10px !important;
+}
+
+.css-26l3qy-menu {
+    background-color: white !important;
+    z-index: 2 !important;
+}
+
+.select_menu {
+    background-color: #ffff;
+}
+
+input[type=text]:focus,
+input[type=email]:focus,
+input[type=password]:focus,
+input[type=number]:focus,
+textarea.form-control:focus,
+select:focus {
+    border: 1px solid rgb(7, 7, 7);
+    background-color: #d7d7d721;
+    color: black;
+}
+
+
+.button-save {
+    width: 184px;
+    height: 48px;
+}
+
+.button-side-bar-close {
+    width: 50px !important ;
+    height: 50px !important;
+    position: absolute;
+        /* top: 0; */
+        right: 35px;
+        font-size: 25px;
+        margin-left: 50px;
+}
+
+/* ***************************** */
+/* Youtube Frame Form */
+.video-container {
+    width: 100%;
+    height: 100%;
+    ;
+    padding-bottom: 60.25%;
+    /* Ratio 16:9 (pour une vidéo avec un ratio différent, ajustez cette valeur en conséquence) */
+    position: relative;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/***************************************************************************/
+/**************************Accordion for question **************************/
+
+form.mt-5 .accordion .accordion-item .show {
+    display: block;
+}
+
+/* .accordion-collapse */
+
+
+
+.btn-tab-youtube,
+.btn-tab-googleDrive,
+.btn-tab-images,
+.btn-tab-audio,
+btn-tab-video,
+.btn-tab-pdf {
+    width: 90px !important;
+    height: 90px !important;
+    background-color: rgb(233, 233, 233) !important;
+    color: rgb(73, 73, 73) !important;
+}
+
+
+.btn-tab-youtube:hover {
+    background-color: #F70000 !important;
+    color: white !important;
+}
+
+.btn-tab-googleDrive:hover {
+    background-color: #4285F4 !important;
+    color: white !important;
+}
+
+.btn-tab-images:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.btn-tab-audio:hover {
+    background-color: #FF5733 !important;
+    color: white !important;
+}
+
+.active-youtube {
+    background-color: #F70000 !important;
+    color: white !important;
+}
+
+.active-images {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.active-audio {
+    background-color: #FF5733 !important;
+    color: white !important;
+}
+
+.active-googleDrive {
+    background-color: #4285F4 !important;
+    color: white !important;
+}
+
+.btn-tab-video,
+.btn-tab-pdf {
+    width: 90px !important;
+    height: 90px !important;
+    background-color: rgb(233, 233, 233) !important;
+    color: rgb(73, 73, 73) !important;
+}
+
+.btn-tab-video:hover {
+    background-color: #008080 !important;
+    /* Teal Green */
+    color: white !important;
+}
+
+.active-video {
+    background-color: #008080 !important;
+    /* Teal Green */
+    color: white !important;
+}
+.btn-tab-pdf:hover {
+    background-color: #DC143C !important;
+    /* Crimson Red */
+    color: white !important;
+}
+
+.active-pdf {
+    background-color: #DC143C !important;
+    /* Crimson Red */
+    color: white !important;
+}
+
+
+
+
+.btn-tab-youtube, .btn-tab-googleDrive, .btn-tab-images, .btn-tab-audio {
+  width: 100%; /* Full width on smaller screens */
+  padding: 10px; /* Adequate padding for touch targets */
+}
+
+/* Media queries for larger screens */
+@media (min-width: 768px) {
+  .btn-tab-youtube, .btn-tab-googleDrive, .btn-tab-images, .btn-tab-audio {
+    width: auto; /* Auto width on larger screens */
+  }
+}
+
+
+
+
+/********************************************************************/
+.settings-input.form-control {
+    width: 387px !important;
+}
+
+.center_div {
+    margin: 0 auto;
+    width: 80%
+        /* value of your choice which suits your alignment */
+}
+
+/********************************************************************/
+/* text exam  */
+.text {
+    font-size: 20px !important;
+}
+
+.img-exam {
+    width: 300px;
+}
+
+@media (max-width: 767px) {
+    .title-exam {
+        font-size: 16px !important;
+    }
+
+    .text {
+        font-size: 15px !important;
+    }
+
+    .img-exam {
+        width: auto;
+        height: 100px;
+    }
+}
+
+/* container layout  */
+.custom-body-container {
+    position: absolute;
+    margin-top: 50px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
+/* Table  */
+table.table thead tr th {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+table.table tbody tr td {
+    background-color: white !important;
+    /* background-color: var(--primary-color) !important;
+    color: white !important; */
+}
+
+table.table thead tr th:first-child,
+tbody tr td:first-child {
+    border-radius: 20px 0 0 20px !important;
+}
+
+table.table thead tr th:last-child,
+table.table tbody tr td:last-child {
+    border-radius: 0 20px 20px 0 !important;
+    width: auto !important;
+}
+
+table.table thead tr th {
+    border-right: 5px solid white !important;
+}
+
+table.table thead tr th:last-child {
+    border-right: none !important;
+}
+
+table.table thead tr th {
+    border-right: 5px solid white !important;
+}
+
+table.table tbody tr {
+    /* background-color: #f8f9fa!important; */
+    border: 5px solid #f1f1f1 !important;
+}
+
+
+/* ********************** */
+
+/*overwrite examsss css  */
+.margin-left button {
+    /* float: right; */
+    margin: 0 !important;
+}
+
+/* ************button bootstrap ************ */
+.btn-outline-light {
+    --bs-btn-color: #000 !important;
+    /* Text color */
+    --bs-btn-border-color: #000 !important;
+    /* Border color */
+    --bs-btn-hover-color: #f8f9fa !important;
+    /* Text color on hover */
+    --bs-btn-hover-bg: #000 !important;
+    /* Background color on hover */
+    --bs-btn-hover-border-color: #000 !important;
+    /* Border color on hover */
+    --bs-btn-focus-shadow-rgb: 0, 0, 0 !important;
+    /* Shadow color in RGB for focus */
+    --bs-btn-active-color: #f8f9fa !important;
+    /* Text color when active */
+    --bs-btn-active-bg: #000 !important;
+    /* Background color when active */
+    --bs-btn-active-border-color: #000 !important;
+    /* Border color when active */
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+    /* Shadow when active */
+    --bs-btn-disabled-color: #000 !important;
+    /* Text color when disabled */
+    --bs-btn-disabled-bg: transparent !important;
+    /* Background when disabled */
+    --bs-btn-disabled-border-color: #000 !important;
+    /* Border color when disabled */
+    --bs-gradient: none !important;
+    /* Disable gradient */
+}
+/* ********************************************** */
+/* ********* Buttoon Model  ******** */
+.button-model {
+    width: 150px !important;
+}
+
+
+/* ***************************************************************** */
+/* *********     Dachboard section      ******** */
+/* .table-overview {
+    overflow-x: auto;
+} */
+
+
+
+
+/**************************************************************************************/
+.icon-option {
+    cursor: pointer !important;
+    color: black !important;
+}
+
+.icon-option svg:hover {
+    color: var(--primary-color);
+}
+
+.icon-left {
+    padding-left: 20px;
+}
+
+
+/* .icon-option svg{
+    font-size: 23px;
+} */
+
+/* .padding-input {
+    padding-left: 80px;
+} */
+
+.button-size {
+    width: 200px;
+}
+
+/**********************************************************************/
+.action a,
+.action a:hover {
+    color: black;
+}
+
+
+
+/***********************************************************************/
+
+/* .InputSearch{
+    width: 30px;
+} */
+
+@media screen and (max-width: 1200px) {
+    .icon-option svg {
+        font-size: 17px;
+
+    }
+
+    .icon-left {
+        padding-left: 0px;
+    }
+
+    .icon-option svg {
+        font-size: 20px;
+    }
+}
+
+
+/* *********************************************************** */
+/* Loader -container  */
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+}
+
+.loader {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ***************************** */
+/* Invitation  */
+.name-user {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+}
+
+/* ************************************** */
+/* ********All quetstionn ********* */
+div.accordion div.accordion-collapse div.accordion-body div.row div.col-md-2 {
+    width: 25px !important;
+    /* height: 25px !important; */
+}
+
+/* Dans votre fichier CSS ou une balise <style> dans le composant */
+.my-custom-class p {
+    font-size: 16px;
+    /* Taille de police de base */
+    word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+
+    /* Pour les écrans de largeur maximale de 768px et moins */
+    .my-custom-class p {
+        font-size: 14px;
+        /* Réduire la taille de la police */
+        word-wrap: break-word;
+        /* Permettre le retour à la ligne des mots longs */
+    }
+}
+
+@media (max-width: 576px) {
+
+    /* Pour les écrans de largeur maximale de 576px et moins */
+    .my-custom-class p {
+        font-size: 12px;
+        /* Réduire davantage la taille de la police */
+    }
+}
+
+
+.centered-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+
+.center_div_container {
+    padding-bottom: 100px;
+    padding-top: 100px;
+}
+
+
+/* ******************************************** */
+@media (min-width: 575px) {
+    article {
+        width: 550px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Ensure this path is correct based on your component hierarchy */
+
+.custom-light-button {
+    /* background-color: blue; */
+    /* Couleur de fond initiale */
+    color: white;
+    /* Couleur du texte initial */
+    border-color: white;
+    /* Couleur de la bordure initiale */
+}
+
+.custom-light-button:hover {
+    background-color: white;
+    /* Couleur de fond au survol */
+    color: black;
+    /* Couleur du texte au survol */
+    border-color: white;
+    /* Couleur de la bordure au survol */
+}
+
+/* @media screen and (max-width: 576px) {
+
+    .QuestionTest {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .QuestionTest .title-exam {
+        font-size: 18px;
+    }
+
+    .QuestionTest .text {
+        font-size: 16px;
+    }
+
+    .QuestionTest .ChoiceTable {
+        font-size: 14px;
+    }
+}
+@media screen and (max-width: 576px) {
+    .QuestionTest .img-exam {
+        width: 100%;
+        height: auto;
+    }
+
+    .QuestionTest .YouTubeVideo {
+        width: 100%;
+    }
+} */
