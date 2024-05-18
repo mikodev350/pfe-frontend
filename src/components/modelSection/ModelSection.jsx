@@ -34,12 +34,12 @@ const ModelSection = ({ onAddSection }) => {
   return (
     <>
       <Button className="button-dashboard btn-color" onClick={handleShow}>
-        <span className="button-span-size">Add Section</span>
+        <span className="button-span-size">ajouer un module</span>
       </Button>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Section</Modal.Title>
+          <Modal.Title>ajouer un module</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Formik

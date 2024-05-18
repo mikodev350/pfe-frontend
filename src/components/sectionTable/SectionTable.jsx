@@ -13,7 +13,7 @@ import TableRow from "../table/TableRow";
 import { parseISO, format } from "date-fns";
 import TableIconeSection from "../table/TableIconeSection";
 
-const header = ["#", "Sections", "Total Exam", "Date", "Options"];
+const header = ["#", "module", "Total de resource", "Date", "Options"];
 
 export const SectionTable = ({ searchValue }) => {
   const [currentPage, setCurrentPage] = useState(1);

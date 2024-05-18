@@ -27,12 +27,12 @@ const UpdateSection = ({ sectionId, currentName, handleSubmit }) => {
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Update Section</Modal.Title>
+          <Modal.Title>modifier le module</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Update Section</Form.Label>
+              <Form.Label>modifier le module</Form.Label>
               <Form.Control
                 type="text"
                 placeholder=""
