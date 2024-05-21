@@ -4,11 +4,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 #login-box {
     background-color: white;
-    border-radius: 15px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    display: grid;
+    align-items: center;
 }
 
 #login .container #login-row #login-column #login-box,
@@ -22,7 +26,7 @@
 #signUp-column {
     max-width: 500px;
     height: auto;
-    border-radius: 15px;
+    border-radius: 150px;
     background-color: white;
 }
 
@@ -38,12 +42,12 @@
 #signUp-column,
 #login-box {
     padding-right: 20px;
-    padding-left: 20px;
+    padding-left: 40px;
 }
 
 .button-Login {
     margin: 8px 0;
-    width: 100%;
+    width: 70%;
     height: 55px;
 
 }
@@ -63,7 +67,7 @@
 .button-login {
     margin: 5px !important;
     height: 55px;
-    width: 60px !important;
+    width: 70px !important;
     border: 1px solid rgba(202, 202, 202, 0.899) !important;
 }
 
@@ -136,5 +140,109 @@
 
     to {
         transform: translateX(0);
+    }
+}
+
+/*New Modification */
+
+/* input */
+.form-control, .select__control,
+ input.react-datepicker-ignore-onclickoutside, 
+ input.date-inputs, .Img-brd, .accordion-item {
+    border-radius: 100px !important;
+    border: none;
+}
+/* Styles généraux pour tous les boutons */
+button,.custom-button,.button-Login,.button-singup,.button-login 
+{
+    background: var(--primary-color) !important;
+    border-radius: 999px !important;
+    box-shadow: #5E5DF0 0 10px 20px -10px !important;
+    box-sizing: border-box !important;
+    color: #FFFFFF !important;
+    cursor: pointer !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    line-height: 24px !important;
+    opacity: 1 !important;
+    outline: 0 solid transparent !important;
+    padding: 8px 18px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    touch-action: manipulation !important;
+    width: fit-content !important;
+    word-break: break-word !important;
+    border: 0 !important;
+}
+
+  button:hover,.custom-button:hover,.button-Login:hover,.button-singup:hover,.button-login:hover
+{
+    background: #1e7fc9c2!important;
+    box-shadow: #5d5df0a9 0 10px 20px -10px  !important;
+}
+
+ /* Add background image  */
+ main .main-login-container
+{   left: 0px;
+    right: 0px;
+    position:absolute;
+    width: 100%;
+    background-color:#59bdf379;
+    /* hadi apr ha nhiha w nkhli desig t3 login full page with no navbar */
+    margin-top: -90px;
+}
+ .background-image {
+    background-image: url('./Learning-pana.svg');
+    background-size: auto;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100vh;
+    background-position: center;
+  }
+  /* login title  */
+  .custom-heading {
+    font-size: 40px;
+    font-weight: 750;
+    background-image: linear-gradient(to left, #59bcf3, #10266f);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    padding-bottom: 20px;
+  }
+@media (max-width: 768px){
+    main .main-login-container{
+        width: 100%;
+        background-color:white;
+        top: 0px;
+        display: grid;
+        
+    }    
+    .background-image {
+        background-size:auto;
+        width:65%;
+        height: 100vh;
+        z-index: 0;
+        margin-bottom: -9rem;
+    }
+
+    .custom-heading {
+        display: none;
+    }
+
+    .image-login {
+        display: flex;
+        justify-content: center;
+        margin: 0px;
+    }
+    #login-box {
+        padding: 0px 6cqmax;
+    }
+}
+
+@media (max-width: 650px){
+     .background-image {
+        background-size:auto;
+        width: 60%;
+        width: 75vh;
     }
 }

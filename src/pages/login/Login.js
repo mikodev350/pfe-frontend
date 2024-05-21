@@ -3,9 +3,10 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
+// import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import "./login.css";
 import Layout from "../../components/layout/Layout";
+
 // import { loginAPI } from "../../api/authApi";
 // import { getToken } from "../../util/authUtils";
 // import { ToastContainer } from "react-toastify";
@@ -53,13 +54,15 @@ const Login = () => {
     // }
     setIsSubmitting(false);
   };
-
+  
   return (
-    <Layout fullcontent={true} backgroundColorIdentification={false}>
-      <Row className="justify-content-center">
-        {/* <ToastContainer /> */}
-
-        <Col xs={12} md={4} id="login-box">
+    <Layout fullcontent={true} backgroundColorIdentification={true}>
+       <div className="main-login-container">
+        <Row className="justify-content-center">
+          <Col md={6} className="image-login">
+          <div className="background-image"></div>
+          </Col>
+          <Col md={6} id="login-box" >
           <Formik
             initialValues={values}
             validationSchema={LoginSchema}
@@ -74,8 +77,9 @@ const Login = () => {
               handleSubmit,
             }) => (
               <Form onSubmit={handleSubmit} className="mt-5">
-                <h2 className="text-center">Login</h2>
-                <div className="text-center forgot">
+                <h2 className="text-center custom-heading">Login</h2>
+                {/* Login with Facebook & Googel in comment  */}
+                {/* <div className="text-center forgot">
                   <Button variant="light" className="button-login">
                     <span>
                       <FaGoogle size={24} />
@@ -86,9 +90,9 @@ const Login = () => {
                       <FaFacebookF size={24} />
                     </span>
                   </Button>
-                </div>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
+                </div> */}
+                <Form.Group className="mb-3 mt-5" controlId="formBasicEmail">
+                  <Form.Label className="ms-4">Email address</Form.Label>
                   <Form.Control
                     type="email"
                     name="identifier"
@@ -98,15 +102,16 @@ const Login = () => {
                     className={
                       touched.identifier && errors.identifier
                         ? "is-invalid"
-                        : ""
-                    }
+                        : "border-1"
+                        
+                    } style={{ borderColor: "#1e7fc9c2" }}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.identifier}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId="formBasicPassword">
-                  <Form.Label>Password</Form.Label>
+                  <Form.Label className="ms-4">Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="password"
@@ -114,8 +119,8 @@ const Login = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     className={
-                      touched.password && errors.password ? "is-invalid" : ""
-                    }
+                      touched.password && errors.password ? "is-invalid" : "border-1"
+                    }style={{ borderColor: "#1e7fc9c2" }}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.password}
@@ -126,21 +131,23 @@ const Login = () => {
                     variant="primary"
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-100 button-Login btn-color"
+                    className="w-50 button-Login btn-color mt-5"
                   >
                     Login
                   </Button>
-                  <div className="text-center forgot">
-                    <Link to={"/"}>Forgot your password?</Link>
-                  </div>
-                </Form.Group>
-              </Form>
-            )}
-          </Formik>
-        </Col>
-      </Row>
+                  <div className="text-center mt-2 forgot">
+                    <p>Having trouble logging in?&nbsp;
+                    <Link to={"/"}>Forgot your password?</Link></p>
+                    </div>
+                  </Form.Group>
+                </Form>
+              )}
+            </Formik>
+          </Col>
+        </Row>
+      </div>
     </Layout>
-  );
+ );
 };
 
 export default Login;

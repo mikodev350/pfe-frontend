@@ -17,13 +17,16 @@ body {
 
 body {
   font-family: 'Cairo', sans-serif;
-  background-color: #F1F1F1;
+   background-color: #F1F1F1;
 }
 
 :root {
-  --primary-color: #007bd4;
+  /* New colors */
+  --primary-color: #1e80c9;              /* #007bd4; */
+  --light-blue :#59bcf3;
+  --Dark-blue: #10266f;
   /* --secondary-color: #007bd4 ; */
-  --body-color: #F1F1F1;
+  /* --body-color: #F1F1F1; */
   --input-border-color: #d7d7d721;
 }
 
