@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import {
   onUpdateSidebarStatus,
   sidebarState,
-} from "../../../features/sidebarSlice";
+} from "../../../redux/features/sidebarSlice";
 import { routesSide } from "../../../constants/routes";
 
 import "./SideBarMobile.css";

@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 // Importez useDispatch si vous utilisez Redux
 import { useDispatch } from "react-redux";
-import { onUpdateSidebarStatus } from "../../features/sidebarSlice";
+import { onUpdateSidebarStatus } from "../../redux/features/sidebarSlice";
+// import { onUpdateSidebarStatus } from "../../features/sidebarSlice";
 // import { onUpdateSidebarStatus } from "../pathToYourSidebarSlice";
 
 export default function Header() {
