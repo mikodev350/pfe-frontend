@@ -1,625 +1,482 @@
-
-
-
-import React from "react";
-import { Col, Button, Form, Container, Row } from "react-bootstrap";
-import { useLocation, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { FiImage, FiTrash2, FiVolume2, FiYoutube,FiFile,FiVideo } from "react-icons/fi";
-
-import YouTubeVideo from "../../components/youtube/YouTubeVideo";
+import React, { useState, useRef } from "react";
+import { Button, Form, Container, Row, Col } from "react-bootstrap";
+import Select, { components } from "react-select";
 import { useFormik } from "formik";
-
-// import { initialValues } from "../../util/config.question";
-// import { addExam } from "../../features/examSlices";
-import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { validationSchema } from "../../validator/addResourceValidator";
-// import { fetchExamById } from "../../api/apiExams";
-import { saveQuestion } from "../../api/apiQuestion";
-import Loader from "../../components/loader/Loader";
+import { saveResource } from "../../api/apiResource";
+import { getAllParcours, getModulesByParcours, getLessonsByModule } from "../../api/apiData";
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
+import YouTubeVideo from "../../components/youtube/YouTubeVideo";
+import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
+import Loader from "../../components/loader/Loader";
+import { FiImage, FiTrash2, FiVolume2, FiYoutube, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
+
+const CheckboxOption = (props) => {
+  return (
+    <components.Option {...props}>
+      <input
+        type="checkbox"
+        checked={props.isSelected}
+        onChange={() => null}
+      />{" "}
+      <label>{props.label}</label>
+    </components.Option>
+  );
+};
 
 export default function AddResource() {
+  const [parcoursOptions, setParcoursOptions] = useState([]);
+  const [moduleOptions, setModuleOptions] = useState([]);
+  const [lessonOptions, setLessonOptions] = useState([]);
 
+  const [resources, setResources] = useState([]);
+  const [image, setImage] = useState({ preview: "", raw: null });
+  const [audioFile, setAudioFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfPreview, setPdfPreview] = useState("");
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState("");
+  const [link, setLink] = useState("");
+  const [bookReference, setBookReference] = useState("");
+  const [displayLinkInput, setDisplayLinkInput] = useState(false);
+  const [displayBookInput, setDisplayBookInput] = useState(false);
 
- const [image, setImage] = React.useState({ preview: "", raw: null });
-  const [audioFile, setAudioFile] = React.useState(null);
-const [pdfFile, setPdfFile] = React.useState(null);  // State for PDF file
-    const [pdfPreview, setPdfPreview] = React.useState(""); // State for PDF preview URL  const hiddenFileInput = React.useRef(null);
-  
-  const hiddenFileInput = React.useRef(null);
-    const hiddenFileInputAudio = React.useRef(null);
-    const hiddenFileInputPdf = React.useRef(null);  // Ref for PDF input
-  const [displayInput, setDisplayInput] = React.useState(false);
-  const [displayDrive, setDisplayDrive] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const examId = searchParams.get("examId");
-  const dispatch = useDispatch();
-const formik = useFormik({
- initialValues: {
-  WriteText: "",
-  image: "",  // This will store the URL or a reference to the image file
-  youtubeLink: "",
-  justificateAnwser: "",
-  audio: "",  // This will store the URL or a reference to the audio file
-  pdf: "",    // This will store the URL or a reference to the PDF file
-    video: "",    // This will store the URL or a reference to the PDF file
+  const hiddenFileInputImage = useRef(null);
+  const hiddenFileInputAudio = useRef(null);
+  const hiddenFileInputPdf = useRef(null);
+  const hiddenFileInputVideo = useRef(null);
 
-},
-  validationSchema: validationSchema,
-  onSubmit: async (values) => {
-    setIsLoading(true);
-          console.log('====================================');
-      console.log(values);
-      console.log('====================================');
-    try {
-
-      const savedQuestion = await saveQuestion(values, Number(examId));
-      if (savedQuestion) {
+  const formik = useFormik({
+    initialValues: {
+      resourceName: "",
+      format: "",
+      parcours: [],
+      module: [],
+      lesson: [],
+      WriteText: "",
+      youtubeLink: "",
+      image: "",
+      audio: "",
+      pdf: "",
+      video: "",
+      link: "",
+      bookReference: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const newResource = {
+          id: Date.now(),  // Use timestamp as a unique identifier
+          ...values,
+        };
+        setResources([...resources, newResource]);
+        await saveResource(values);
         formik.resetForm();
         setImage({ preview: "", raw: null });
         setAudioFile(null);
-        setIsLoading(false);
+        setPdfFile(null);
+        setPdfPreview("");
+        setVideoFile(null);
+        setVideoPreview("");
+        setLink("");
+        setBookReference("");
+        setDisplayLinkInput(false);
+        setDisplayBookInput(false);
+      } catch (error) {
+        console.error("Error saving resource:", error);
       }
-    } catch (error) {
-      console.error("Error while saving question:", error);
-      setIsLoading(false);
-    }
-  },
-});
+    },
+  });
 
-console.log(formik);  // Check what's inside formik
-
-    function RemoveButtonyoutube() {
-    const youtubeButton = document.querySelector(".btn-tab-youtube");
-    if (youtubeButton) {
-      youtubeButton.classList.remove("active-youtube");
-    }
-  }
-  function RemoveButtonGoogleDrive() {
-    const googleDriveButton = document.querySelector(".btn-tab-googleDrive");
-    if (googleDriveButton) {
-      googleDriveButton.classList.remove("active-googleDrive");
-    }
-  }
-  /*************************************************************************************/
-  
-const [videoFile, setVideoFile] = React.useState(null);
-const [videoPreview, setVideoPreview] = React.useState("");
-const hiddenFileInputVideo = React.useRef(null);
-
-
-  const handleVideoChange = (event) => {
-  const file = event.target.files ? event.target.files[0] : null;
-  if (file && file.type.startsWith('video')) {
-    setVideoFile(file);
-    const previewUrl = URL.createObjectURL(file);
-    setVideoPreview(previewUrl);
-    formik.setFieldValue("video", file); // Ensure your formik setup handles a 'video' field
-  }
-};
-
-const handleClickVideo = () => {
-  hiddenFileInputVideo.current && hiddenFileInputVideo.current.click();
-};
-  /**************************************************************************************/  
   React.useEffect(() => {
-    const fetchExamDetails = async () => {
-      if (examId) {
-        try {
-          // const examDetails = await fetchExamById(parseInt(examId));
-          // dispatch(addExam(examDetails));
-        } catch (error) {
-          console.error("Error fetching exam details:", error);
-        }
-      }
+    const fetchData = async () => {
+      const parcours = await getAllParcours();
+      setParcoursOptions(parcours.map(p => ({ value: p.id, label: p.name })));
     };
+    fetchData();
+  }, []);
 
-    fetchExamDetails();
-  }, [examId, dispatch]);
-/*************************************************************************************/ 
-const handleChange = (event) => {
-  const file = event.target.files ? event.target.files[0] : null;
-  if (file) {
-    // Create a URL for the file
-    const imageUrl = URL.createObjectURL(file);
-    setImage({
-      preview: imageUrl,
-      raw: file
-    });
-    formik.setFieldValue("image", imageUrl);
-  }
-};
+  const handleParcoursChange = async (selectedParcours) => {
+    formik.setFieldValue("parcours", selectedParcours.map(p => p.value));
+    const modules = await getModulesByParcours(selectedParcours.map(p => p.value));
+    setModuleOptions(modules.map(m => ({ value: m.id, label: m.name })));
+    setLessonOptions([]);  // Reset lessons when parcours change
+  };
 
-/******************************************************************************/ 
-const handleAudioChange = (event) => {
-  const file = event.target.files ? event.target.files[0] : null;
-  if (file) {
-    // Create a URL for the audio file
-    const audioUrl = URL.createObjectURL(file);
-    setAudioFile(file);
-    formik.setFieldValue("audio", audioUrl);
-  }
-};
+  const handleModulesChange = async (selectedModules) => {
+    formik.setFieldValue("module", selectedModules.map(m => m.value));
+    const lessons = await getLessonsByModule(selectedModules.map(m => m.value));
+    setLessonOptions(lessons.map(l => ({ value: l.id, label: l.name })));
+  };
 
+  const handleLessonsChange = (selectedLessons) => {
+    formik.setFieldValue("lesson", selectedLessons.map(l => l.value));
+  };
 
-  const handleClick = () => hiddenFileInput.current && hiddenFileInput.current.click();
-  const handleClickAudio = () => hiddenFileInputAudio.current && hiddenFileInputAudio.current.click();
-
-
-  const handleChangeTextQuestion = React.useCallback(
-    (newContent) => {
-      formik.setFieldValue("WriteText", newContent);
-      formik.setFieldTouched("WriteText", true);
+  const handleDescriptionChange = React.useCallback(
+    (content) => {
+      formik.setFieldValue("WriteText", content);
     },
     [formik]
   );
 
-
-  const removeImg = () => {
-    setImage({
-      preview: "",
-      raw: null, // Correctly set this to null instead of an empty string
-    });
-
-  }
-
-  /********************************************************************/
-  /**************  removePdf    ***************************/ 
-  const removePdf = () => {
-    setPdfFile(null); // Assuming you have a state called pdfFile
-    setPdfPreview(""); // Assuming you have a state called pdfPreview for storing the URL
-    formik.setFieldValue("pdf", null); // Adjust this if your field name in Formik differs
-};
-  /********************************************************************/
-  /**************  removeVideo    ***************************/ 
-const removeVideo = () => {
-    setVideoFile(null); // Assuming you have a state called videoFile
-    setVideoPreview(""); // Assuming you have a state called videoPreview for storing the URL
-    formik.setFieldValue("video", null); // Adjust this if your field name in Formik differs
-};
-
- 
-const handleDriveLinkChange = (event) => {
-  const inputDriveLink = event.target.value;
-
-  // Use a regular expression to extract the ID from the Google Drive link
-  const idMatch = inputDriveLink.match(/[-\w]{25,}/);
-
-  if (idMatch) {
-    const fullDriveUrl = `https://drive.google.com/uc?id=${idMatch[0]}`;
-    formik.setFieldValue("driveLinkImage", fullDriveUrl);
-  } else {
-    formik.setFieldValue("driveLinkImage", inputDriveLink);
-  }
-};
-
-    const deleteAudio = () => {
-    setAudioFile(null);
-
-    formik.setFieldValue("audio", "");
-    formik.setFieldTouched("audio", false);
+  const handleFileChange = (event, type) => {
+    const file = event.target.files[0];
+    setDisplayLinkInput(false);
+    setDisplayBookInput(false);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      if (type === "image") {
+        setImage({ preview: url, raw: file });
+        formik.setFieldValue("image", file);
+      } else if (type === "audio") {
+        setAudioFile(file);
+        formik.setFieldValue("audio", file);
+      } else if (type === "pdf") {
+        setPdfFile(file);
+        setPdfPreview(url);
+        formik.setFieldValue("pdf", file);
+      } else if (type === "video") {
+        setVideoFile(file);
+        setVideoPreview(url);
+        formik.setFieldValue("video", file);
+      }
+    }
   };
 
-  const YoutubeShowDisplay = (event) => {
-  if (!displayInput) {
-    setDisplayInput(true);
-    setDisplayDrive(false);
-    event.currentTarget.classList.add("active-youtube");
-    RemoveButtonGoogleDrive();
-  } else {
-    setDisplayInput(false);
-    event.currentTarget.classList.remove("active-youtube");
-  }
-};
-/****************************************************************************/
-const driveShowDisplay = (event) => {
-  if (!displayDrive) {
-    setDisplayDrive(true);
-    setDisplayInput(false);
-    event.currentTarget.classList.add("active-googleDrive");
-    RemoveButtonyoutube();
-  } else {
-    setDisplayDrive(false);
-    event.currentTarget.classList.remove("active-googleDrive");
-  }
-};
+  const handleClick = (type) => {
+    if (type === "image") {
+      hiddenFileInputImage.current.click();
+    } else if (type === "audio") {
+      hiddenFileInputAudio.current.click();
+    } else if (type === "pdf") {
+      hiddenFileInputPdf.current.click();
+    } else if (type === "video") {
+      hiddenFileInputVideo.current.click();
+    }
+  };
 
-/*********************************************************************************/
-const handlePdfChange = (event) => {
-        const file = event.target.files ? event.target.files[0] : null;
-        if (file && file.type === "application/pdf") {
-            setPdfFile(file);
-            const previewUrl = URL.createObjectURL(file);
-            setPdfPreview(previewUrl); // Set the preview URL
-            formik.setFieldValue("pdf", file);
-        }
-    };
+  const removeFile = (type) => {
+    if (type === "image") {
+      setImage({ preview: "", raw: null });
+      formik.setFieldValue("image", "");
+    } else if (type === "audio") {
+      setAudioFile(null);
+      formik.setFieldValue("audio", "");
+    } else if (type === "pdf") {
+      setPdfFile(null);
+      setPdfPreview("");
+      formik.setFieldValue("pdf", "");
+    } else if (type === "video") {
+      setVideoFile(null);
+      setVideoPreview("");
+      formik.setFieldValue("video", "");
+    }
+  };
 
-    const handleClickPdf = () => {
-        hiddenFileInputPdf.current && hiddenFileInputPdf.current.click();
-    };
+  const handleLinkChange = (event) => {
+    const value = event.target.value;
+    setLink(value);
+    formik.setFieldValue("link", value);
+    if (value) {
+      setDisplayBookInput(false);
+    }
+  };
 
+  const handleBookReferenceChange = (event) => {
+    const value = event.target.value;
+    setBookReference(value);
+    formik.setFieldValue("bookReference", value);
+    if (value) {
+      setDisplayLinkInput(false);
+    }
+  };
 
- return (
-    <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Container className="baground-exam ">
-          <Row className="padding-row-top margin-left padding-form ">
-            <Form
-  onSubmit={(event) => {
-    event.preventDefault();
-    formik.handleSubmit();
-    // You can call additional functions here if needed, like resetting a rich text editor
-  }}
-  className="mt-5"
->
-              {" "}
-              <h3 className="text-center ">Add new resource </h3>
+  return (
+    <Container>
+      <Row className="justify-content-md-center">
+        <Col md={8}>
+          <Form onSubmit={formik.handleSubmit}>
+            <Form.Group controlId="resourceName">
+              <Form.Label>Resource Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="resourceName"
+                value={formik.values.resourceName}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.resourceName}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.resourceName}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-              <Form.Group
-                className="mt-5 mb-3"
-                controlId="exampleForm.ControlTextarea1"
+            <Form.Group controlId="format">
+              <Form.Label>Format</Form.Label>
+              <Form.Control
+                as="select"
+                name="format"
+                value={formik.values.format}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.format}
               >
-                <Form.Label className="Font">Write the text : </Form.Label>
+                <option value="">Select format</option>
+                <option value="cours">Cours</option>
+                <option value="devoir">Devoir</option>
+                <option value="ressource numérique">Ressource Numérique</option>
+              </Form.Control>
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.format}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-                <Col md={12}>
-                  <RichTextEditor
-                    initialValue={formik.values.WriteText || ""}
-                    getValue={handleChangeTextQuestion}
-                    isUpdate={formik.values.WriteText ? true : false}
-                    // resetContent={resetEditorContent}
-                  />
-                  <br />
-                  {formik.touched.WriteText && formik.errors.WriteText && (
-                    <div className="text-danger">
-                      {formik.errors.WriteText}
-                    </div>
-                  )}
-                </Col>
-              </Form.Group>
-              <Form.Group>
-                    <Container className="d-flex justify-content-center">
-                                      <Row className="">
+            <Form.Group controlId="parcours">
+              <Form.Label>Parcours</Form.Label>
+              <Select
+                isMulti
+                options={parcoursOptions}
+                name="parcours"
+                onChange={handleParcoursChange}
+                classNamePrefix="select"
+                components={{ Option: CheckboxOption }}
+              />
+              {formik.errors.parcours && (
+                <div className="text-danger">{formik.errors.parcours}</div>
+              )}
+            </Form.Group>
 
-    <Col sm={12} className="mb-3">
-                      <Form.Label className="Font">Choose to upload  : </Form.Label>
+            <Form.Group controlId="modules">
+              <Form.Label>Modules</Form.Label>
+              <Select
+                isMulti
+                options={moduleOptions}
+                name="module"
+                onChange={handleModulesChange}
+                classNamePrefix="select"
+                components={{ Option: CheckboxOption }}
+              />
+              {formik.errors.module && (
+                <div className="text-danger">{formik.errors.module}</div>
+              )}
+            </Form.Group>
 
-                <div className="justify-content-center">
-                    <Button
-                      className={`btn-tab-youtube ${formik.values.youtubeLink ? "active-youtube" : ""}`}
-                      style={{
-                        width: "200px !important",
-                        height: "200px !important",
-                      }}
-                      onClick={YoutubeShowDisplay}
-                    disabled={!!(audioFile || image.preview || pdfPreview || videoPreview)}
-                    >
-                      <span>
-                        <FiYoutube size={35} />
-                        <br />
-                        Add Link
-                      </span>
-                    </Button>{" "}
-{/* ********************************************************************************************* */}
-                            <Button onClick={handleClickPdf} 
-                            
-                      className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
-                    disabled={!!(audioFile || image.preview || formik.values.youtubeLink || videoPreview)}
-                      style={{
-                        width: "200px !important",
-                        height: "200px !important",
-                      }}
-                      
-                            // className="btn-tab-pdf"
-                            
-                            >
-                                <FiFile size={35} />
-                                Upload PDF
-                            </Button>
-                            <input
-                                type="file"
-                                accept="application/pdf"
-                                ref={hiddenFileInputPdf}
-                                onChange={handlePdfChange}
-                                style={{ display: "none" }}
-                            />
-                         
-                    <Button
-                     className={`btn-tab-images ${image.preview ? "active-images" : ""}`}
-                    onClick={handleClick}
-                    disabled={!!(audioFile || formik.values.youtubeLink || pdfPreview || videoPreview)}
-                    >
-                      <span>
-                        <FiImage size={35} />
-                        Upload
-                      </span>
-                    </Button>{" "}
-                    <input
-                      type="file"
-                      accept="image/png, image/jpeg"
-                      ref={hiddenFileInput}
-                      onChange={handleChange}
-                      style={{ display: "none" }}
-                    />
-                 
-                    <Button
-                      style={{
-                        width: "200px !important",
-                        height: "200px !important",
-                      }}
-className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
-                    onClick={handleClickAudio}
-                    disabled={!!(image.preview || formik.values.youtubeLink || pdfPreview || videoPreview)}
-                    >
-                      <span>
-                        <FiVolume2 size={35} />
-                        <br />
-                        Upload Audio
-                      </span>
-                    </Button>{" "}
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      ref={hiddenFileInputAudio}
-                      onChange={handleAudioChange}
-                      style={{ display: "none" }}
-                    />
-                   {/* *************************************************************** */}
-  <Button
-      style={{
-                        width: "200px !important",
-                        height: "200px !important",
-                      }}
-     className={`btn-tab-video ${videoPreview ? "active-video" : ""}`}
-                    onClick={handleClickVideo}
-                    disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview)}
-  >
-    <span>
-      <FiVideo size={35} />
-      <br />
-      Upload Video
-    </span>
-  </Button>{" "}
-  <input
-    type="file"
-    accept="video/*"
-    ref={hiddenFileInputVideo}
-    onChange={handleVideoChange}
-    style={{ display: "none" }}
-  />
-</div>
+            <Form.Group controlId="lessons">
+              <Form.Label>Lessons</Form.Label>
+              <Select
+                isMulti
+                options={lessonOptions}
+                name="lesson"
+                onChange={handleLessonsChange}
+                classNamePrefix="select"
+                components={{ Option: CheckboxOption }}
+              />
+              {formik.errors.lesson && (
+                <div className="text-danger">{formik.errors.lesson}</div>
+              )}
+            </Form.Group>
 
-               
+            <Form.Group controlId="note">
+              <Form.Label>Note</Form.Label>
+              <RichTextEditor
+                initialValue={formik.values.WriteText}
+                getValue={handleDescriptionChange}
+              />
+              {formik.errors.WriteText && (
+                <div className="text-danger">{formik.errors.WriteText}</div>
+              )}
+            </Form.Group>
 
-                {/* ************************************************************************************ */}
-                </Col>
-                                </Row>
+            <Form.Group controlId="youtubeLink">
+              <Form.Label>YouTube Link</Form.Label>
+              <Form.Control
+                type="text"
+                name="youtubeLink"
+                value={formik.values.youtubeLink}
+                onChange={formik.handleChange}
+                isInvalid={!!formik.errors.youtubeLink}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.youtubeLink}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-                </Container>
-              </Form.Group>
+            <Form.Group>
+              <Form.Label>Upload Options:</Form.Label>
+              <div className="d-flex justify-content-center">
+                <Button
+                  onClick={() => handleClick("image")}
+                  className={`btn-tab-images ${image.preview ? "active-images" : ""}`}
+                  disabled={!!(audioFile || formik.values.youtubeLink || pdfPreview || videoPreview || link || bookReference)}
+                >
+                  <span>
+                    <FiImage size={35} />
+                    Upload Image
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  ref={hiddenFileInputImage}
+                  onChange={(event) => handleFileChange(event, "image")}
+                  style={{ display: "none" }}
+                />
 
+                <Button
+                  onClick={() => handleClick("audio")}
+                  className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
+                  disabled={!!(image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || link || bookReference)}
+                >
+                  <span>
+                    <FiVolume2 size={35} />
+                    Upload Audio
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  ref={hiddenFileInputAudio}
+                  onChange={(event) => handleFileChange(event, "audio")}
+                  style={{ display: "none" }}
+                />
 
-{/* ************************************************************************************* */}
+                <Button
+                  onClick={() => handleClick("pdf")}
+                  className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
+                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || videoPreview || link || bookReference)}
+                >
+                  <span>
+                    <FiFile size={35} />
+                    Upload PDF
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  ref={hiddenFileInputPdf}
+                  onChange={(event) => handleFileChange(event, "pdf")}
+                  style={{ display: "none" }}
+                />
 
-   {videoPreview && (
-    <div className="video-preview ">
-            <video src={videoPreview} controls width="100%" />
-                <div className="d-flex justify-content-center">
-             <button  onClick={removeVideo} style={{ marginTop: '10px', backgroundColor: 'red', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-            Remove Video
-        </button>
-        </div>
-            {/* <button onClick={removeVideo}>Remove Video</button> */}
-        </div>
-    )}
+                <Button
+                  onClick={() => handleClick("video")}
+                  className={`btn-tab-video ${videoPreview ? "active-video" : ""}`}
+                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || link || bookReference)}
+                >
+                  <span>
+                    <FiVideo size={35} />
+                    Upload Video
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="video/*"
+                  ref={hiddenFileInputVideo}
+                  onChange={(event) => handleFileChange(event, "video")}
+                  style={{ display: "none" }}
+                />
 
-{/* ***************************************************** */}
+                <Button
+                  onClick={() => {
+                    setDisplayLinkInput(true);
+                    setDisplayBookInput(false);
+                  }}
+                  className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
+                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || bookReference)}
+                >
+                  <span>
+                    <FiLink size={35} />
+                    Add Link
+                  </span>
+                </Button>
 
-
-
-
-
-
-
-
-
-
-
-
-
-              <Form.Group className="mb-3 " controlId="Audio">
-                {image.preview ? (
-                  <div
-                    style={{
-                      position: "relative",
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "0",
-                        right: "0",
-                        left: "0",
-                        bottom: "0",
-                        zIndex: 2,
-                        backgroundColor: "rgba(0, 0, 0, 0.250)",
-                        borderRadius: "15px",
-                      }}
-                    ></div>
-                    <div
-                      style={{
-                        position: "absolute",
-                        zIndex: " 3",
-                        color: "white",
-                        top: "calc(80% - 25px)",
-                        right: "calc(50% - 25px)",
-                        height: "50px",
-                        width: "50px",
-                        paddingTop: "10px",
-                        paddingLeft: "12px",
-                        borderRadius: "100%",
-                        backgroundColor: "#A71D11",
-                        cursor: "pointer",
-                      }}
-                      onClick={removeImg}
-                    >
-                      <FiTrash2 size={24} />
-                    </div>
-                    <img
-                      src={image.preview}
-                      alt="dummy"
-                      style={{
-                        objectFit: "contain",
-                        width: "100%",
-                        height: "300px",
-                      }}
-                      className="Img-brd"
-                    />
-                  </div>
-                ) : null}
-
-                {audioFile && formik.values.audio ? ( // Utilisez la condition pour vérifier si audioFile est défini
-                  <div className="d-flex justify-content-center align-items-center">
-                    <AudioPlayer audioFile={audioFile} />
-                    <div>
-                      {" "}
-                      <Button variant="outline-danger" onClick={deleteAudio}>
-                        <FiTrash2 size={24} />
-                      </Button>{" "}
-                    </div>
-                  </div>
-                ) : null}
-                {displayInput && !(audioFile || formik.values.youtubeLink || pdfPreview || videoPreview) && (
-                  <Row>
-                    <Form.Label className="Font">Link youtube </Form.Label>
-                    <Col xs={12} md={12} lg={12}>
-                      <Form.Control
-                        type="text"
-                        placeholder="Put YouTube Link"
-                        name="youtubeLink"
-                        value={formik.values.youtubeLink}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        isInvalid={
-                          formik.touched.youtubeLink &&
-                          !!formik.errors.youtubeLink
-                        }
-                      />
-                      {formik.touched.youtubeLink &&
-                        formik.errors.youtubeLink && (
-                          <div className="text-danger text-center">
-                            {formik.errors.youtubeLink}
-                          </div>
-                        )}
-                    </Col>
-                    <Col>
-                      {formik.values.youtubeLink ? (
-                        <>
-                          <div className="d-flex justify-content-center align-items-center">
-                            <YouTubeVideo videoId={formik.values.youtubeLink} />
-                          </div>
-                        </>
-                      ) : null}
-                    </Col>
-                  </Row>
-                )}
-
-
-
-{/* display pdff  */}
-   {pdfPreview && (
-                                <div className="pdf-preview ">
-                                    <iframe src={pdfPreview} width="100%" height="500px" />
-                                    <div className="d-flex justify-content-center">
-                                     <button  onClick={removePdf} style={{ marginTop: '10px', backgroundColor: 'red', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-            Remove PDF
-            
-        </button>
-        </div>
-                                </div>
-                                
-                            )}
-
-                {displayDrive && !displayInput && (
-                  <Row>
-                    <Form.Label className="Font">drive Link : </Form.Label>
-                    <Col xs={12} md={12} lg={12}>
-                      <Form.Control
-                        type="text"
-                        placeholder="Put drive Link"
-                        name="driveLinkImage"
-                        value={formik.values.driveLinkImage}
-                        onChange={handleDriveLinkChange}
-                        onBlur={formik.handleBlur}
-                        isInvalid={
-                          formik.touched.driveLinkImage &&
-                          !!formik.errors.driveLinkImage
-                        }
-                      />
-                      {formik.touched.driveLinkImage &&
-                        formik.errors.driveLinkImage && (
-                          <div className="text-danger text-center">
-                            {formik.errors.driveLinkImage }
-                          </div>
-                        )}
-                    </Col>
-                    <Col>
-                      {formik.values.driveLinkImage ? (
-                        <>
-                          <div className="d-flex justify-content-center align-items-center">
-                            {/* <YouTubeVideo
-                            videoId={formik.values.driveLinkImage}
-                          /> */}
-                            <img
-                              src={formik.values.driveLinkImage}
-                              style={{
-                                objectFit: "contain",
-                                width: "100%",
-                                height: "300px",
-                              }}
-                              className="Img-brd"
-                              alt=""
-                            />
-                          </div>
-                        </>
-                      ) : null}
-                    </Col>
-
-                  </Row>
-                )}
-              </Form.Group>
-    
-               <div className="d-flex justify-content-center">
-                  <Col md={4} >
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      disabled={isLoading}
-                    >
-                      Save
-                    </Button>
-                  </Col>
+                <Button
+                  onClick={() => {
+                    setDisplayBookInput(true);
+                    setDisplayLinkInput(false);
+                  }}
+                  className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
+                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || link)}
+                >
+                  <span>
+                    <FiBook size={35} />
+                    Add Book Reference
+                  </span>
+                </Button>
               </div>
-<br />
-            </Form>
-          </Row>
-        </Container>
-      )}
-    </>
+            </Form.Group>
+
+            {displayLinkInput && (
+              <Form.Group controlId="link">
+                <Form.Label>External Link</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="link"
+                  value={formik.values.link}
+                  onChange={handleLinkChange}
+                  isInvalid={!!formik.errors.link}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.link}
+                </Form.Control.Feedback>
+              </Form.Group>
+            )}
+
+            {displayBookInput && (
+              <Form.Group controlId="bookReference">
+                <Form.Label>Book Reference</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="bookReference"
+                  value={formik.values.bookReference}
+                  onChange={handleBookReferenceChange}
+                  isInvalid={!!formik.errors.bookReference}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.bookReference}
+                </Form.Control.Feedback>
+              </Form.Group>
+            )}
+
+            {image.preview && (
+              <div className="image-preview">
+                <img src={image.preview} alt="Preview" style={{ width: "100%", height: "auto" }} />
+                <Button variant="outline-danger" onClick={() => removeFile("image")}>
+                  <FiTrash2 size={24} /> Remove Image
+                </Button>
+              </div>
+            )}
+
+            {audioFile && (
+              <div className="audio-preview">
+                <AudioPlayer audioFile={audioFile} />
+                <Button variant="outline-danger" onClick={() => removeFile("audio")}>
+                  <FiTrash2 size={24} /> Remove Audio
+                </Button>
+              </div>
+            )}
+
+            {pdfPreview && (
+              <div className="pdf-preview">
+                <iframe src={pdfPreview} width="100%" height="500px" />
+                <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
+                  <FiTrash2 size={24} /> Remove PDF
+                </Button>
+              </div>
+            )}
+
+            {videoPreview && (
+              <div className="video-preview">
+                <video src={videoPreview} controls width="100%" />
+                <Button variant="outline-danger" onClick={() => removeFile("video")}>
+                  <FiTrash2 size={24} /> Remove Video
+                </Button>
+              </div>
+            )}
+
+            <Button type="submit" className="mt-3">Save Resource</Button>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
-
-
-
-
-
-
-
-
-
-
