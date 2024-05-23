@@ -11,7 +11,7 @@ import TableRow from "../table/TableRow";
 import { getToken } from "../../util/authUtils";
 import TableCell from "../table/TableCell";
 import TableBody from "../table/TableBody";
-import TableIconeResource from "../table/TableIconeResource";
+// import TableIconeResource from "../table/TableIconeResource";
 
 
 const header = [
@@ -80,8 +80,7 @@ const ResourceTable = ({ searchValue }) => {
               <TableCell dataLabel={header[2]} item={resource.type} />
               <TableCell dataLabel={header[3]} item={isValidDate(resource.dateOfCreation) ? format(parseISO(resource.dateOfCreation), "dd-MM-yyyy").toString() : "Invalid Date"} />
               <TableCell dataLabel={header[5]} item={resource.isPublic ? "Yes" : "No"} />
-              <TableIconeResource dataLabel={header[6]} id={resource.id}
-   />
+              {/* <TableIconeResource dataLabel={header[6]} id={resource.id}/> */}
               
               {/* Add actions or buttons here as needed */}
             </TableRow>

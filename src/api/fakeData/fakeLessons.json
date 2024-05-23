@@ -1,0 +1,39 @@
+{
+  "lessons": [
+    {
+      "id": 1,
+      "name": "Lesson 1",
+      "totalResource": 10,
+      "createdAt": "2023-01-01T00:00:00Z",
+      "idModule": 1
+    },
+    {
+      "id": 2,
+      "name": "Lesson 2",
+      "totalResource": 8,
+      "createdAt": "2023-02-01T00:00:00Z",
+      "idModule": 1
+    },
+    {
+      "id": 3,
+      "name": "Lesson 3",
+      "totalResource": 15,
+      "createdAt": "2023-03-01T00:00:00Z",
+      "idModule": 2
+    },
+    {
+      "id": 4,
+      "name": "Lesson 4",
+      "totalResource": 20,
+      "createdAt": "2023-04-01T00:00:00Z",
+      "idModule": 2
+    },
+    {
+      "id": 5,
+      "name": "Lesson 5",
+      "totalResource": 5,
+      "createdAt": "2023-05-01T00:00:00Z",
+      "idModule": 3
+    }
+  ]
+}

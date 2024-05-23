@@ -332,12 +332,14 @@ form.mt-5 .accordion .accordion-item .show {
 /* .accordion-collapse */
 
 
-
+/* Base styles for all buttons */
 .btn-tab-youtube,
+.btn-tab-link,
+.btn-tab-book,
 .btn-tab-googleDrive,
 .btn-tab-images,
 .btn-tab-audio,
-btn-tab-video,
+.btn-tab-video,
 .btn-tab-pdf {
     width: 90px !important;
     height: 90px !important;
@@ -345,7 +347,7 @@ btn-tab-video,
     color: rgb(73, 73, 73) !important;
 }
 
-
+/* Hover styles */
 .btn-tab-youtube:hover {
     background-color: #F70000 !important;
     color: white !important;
@@ -366,8 +368,38 @@ btn-tab-video,
     color: white !important;
 }
 
+.btn-tab-link:hover {
+    background-color: #4CAF50 !important;
+    /* Green */
+    color: white !important;
+}
+
+.btn-tab-book:hover {
+    background-color: #800080 !important;
+    /* Purple */
+    color: white !important;
+}
+
+.btn-tab-video:hover {
+    background-color: #008080 !important;
+    /* Teal Green */
+    color: white !important;
+}
+
+.btn-tab-pdf:hover {
+    background-color: #DC143C !important;
+    /* Crimson Red */
+    color: white !important;
+}
+
+/* Active styles */
 .active-youtube {
     background-color: #F70000 !important;
+    color: white !important;
+}
+
+.active-googleDrive {
+    background-color: #4285F4 !important;
     color: white !important;
 }
 
@@ -381,33 +413,21 @@ btn-tab-video,
     color: white !important;
 }
 
-.active-googleDrive {
-    background-color: #4285F4 !important;
+.active-link {
+    background-color: #4CAF50 !important;
+    /* Green */
     color: white !important;
 }
 
-.btn-tab-video,
-.btn-tab-pdf {
-    width: 90px !important;
-    height: 90px !important;
-    background-color: rgb(233, 233, 233) !important;
-    color: rgb(73, 73, 73) !important;
-}
-
-.btn-tab-video:hover {
-    background-color: #008080 !important;
-    /* Teal Green */
+.active-book {
+    background-color: #800080 !important;
+    /* Purple */
     color: white !important;
 }
 
 .active-video {
     background-color: #008080 !important;
     /* Teal Green */
-    color: white !important;
-}
-.btn-tab-pdf:hover {
-    background-color: #DC143C !important;
-    /* Crimson Red */
     color: white !important;
 }
 
@@ -417,22 +437,31 @@ btn-tab-video,
     color: white !important;
 }
 
-
-
-
-.btn-tab-youtube, .btn-tab-googleDrive, .btn-tab-images, .btn-tab-audio {
-  width: 100%; /* Full width on smaller screens */
-  padding: 10px; /* Adequate padding for touch targets */
+/* Responsive styles */
+.btn-tab-youtube,
+.btn-tab-link,
+.btn-tab-book,
+.btn-tab-googleDrive,
+.btn-tab-images,
+.btn-tab-audio {
+    width: 100%;
+    /* Full width on smaller screens */
+    padding: 10px;
+    /* Adequate padding for touch targets */
 }
 
-/* Media queries for larger screens */
 @media (min-width: 768px) {
-  .btn-tab-youtube, .btn-tab-googleDrive, .btn-tab-images, .btn-tab-audio {
-    width: auto; /* Auto width on larger screens */
-  }
+
+    .btn-tab-youtube,
+    .btn-tab-link,
+    .btn-tab-book,
+    .btn-tab-googleDrive,
+    .btn-tab-images,
+    .btn-tab-audio {
+        width: auto;
+        /* Auto width on larger screens */
+    }
 }
-
-
 
 
 /********************************************************************/
