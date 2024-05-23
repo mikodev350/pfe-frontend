@@ -11,6 +11,12 @@ import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import Loader from "../../components/loader/Loader";
 import { FiImage, FiTrash2, FiVolume2, FiYoutube, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
 
+
+const formatOptions = [
+  { value: 'cours', label: 'Cours' },
+  { value: 'devoir', label: 'Devoir' },
+  { value: 'ressource numérique', label: 'Ressource Numérique' }
+];
 const CheckboxOption = (props) => {
   return (
     <components.Option {...props}>
@@ -96,19 +102,31 @@ export default function AddResource() {
     fetchData();
   }, []);
 
+  // const handleParcoursChange = async (selectedParcours) => {
+  //   formik.setFieldValue("parcours", selectedParcours.map(p => p.value));
+  //   const modules = await getModulesByParcours(selectedParcours.map(p => p.value));
+  //   setModuleOptions(modules.map(m => ({ value: m.id, label: m.name })));
+  //   setLessonOptions([]);  // Reset lessons when parcours change
+  // };
+
+  // const handleModulesChange = async (selectedModules) => {
+  //   formik.setFieldValue("module", selectedModules.map(m => m.value));
+  //   const lessons = await getLessonsByModule(selectedModules.map(m => m.value));
+  //   setLessonOptions(lessons.map(l => ({ value: l.id, label: l.name })));
+  // };
+
   const handleParcoursChange = async (selectedParcours) => {
     formik.setFieldValue("parcours", selectedParcours.map(p => p.value));
     const modules = await getModulesByParcours(selectedParcours.map(p => p.value));
     setModuleOptions(modules.map(m => ({ value: m.id, label: m.name })));
-    setLessonOptions([]);  // Reset lessons when parcours change
-  };
+    setLessonOptions([]); // Réinitialise les leçons lorsque le parcours change
+};
 
-  const handleModulesChange = async (selectedModules) => {
+const handleModulesChange = async (selectedModules) => {
     formik.setFieldValue("module", selectedModules.map(m => m.value));
     const lessons = await getLessonsByModule(selectedModules.map(m => m.value));
     setLessonOptions(lessons.map(l => ({ value: l.id, label: l.name })));
-  };
-
+};
   const handleLessonsChange = (selectedLessons) => {
     formik.setFieldValue("lesson", selectedLessons.map(l => l.value));
   };
@@ -192,6 +210,10 @@ export default function AddResource() {
     }
   };
 
+
+    const handleFormatChange = (selectedOption) => {
+    formik.setFieldValue('format', selectedOption.value);
+  };
   return (
     <Container>
       <Row className="justify-content-md-center">
@@ -211,23 +233,19 @@ export default function AddResource() {
               </Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Group controlId="format">
+      <Form.Group controlId="format">
               <Form.Label>Format</Form.Label>
-              <Form.Control
-                as="select"
-                name="format"
-                value={formik.values.format}
-                onChange={formik.handleChange}
+              <Select
+                options={formatOptions}
+                value={formatOptions.find(option => option.value === formik.values.format)}
+                onChange={handleFormatChange}
+                classNamePrefix="select"
+                placeholder="Select format"
                 isInvalid={!!formik.errors.format}
-              >
-                <option value="">Select format</option>
-                <option value="cours">Cours</option>
-                <option value="devoir">Devoir</option>
-                <option value="ressource numérique">Ressource Numérique</option>
-              </Form.Control>
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.format}
-              </Form.Control.Feedback>
+              />
+              {formik.errors.format && (
+                <div className="text-danger">{formik.errors.format}</div>
+              )}
             </Form.Group>
 
             <Form.Group controlId="parcours">
@@ -286,19 +304,7 @@ export default function AddResource() {
               )}
             </Form.Group>
 
-            <Form.Group controlId="youtubeLink">
-              <Form.Label>YouTube Link</Form.Label>
-              <Form.Control
-                type="text"
-                name="youtubeLink"
-                value={formik.values.youtubeLink}
-                onChange={formik.handleChange}
-                isInvalid={!!formik.errors.youtubeLink}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.youtubeLink}
-              </Form.Control.Feedback>
-            </Form.Group>
+           
 
             <Form.Group>
               <Form.Label>Upload Options:</Form.Label>
@@ -306,7 +312,7 @@ export default function AddResource() {
                 <Button
                   onClick={() => handleClick("image")}
                   className={`btn-tab-images ${image.preview ? "active-images" : ""}`}
-                  disabled={!!(audioFile || formik.values.youtubeLink || pdfPreview || videoPreview || link || bookReference)}
+                  disabled={!!(audioFile || pdfPreview || videoPreview || link || bookReference)}
                 >
                   <span>
                     <FiImage size={35} />
@@ -324,7 +330,7 @@ export default function AddResource() {
                 <Button
                   onClick={() => handleClick("audio")}
                   className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
-                  disabled={!!(image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || link || bookReference)}
+                  disabled={!!(image.preview || pdfPreview || videoPreview || link || bookReference)}
                 >
                   <span>
                     <FiVolume2 size={35} />
@@ -342,7 +348,7 @@ export default function AddResource() {
                 <Button
                   onClick={() => handleClick("pdf")}
                   className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
-                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || videoPreview || link || bookReference)}
+                  disabled={!!(audioFile || image.preview  || videoPreview || link || bookReference)}
                 >
                   <span>
                     <FiFile size={35} />
@@ -360,7 +366,7 @@ export default function AddResource() {
                 <Button
                   onClick={() => handleClick("video")}
                   className={`btn-tab-video ${videoPreview ? "active-video" : ""}`}
-                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || link || bookReference)}
+                  disabled={!!(audioFile || image.preview || pdfPreview || link || bookReference)}
                 >
                   <span>
                     <FiVideo size={35} />
@@ -381,7 +387,7 @@ export default function AddResource() {
                     setDisplayBookInput(false);
                   }}
                   className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || bookReference)}
+                  disabled={!!(audioFile || image.preview || pdfPreview || videoPreview || bookReference)}
                 >
                   <span>
                     <FiLink size={35} />
@@ -395,7 +401,7 @@ export default function AddResource() {
                     setDisplayLinkInput(false);
                   }}
                   className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
-                  disabled={!!(audioFile || image.preview || formik.values.youtubeLink || pdfPreview || videoPreview || link)}
+                  disabled={!!(audioFile || image.preview || pdfPreview || videoPreview || link)}
                 >
                   <span>
                     <FiBook size={35} />
