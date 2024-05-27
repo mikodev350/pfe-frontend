@@ -14,6 +14,8 @@ import SideBarMobile from "../sideBar/sideBarMobile/SideBarMobile";
 // import ChatManager from "../messaging/ChatManager";
 import ChatApplication from "../messaging/ChatApplication";
 import ChatApp from "../messaging/ChatApp";
+import SearchFormDetail from "../searchForm/SearchFormDetail";
+import SocialMediaNavbar from "../header/SocialMediaNavbar";
 // import Messenger from "../messenger/Messenger"; // Assurez-vous que le chemin est correct
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
@@ -56,7 +58,8 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
+      <  SocialMediaNavbar/>
       <aside>
         <SideBarMobile />
       </aside>
