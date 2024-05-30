@@ -8,12 +8,12 @@ import TableCell from "../table/TableCell";
 import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import { parseISO, format } from "date-fns";
-import TableIconeParcours from "../table/TableIconeParcours"; // Make sure to create this component or adjust accordingly
-import { fetchParcours } from "../../api/apiParcours";
+import TableIconeParcours from "../table/TableIconeParcours"; // Assurez-vous de créer ce composant ou de l'ajuster en conséquence
+import { fetchParcours } from "../../api/ApiParcour";
 
 const header = ["#", "Nom", "Date", "Options"];
 
-export const ParcoursTable = ({ searchValue }) => {
+export const ParcoursTable = ({ searchValue, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
@@ -21,7 +21,7 @@ export const ParcoursTable = ({ searchValue }) => {
 
   const fetchParcoursMemoized = React.useCallback(
     async (page, search) => {
-      const response = await fetchParcours(page, search);
+      const response = await fetchParcours(page, search,token);
       return response;
     },
     []
@@ -67,7 +67,7 @@ export const ParcoursTable = ({ searchValue }) => {
                 dataLabel={header[0]}
                 className="border-table-right"
               />
-              <TableCell item={item.name} dataLabel={header[1]} />
+              <TableCell item={item.nom} dataLabel={header[1]} />
               <TableCell
                 item={
                   item.createdAt
@@ -78,10 +78,10 @@ export const ParcoursTable = ({ searchValue }) => {
               />
               <TableIconeParcours
                 parcoursId={item.id || ""}
-                parcoursName={item.name || ""}
+                parcoursName={item.nom || ""}
                 dataLabel={header[3]}
                 className="border-table-left"
-                // Add any other necessary props and functions here
+                // Ajoutez les autres props nécessaires ici
               />
             </TableRow>
           ))}

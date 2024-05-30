@@ -1,75 +1,68 @@
-import lessonsData from "./fakeData/fakeLessons.json";
+import axios from "axios";
+import { API_BASE_URL } from "../constants/constante"; // Make sure to define your API base URL in constants
 
-export const fetchLessons = async (currentPage, token, name, idModule) => {
+// Fetch lessons with pagination, search, and moduleId
+export const fetchLessons = async (page, token, search = "", moduleId) => {
   try {
-    const filteredData = lessonsData.lessons.filter(
-      (lesson) => lesson.name.includes(name) && lesson.idModule === idModule
-    );
-    const paginatedData = filteredData.slice(
-      (currentPage - 1) * 10,
-      currentPage * 10
-    );
+    const response = await axios.get(`${API_BASE_URL}/lessons`, {
+      params: {
+        _page: page,
+        _limit: 5,
+        _q: search,
+        moduleId: moduleId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return {
-      data: paginatedData,
-      totalPages: Math.ceil(filteredData.length / 10),
+      data: response.data.data,
+      totalPages: Math.ceil(response.data.meta.pagination.total / 5),
     };
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error fetching lessons:", error);
     throw error;
   }
 };
 
-// Function to simulate adding a lesson
-export const addLesson = async (lesson) => {
+// Add a new lesson
+export const addLesson = async (lesson, token) => {
   try {
-    // Load existing lessons from localStorage or use the initial fake data
-    const storedLessons = localStorage.getItem("lessons");
-    let lessons = storedLessons
-      ? JSON.parse(storedLessons)
-      : { lessons: lessonsData.lessons };
+    const response = await axios.post(
+      `${API_BASE_URL}/lessons`,
+      { data: lesson },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    // Generate a new ID for the lesson
-    const newId = lessons.lessons.length + 1;
-
-    // Create the new lesson object
-    const newLesson = {
-      id: newId,
-      ...lesson,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Add the new lesson to the lessons array
-    lessons.lessons.push(newLesson);
-
-    // Store the updated lessons array in localStorage
-    localStorage.setItem("lessons", JSON.stringify(lessons));
-
-    // Return the updated lessons
-    return lessons;
+    return response.data;
   } catch (error) {
     console.error("Error adding lesson:", error);
     throw error;
   }
 };
 
-export const updateLesson = async (lesson) => {
+// Update an existing lesson
+export const updateLesson = async (lessonId, lesson, token) => {
   try {
-    const storedLessons = localStorage.getItem("lessons");
-    let lessons = storedLessons ? JSON.parse(storedLessons) : { lessons: [] };
+    const response = await axios.put(
+      `${API_BASE_URL}/lessons/${lessonId}`,
+      { data: lesson },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    const lessonIndex = lessons.lessons.findIndex((l) => l.id === lesson.id);
-    if (lessonIndex !== -1) {
-      lessons.lessons[lessonIndex] = {
-        ...lessons.lessons[lessonIndex],
-        ...lesson,
-      };
-
-      localStorage.setItem("lessons", JSON.stringify(lessons));
-      return lessons.lessons[lessonIndex];
-    } else {
-      throw new Error("Lesson not found");
-    }
+    return response.data;
   } catch (error) {
     console.error("Error updating lesson:", error);
     throw error;

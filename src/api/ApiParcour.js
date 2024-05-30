@@ -1,14 +1,12 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants/constante";
-
-export const fetchModules = async (page, token, search, idParcours) => {
+export const fetchParcours = async (page, search, token) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/modules`, {
+    const response = await axios.get(`${API_BASE_URL}/parcours`, {
       params: {
         _page: page,
         _limit: 5,
         _q: search,
-        parcour: idParcours,
       },
       headers: {
         "Content-Type": "application/json",
@@ -21,16 +19,16 @@ export const fetchModules = async (page, token, search, idParcours) => {
       totalPages: Math.ceil(response.data.meta.pagination.total / 5),
     };
   } catch (error) {
-    console.error("Error fetching modules:", error);
+    console.error("Error fetching parcours:", error);
     throw error;
   }
 };
 
-export const updateModule = async (id, data, token) => {
+export const createPathway = async (pathwayData, token) => {
   try {
-    const response = await axios.put(
-      `${API_BASE_URL}/modules/${id}`,
-      { data },
+    const response = await axios.post(
+      `${API_BASE_URL}/parcours`,
+      { data: pathwayData },
       {
         headers: {
           "Content-Type": "application/json",
@@ -38,9 +36,11 @@ export const updateModule = async (id, data, token) => {
         },
       }
     );
+
+    console.log(response);
     return response.data;
   } catch (error) {
-    console.error("Error updating module:", error);
+    console.error("Error creating pathway:", error);
     throw error;
   }
 };

@@ -1,51 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 
-const ModelModule = ({ show, handleClose, onSave, initialData }) => {
-  const [moduleName, setModuleName] = useState("");
+const TableIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
+  const [show, setShow] = useState(false);
+  const [newName, setNewName] = useState(moduleName);
 
-  useEffect(() => {
-    if (initialData) {
-      setModuleName(initialData.name);
-    }
-  }, [initialData]);
-
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
   const handleSave = () => {
-    onSave({ ...initialData, name: moduleName });
-    setModuleName("");
+    handleUpdateModule(moduleId, newName);
     handleClose();
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          {initialData ? "Modifier le module" : "Ajouter un module"}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="moduleName">
-            <Form.Label>Nom du module</Form.Label>
+    <>
+      <Button variant="info" onClick={handleShow}>
+        Modifier
+      </Button>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modifier Module</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="formModuleName">
+            <Form.Label>Nom du Module</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Entrer le nom du module"
-              value={moduleName}
-              onChange={(e) => setModuleName(e.target.value)}
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
             />
           </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Fermer
-        </Button>
-        <Button variant="primary" onClick={handleSave}>
-          {initialData ? "Modifier" : "Ajouter"}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Annuler
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Enregistrer
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 
-export default ModelModule;
+export default TableIconeModule;

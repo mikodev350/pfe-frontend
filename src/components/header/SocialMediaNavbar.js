@@ -136,7 +136,6 @@ const messages = [
 const SearchFormDetail = ({ onFilterChange }) => {
   const [filters, setFilters] = useState({
     searchValue: "",
-    formatFilter: "",
     parcoursFilter: [],
     moduleFilter: [],
     lessonFilter: [],
@@ -225,24 +224,11 @@ const SearchFormDetail = ({ onFilterChange }) => {
               />
             </div>
             <div style={styles.filterGroup}>
-              <Form.Control
-                as="select"
-                value={filters.formatFilter}
-                onChange={(e) =>
-                  handleFilterChange("formatFilter", e.target.value)
-                }
-              >
-                <option value="">All Formats</option>
-                <option value="cours">Cours</option>
-                <option value="devoir">Devoir</option>
-                <option value="ressource numérique">Ressource Numérique</option>
-              </Form.Control>
-            </div>
-            <div style={styles.filterGroup}>
               <Select
                 isMulti
                 options={parcoursOptions}
                 name="parcours"
+                placeholder="Select parcours..."
                 onChange={handleParcoursChange}
                 classNamePrefix="select"
                 value={parcoursOptions.filter((option) =>
@@ -255,6 +241,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={moduleOptions}
                 name="module"
+                placeholder="Select modules..."
                 onChange={handleModulesChange}
                 classNamePrefix="select"
                 value={moduleOptions.filter((option) =>
@@ -267,6 +254,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={lessonOptions}
                 name="lesson"
+                placeholder="Select lessons..."
                 onChange={handleLessonsChange}
                 classNamePrefix="select"
                 value={lessonOptions.filter((option) =>
@@ -288,16 +276,13 @@ function SocialMediaNavbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
-  const filterDropdownRef = useRef(null);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useOnClickOutside(messageDropdownRef, () => setIsMessagesOpen(false));
   useOnClickOutside(notificationDropdownRef, () =>
     setIsNotificationsOpen(false)
   );
-  useOnClickOutside(filterDropdownRef, () => setIsFilterOpen(false));
 
   const handleFilterChange = (newFilters) => {
     console.log("Applied Filters: ", newFilters);

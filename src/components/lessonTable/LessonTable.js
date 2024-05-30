@@ -1,25 +1,27 @@
 import React, { useState } from "react";
-import { useQuery } from "react-query";
-import { fetchLessons } from "../../api/apiLesson";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { fetchLessons, updateLesson } from "../../api/apiLesson";
 import Loader from "../loader/Loader";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, Modal, Form } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
 import TableBody from "../table/TableBody";
 import TableCell from "../table/TableCell";
 import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import { parseISO, format } from "date-fns";
+import { BiEdit, BiTrash } from "react-icons/bi";
 
-const header = ["#", "Lesson", "ID Module", "Date", "Options"];
+const header = ["#", "Lesson", "Date", "Options"];
 
-const LessonTable = ({ searchValue, onEditLesson }) => {
+const LessonTable = ({ searchValue, token, moduleId }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery(
-    ["lessons", currentPage, searchValue],
-    () => fetchLessons(currentPage, "token", searchValue, 1), // Pass the correct module ID
+    ["lessons", currentPage, searchValue, moduleId],
+    () => fetchLessons(currentPage, token, searchValue, moduleId),
     {
       onSuccess: (response) => {
         setTotalPages(response.totalPages);
@@ -27,8 +29,38 @@ const LessonTable = ({ searchValue, onEditLesson }) => {
     }
   );
 
+  const updateLessonMutation = useMutation(
+    (updatedLesson) =>
+      updateLesson(updatedLesson.id, { nom: updatedLesson.nom }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("lessons");
+      },
+      onError: (error) => {
+        console.error("Error updating lesson:", error);
+      },
+    }
+  );
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState({});
+
+  const handleEdit = (lesson) => {
+    setCurrentLesson(lesson);
+    setShowEditModal(true);
+  };
+
+  const handleSave = async () => {
+    await updateLessonMutation.mutateAsync(currentLesson);
+    setShowEditModal(false);
+  };
+
+  const handleInputChange = (e) => {
+    setCurrentLesson({ ...currentLesson, nom: e.target.value });
   };
 
   if (isLoading) {
@@ -51,20 +83,18 @@ const LessonTable = ({ searchValue, onEditLesson }) => {
                 dataLabel={header[0]}
                 className="border-table-right"
               />
-              <TableCell item={item.name} dataLabel={header[1]} />
-              <TableCell item={item.idModule} dataLabel={header[2]} />
+              <TableCell item={item.nom} dataLabel={header[1]} />
               <TableCell
                 item={
                   item.createdAt
                     ? format(parseISO(item.createdAt), "dd-MM-yyyy")
                     : "N/A"
                 }
-                dataLabel={header[3]}
+                dataLabel={header[2]}
               />
-              <TableCell dataLabel={header[4]}>
-                <Button variant="warning" onClick={() => onEditLesson(item)}>
-                  Modifier
-                </Button>
+              <TableCell dataLabel={header[3]}>
+                <BiEdit size={24} onClick={() => handleEdit(item)} />
+                <BiTrash size={24} />
               </TableCell>
             </TableRow>
           ))}
@@ -77,6 +107,32 @@ const LessonTable = ({ searchValue, onEditLesson }) => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Lesson</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="lessonName">
+              <Form.Label>Lesson Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={currentLesson.nom || ""}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

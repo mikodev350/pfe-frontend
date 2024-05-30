@@ -3,10 +3,11 @@ import { Container, Col, Row, Button } from "react-bootstrap";
 import SearchForm from "../../components/searchForm/SearchForm";
 import { ParcoursTable } from "../../components/parcoursTable/ParcoursTable";
 import { Link } from "react-router-dom";
+import { getToken } from "../../util/authUtils";
 
 const Parcours = () => {
   const [searchValue, setSearchValue] = useState("");
-  const token = "your-token-here"; // Define your token here
+  const token = React.useMemo(() => getToken(), []);
 
   const handleSearch = async (value) => {
     setSearchValue(value);
@@ -20,7 +21,7 @@ const Parcours = () => {
             <Link to={`/student/new-parcour`}>
               <Button variant="primary" className="button-dashboard btn-color">
                 <span className="button-span-size btn-write-white">
-                  Add resource{" "}
+                  Add resource
                 </span>
               </Button>
             </Link>

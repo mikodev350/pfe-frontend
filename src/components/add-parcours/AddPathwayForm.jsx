@@ -3,32 +3,45 @@ import { Button, Form, Container, Row, Col, ListGroup } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import AddModuleModal from "../AddModuleForm/AddModuleModal";
+import { getToken } from "../../util/authUtils";
+import { createPathway } from "../../api/ApiParcour";
 
 // Validation schema for the form
 const validationSchema = Yup.object({
-  pathwayName: Yup.string().required("Nom du parcours est requis"),
-  pathwayType: Yup.string().required("Type du parcours est requis"),
-  institution: Yup.string(),
-  selfLearning: Yup.boolean(),
+  nom: Yup.string().required("Nom du parcours est requis"),
+  type: Yup.string().required("Type du parcours est requis"),
+  etablissement: Yup.string(),
+  autoApprentissage: Yup.boolean(),
 });
+
 
 const AddPathwayForm = ({ onSave }) => {
   const [showModuleModal, setShowModuleModal] = useState(false);
   const [modules, setModules] = useState([]);
   const [editingModuleIndex, setEditingModuleIndex] = useState(null);
 
+  // get the token 
+  const token = React.useMemo(() => getToken(), []);
+
   const formik = useFormik({
     initialValues: {
-      pathwayName: '',
-      pathwayType: 'académique',
-      institution: '',
-      selfLearning: false,
+      nom: '',
+      type: 'académique',
+      etablissement: '',
+      autoApprentissage: false,
     },
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const pathwayData = { ...values, modules };
       console.log("Enregistrer le parcours:", pathwayData); // Afficher les données dans la console
-      onSave(pathwayData);
+      
+      try {
+        const response = await createPathway(pathwayData,token);
+        console.log('Pathway created successfully:', response);
+        onSave(response);
+      } catch (error) {
+        console.error('Error creating pathway:', error);
+      }
     },
   });
 
@@ -44,6 +57,7 @@ const AddPathwayForm = ({ onSave }) => {
     setShowModuleModal(false);
   };
 
+  console.log(formik);
   const handleEditModule = (index) => {
     setEditingModuleIndex(index);
     setShowModuleModal(true);
@@ -64,76 +78,76 @@ const AddPathwayForm = ({ onSave }) => {
       <Row className="padding-row-top margin-left padding-form">
         <h3 className="text-center">Ajouter un parcours</h3>
         <Form className="mt-5" onSubmit={formik.handleSubmit}>
-          <Form.Group className="mt-4" controlId="pathwayName">
-            <Form.Label>Nom du {formik.values.pathwayType === 'continu' ? 'domaine' : 'parcours'}</Form.Label>
+          <Form.Group className="mt-4" controlId="nom">
+            <Form.Label>Nom du {formik.values.type === 'continue' ? 'domaine' : 'parcours'}</Form.Label>
             <Form.Control
               type="text"
-              name="pathwayName"
-              value={formik.values.pathwayName}
+              name="nom"
+              value={formik.values.nom}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               className={
-                formik.touched.pathwayName && formik.errors.pathwayName
+                formik.touched.nom && formik.errors.nom
                   ? "form-control is-invalid"
                   : "form-control"
               }
             />
-            {formik.touched.pathwayName && formik.errors.pathwayName && (
-              <div className="text-danger">{formik.errors.pathwayName}</div>
+            {formik.touched.nom && formik.errors.nom && (
+              <div className="text-danger">{formik.errors.nom}</div>
             )}
           </Form.Group>
 
-          <Form.Group className="mt-4" controlId="pathwayType">
+          <Form.Group className="mt-4" controlId="type">
             <Form.Label>Type de parcours</Form.Label>
             <Form.Control
               as="select"
-              name="pathwayType"
-              value={formik.values.pathwayType}
+              name="type"
+              value={formik.values.type}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             >
               <option value="académique">Académique</option>
-              <option value="continu">Continu</option>
+              <option value="continue">Continue</option>
             </Form.Control>
-            {formik.touched.pathwayType && formik.errors.pathwayType && (
-              <div className="text-danger">{formik.errors.pathwayType}</div>
+            {formik.touched.type && formik.errors.type && (
+              <div className="text-danger">{formik.errors.type}</div>
             )}
           </Form.Group>
 
-          <Form.Group className="mt-4" controlId="selfLearning">
+          <Form.Group className="mt-4" controlId="autoApprentissage">
             <Form.Check
               type="checkbox"
-              name="selfLearning"
+              name="autoApprentissage"
               label="Auto-apprentissage"
-              checked={formik.values.selfLearning}
+              checked={formik.values.autoApprentissage}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
           </Form.Group>
 
-          {(formik.values.pathwayType !== 'continu' && !formik.values.selfLearning) && (
-            <Form.Group className="mt-4" controlId="institution">
+          {(formik.values.type !== 'continue' && !formik.values.autoApprentissage) && (
+            <Form.Group className="mt-4" controlId="etablissement">
               <Form.Label>Établissement</Form.Label>
               <Form.Control
                 type="text"
-                name="institution"
-                value={formik.values.institution}
+                name="etablissement"
+                value={formik.values.etablissement}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className={
-                  formik.touched.institution && formik.errors.institution
+                  formik.touched.etablissement && formik.errors.etablissement
                     ? "form-control is-invalid"
                     : "form-control"
                 }
               />
-              {formik.touched.institution && formik.errors.institution && (
-                <div className="text-danger">{formik.errors.institution}</div>
+              {formik.touched.etablissement && formik.errors.etablissement && (
+                <div className="text-danger">{formik.errors.etablissement}</div>
               )}
             </Form.Group>
           )}
 
           <Button variant="secondary" onClick={handleAddModule} className="mt-4">
-            Ajouter une {formik.values.pathwayType === 'continu' ? 'formation' : 'module'}
+            Ajouter une {formik.values.type === 'continue' ? 'formation' : 'module'}
           </Button>
 
           <div className="mt-3">
@@ -141,7 +155,7 @@ const AddPathwayForm = ({ onSave }) => {
               <div key={index} className="mb-3 p-2 border rounded">
                 <Row className="align-items-center">
                   <Col md={4}>
-                    <strong>{module.moduleName}</strong> ({module.lessons.length} {formik.values.pathwayType === 'continu' ? 'cours' : 'leçons'})
+                    <strong>{module.nom}</strong> ({module.lessons.length} {formik.values.type === 'continu' ? 'cours' : 'leçons'})
                   </Col>
                   <Col md={4} className="text-right">
                     <Button variant="link" onClick={() => handleEditModule(index)} className="mr-2">Modifier</Button>
@@ -161,7 +175,7 @@ const AddPathwayForm = ({ onSave }) => {
           </div>
 
           <Button variant="primary" type="submit" className="mt-4">
-            Enregistrer le {formik.values.pathwayType === 'continu' ? 'domaine' : 'parcours'}
+            Enregistrer le {formik.values.type === 'continue' ? 'domaine' : 'parcours'}
           </Button>
         </Form>
       </Row>
@@ -171,7 +185,7 @@ const AddPathwayForm = ({ onSave }) => {
         handleClose={() => { setShowModuleModal(false); setEditingModuleIndex(null); }}
         onSave={handleSaveModule}
         initialData={editingModuleIndex !== null ? modules[editingModuleIndex] : null}
-        pathwayType={formik.values.pathwayType}  // Pass the pathwayType to the modal
+        type={formik.values.type}  // Pass the type to the modal
       />
     </Container>
   );

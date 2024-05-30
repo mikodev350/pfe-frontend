@@ -6,20 +6,14 @@ import { BiTrash } from "react-icons/bi";
 
 // Validation schema for the form
 const validationSchema = Yup.object({
-  moduleName: Yup.string().required("Nom du module est requis"),
+  nom: Yup.string().required("Nom du module est requis"),
   lessons: Yup.array().of(Yup.string().required("Nom de la leçon est requis")),
 });
 
-const AddModuleModal = ({
-  show,
-  handleClose,
-  onSave,
-  initialData,
-  pathwayType,
-}) => {
+const AddModuleModal = ({ show, handleClose, onSave, initialData, type }) => {
   const formik = useFormik({
     initialValues: initialData || {
-      moduleName: "",
+      nom: "",
       lessons: [""],
     },
     validationSchema,
@@ -58,29 +52,29 @@ const AddModuleModal = ({
       <Modal.Header closeButton>
         <Modal.Title>
           {initialData ? "Modifier" : "Ajouter"} une{" "}
-          {pathwayType === "continu" ? "formation" : "module"}
+          {type === "continue" ? "formation" : "module"}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={formik.handleSubmit}>
-          <Form.Group controlId="moduleName">
+          <Form.Group controlId="nom">
             <Form.Label>
-              Nom de la {pathwayType === "continu" ? "formation" : "module"}
+              Nom de la {type === "continue" ? "formation" : "module"}
             </Form.Label>
             <Form.Control
               type="text"
-              name="moduleName"
-              value={formik.values.moduleName}
+              name="nom"
+              value={formik.values.nom}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               className={
-                formik.touched.moduleName && formik.errors.moduleName
+                formik.touched.nom && formik.errors.nom
                   ? "form-control is-invalid"
                   : "form-control"
               }
             />
-            {formik.touched.moduleName && formik.errors.moduleName && (
-              <div className="text-danger">{formik.errors.moduleName}</div>
+            {formik.touched.nom && formik.errors.nom && (
+              <div className="text-danger">{formik.errors.nom}</div>
             )}
           </Form.Group>
 
@@ -89,7 +83,7 @@ const AddModuleModal = ({
               <Row className="align-items-center">
                 <Col sm={8}>
                   <Form.Label>
-                    Nom du {pathwayType === "continu" ? "cours" : "leçon"}
+                    Nom du {type === "continue" ? "cours" : "leçon"}
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -128,7 +122,7 @@ const AddModuleModal = ({
             onClick={handleAddLesson}
             className="mb-3"
           >
-            Ajouter un {pathwayType === "continu" ? "cours" : "leçon"}
+            Ajouter un {type === "continue" ? "cours" : "leçon"}
           </Button>
 
           <Modal.Footer>
@@ -144,8 +138,7 @@ const AddModuleModal = ({
               </Col>
               <Col xs={6} className="text-right">
                 <Button variant="primary" type="submit">
-                  Enregistrer la{" "}
-                  {pathwayType === "continu" ? "formation" : "module"}
+                  Enregistrer la {type === "continue" ? "formation" : "module"}
                 </Button>
               </Col>
             </Row>

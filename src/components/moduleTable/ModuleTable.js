@@ -13,13 +13,11 @@ import { parseISO, format } from "date-fns";
 
 const header = ["#", "Module", "Total de resources", "Date", "Options"];
 
-const ModuleTable = ({ searchValue, idParcours }) => {
+const ModuleTable = ({ searchValue, idParcours, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
   const queryClient = useQueryClient();
-
-  const token = "token";
 
   const fetchModulesMemoized = React.useCallback(
     async (page, search) => {
@@ -46,7 +44,7 @@ const ModuleTable = ({ searchValue, idParcours }) => {
   );
 
   const updateModuleMutation = useMutation(
-    (data) => updateModule(Number(data.id), { name: data.name }),
+    (data) => updateModule(data.id, { nom: data.name }, token),
     {
       onError: (error) => {
         console.error("Error updating module:", error);
@@ -95,7 +93,7 @@ const ModuleTable = ({ searchValue, idParcours }) => {
                 dataLabel={header[0]}
                 className="border-table-right"
               />
-              <TableCell item={item.name} dataLabel={header[1]} />
+              <TableCell item={item.nom} dataLabel={header[1]} />
               <TableCell item={item.totalResource ?? 0} dataLabel={header[2]} />
               <TableCell
                 item={
@@ -107,7 +105,7 @@ const ModuleTable = ({ searchValue, idParcours }) => {
               />
               <TableIconeModule
                 moduleId={item.id || ""}
-                moduleName={item.name || ""}
+                moduleName={item.nom || ""}
                 dataLabel={header[4]}
                 className="border-table-left"
                 handleUpdateModule={handleUpdateModule}

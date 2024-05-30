@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { BiDetail, BiEdit, BiTrash } from "react-icons/bi";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import ModelModule from "../modelModule/ModelModule"; // Adjust the import path as necessary
+import { Button, Modal, Form } from "react-bootstrap";
 
 const TableIconeModule = ({
   moduleId,
@@ -12,6 +12,7 @@ const TableIconeModule = ({
   handleUpdateModule,
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [newName, setNewName] = useState(moduleName);
 
   const handleEdit = () => {
     setShowEditModal(true);
@@ -21,8 +22,8 @@ const TableIconeModule = ({
     setShowEditModal(false);
   };
 
-  const handleSave = (moduleData) => {
-    handleUpdateModule(moduleData.id, moduleData.name);
+  const handleSave = () => {
+    handleUpdateModule(moduleId, newName);
     setShowEditModal(false);
   };
 
@@ -30,7 +31,7 @@ const TableIconeModule = ({
     <>
       <td data-label={dataLabel} style={{ alignItems: "center" }}>
         <OverlayTrigger
-          overlay={<Tooltip>Accès au lecon</Tooltip>}
+          overlay={<Tooltip>Accès au leçon</Tooltip>}
           placement="top"
           popperConfig={{
             modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
@@ -51,12 +52,30 @@ const TableIconeModule = ({
           <BiTrash size={24} />
         </span>
       </td>
-      <ModelModule
-        show={showEditModal}
-        handleClose={handleClose}
-        onSave={handleSave}
-        initialData={{ id: moduleId, name: moduleName }}
-      />
+
+      <Modal show={showEditModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modifier Module</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="formModuleName">
+            <Form.Label>Nom du Module</Form.Label>
+            <Form.Control
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Annuler
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Enregistrer
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

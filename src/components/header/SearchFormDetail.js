@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import Select from "react-select";
 import {
   getAllParcours,
@@ -7,10 +7,10 @@ import {
   getLessonsByModule,
   getResources,
 } from "../../api/apiData";
-import { FaSearchPlus } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import useOnClickOutside from "../header/useOnClickOutside";
 
-const styles = {
+let styles = {
   filterButton: {
     display: "flex",
     alignItems: "center",
@@ -38,15 +38,6 @@ const styles = {
   filterGroup: {
     marginBottom: "10px",
   },
-  filterLabel: {
-    display: "block",
-    marginBottom: "5px",
-  },
-  filterInput: {
-    width: "100%",
-    padding: "8px",
-    boxSizing: "border-box",
-  },
   customButton: {
     width: "100%",
     backgroundColor: "#007bff",
@@ -61,7 +52,6 @@ const styles = {
 
 const SearchFormDetail = ({ onFilterChange }) => {
   const [filters, setFilters] = useState({
-    searchValue: "",
     parcoursFilter: [],
     moduleFilter: [],
     lessonFilter: [],
@@ -144,7 +134,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
         style={styles.filterButton}
         onClick={() => setIsFilterOpen(!isFilterOpen)}
       >
-        <FaSearchPlus />
+        Recherche Avancée
       </div>
       {isFilterOpen && (
         <div style={styles.filterDropdown}>
@@ -154,6 +144,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={parcoursOptions}
                 name="parcours"
+                placeholder="Select parcours..."
                 onChange={handleParcoursChange}
                 classNamePrefix="select"
                 value={parcoursOptions.filter((option) =>
@@ -166,6 +157,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={moduleOptions}
                 name="module"
+                placeholder="Select modules..."
                 onChange={handleModulesChange}
                 classNamePrefix="select"
                 value={moduleOptions.filter((option) =>
@@ -178,6 +170,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={lessonOptions}
                 name="lesson"
+                placeholder="Select lessons..."
                 onChange={handleLessonsChange}
                 classNamePrefix="select"
                 value={lessonOptions.filter((option) =>
@@ -190,6 +183,7 @@ const SearchFormDetail = ({ onFilterChange }) => {
                 isMulti
                 options={resourceOptions}
                 name="resource"
+                placeholder="Select resources..."
                 onChange={handleResourcesChange}
                 classNamePrefix="select"
                 value={resourceOptions.filter((option) =>
