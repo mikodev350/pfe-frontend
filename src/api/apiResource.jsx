@@ -1,11 +1,47 @@
-// import axios from "axios";
+import axios from "axios";
 // import { getToken } from "../util/authUtils";
 // import { API_BASE_URL } from "../constants/constante";
 
 
 import data  from './fakeData/fakeResource.json';
 
+const BASE_URL = 'http://localhost:1337/api';
 
+export const saveResource = async (resourceData, token) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/resources`, resourceData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error saving resource:', error);
+    throw error;
+  }
+};
+
+
+export const fetchResources = async (currentPage, pageSize, sectionid, searchValue, token) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/resources`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page: currentPage,
+        pageSize: pageSize,
+        section: sectionid,
+        search: searchValue,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+    throw error;
+  }
+};
 
 
 // const token = getToken();
@@ -15,35 +51,35 @@ import data  from './fakeData/fakeResource.json';
 
 
 
-export const fetchResources = async (currentPage, pageSize, sectionid, searchValue, token) => {
-  try {
-    // Simulating network delay
-    await new Promise(resolve => setTimeout(resolve, 500)); 
-    console.log("sectionid")
+// export const fetchResources = async (currentPage, pageSize, sectionid, searchValue, token) => {
+//   try {
+//     // Simulating network delay
+//     await new Promise(resolve => setTimeout(resolve, 500)); 
+//     console.log("sectionid")
 
-    console.log(sectionid)
-    // Filtering data based on sectionid and searchValue
-    const filteredData = data.data.filter(resource => {
-      return (sectionid ? parseInt(resource.sectionId) === parseInt(sectionid) : true) &&
-             (searchValue ? resource.name.toLowerCase().includes(searchValue.toLowerCase()) : true);
-    });
+//     console.log(sectionid)
+//     // Filtering data based on sectionid and searchValue
+//     const filteredData = data.data.filter(resource => {
+//       return (sectionid ? parseInt(resource.sectionId) === parseInt(sectionid) : true) &&
+//              (searchValue ? resource.name.toLowerCase().includes(searchValue.toLowerCase()) : true);
+//     });
 
-    // Pagination logic
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
+//     // Pagination logic
+//     const startIndex = (currentPage - 1) * pageSize;
+//     const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
 
-    // Creating a response structure similar to an actual API
-    const response = {
-      data: paginatedData,
-      totalPages: Math.ceil(filteredData.length / pageSize)
-    };
+//     // Creating a response structure similar to an actual API
+//     const response = {
+//       data: paginatedData,
+//       totalPages: Math.ceil(filteredData.length / pageSize)
+//     };
 
-    return response;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;  // Rethrow the error for the caller to handle if necessary
-  }
-};
+//     return response;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;  // Rethrow the error for the caller to handle if necessary
+//   }
+// };
 // export const fetchResources = async (currentPage, pageSize, sectionid, seachValue, token) => {
 //   try {
 //     const response = await fetch(

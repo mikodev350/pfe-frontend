@@ -31,7 +31,7 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
 
   const updateLessonMutation = useMutation(
     (updatedLesson) =>
-      updateLesson(updatedLesson.id, { nom: updatedLesson.nom }),
+      updateLesson(updatedLesson.id, { nom: updatedLesson.nom }, token),
     {
       onSuccess: () => {
         queryClient.invalidateQueries("lessons");

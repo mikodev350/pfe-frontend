@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-const ModelLesson = ({ show, handleClose, onSaveLesson, initialData }) => {
+const ModelLesson = ({
+  show,
+  handleClose,
+  onSaveLesson,
+  initialData,
+  moduleId,
+}) => {
   const [lessonData, setLessonData] = useState({
     name: "",
-    idModule: "",
   });
 
   useEffect(() => {
@@ -22,7 +27,7 @@ const ModelLesson = ({ show, handleClose, onSaveLesson, initialData }) => {
   };
 
   const handleSave = () => {
-    onSaveLesson(lessonData);
+    onSaveLesson({ ...lessonData, module: moduleId });
   };
 
   return (
@@ -40,15 +45,6 @@ const ModelLesson = ({ show, handleClose, onSaveLesson, initialData }) => {
               type="text"
               name="name"
               value={lessonData.name}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group controlId="formModuleId">
-            <Form.Label>ID Module</Form.Label>
-            <Form.Control
-              type="text"
-              name="idModule"
-              value={lessonData.idModule}
               onChange={handleChange}
             />
           </Form.Group>

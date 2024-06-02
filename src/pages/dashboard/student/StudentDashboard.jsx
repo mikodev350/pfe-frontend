@@ -17,17 +17,20 @@ export default function StudentDashboard() {
     <Layout>
       <Routes>
         {/* <Route path="modules" element={<Section />} /> */}
-        <Route path="resource/:section" element={<Resource />} />
-          <Route path="modules" element={<Section />} />
+        <Route path="resource" element={<Resource />} />
+
+        <Route path="modules" element={<Section />} />
+
         <Route path="new-resource" element={<AddResource />} />
+
         <Route path="new-parcour" element={<AddPathwayForm />} />
-                <Route path="parcours" element={<Parcours />} />
-        {/* <Route path="modules" element={<Section />} /> */}
+
+        <Route path="parcours" element={<Parcours />} />
+
         <Route path="modules/:idParcours" element={<Module />} />
-                <Route path="lessons/:idModule" element={<Lesson />} />
 
+        <Route path="lessons/:idModule" element={<Lesson />} />
 
-        
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
       </Routes>
     </Layout>

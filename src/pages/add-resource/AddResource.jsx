@@ -1,34 +1,30 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import Select, { components } from "react-select";
 import { useFormik } from "formik";
 import { validationSchema } from "../../validator/addResourceValidator";
-import { saveResource } from "../../api/apiResource";
-import { getAllParcours, getModulesByParcours, getLessonsByModule } from "../../api/apiData";
+import { fetchDataAndStore, getParcoursFromLocalStorage, getModulesFromLocalStorage, getLessonsFromLocalStorage } from "../../api/apiDataSelect";
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import YouTubeVideo from "../../components/youtube/YouTubeVideo";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import Loader from "../../components/loader/Loader";
 import { FiImage, FiTrash2, FiVolume2, FiYoutube, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
-
+import { getToken } from "../../util/authUtils"; 
+import { uploadFile } from "../../api/apiUpload";
+import { saveResource } from "../../api/apiResource";
 
 const formatOptions = [
   { value: 'cours', label: 'Cours' },
   { value: 'devoir', label: 'Devoir' },
   { value: 'ressource numérique', label: 'Ressource Numérique' }
 ];
-const CheckboxOption = (props) => {
-  return (
-    <components.Option {...props}>
-      <input
-        type="checkbox"
-        checked={props.isSelected}
-        onChange={() => null}
-      />{" "}
-      <label>{props.label}</label>
-    </components.Option>
-  );
-};
+
+const CheckboxOption = (props) => (
+  <components.Option {...props}>
+    <input type="checkbox" checked={props.isSelected} onChange={() => null} />{" "}
+    <label>{props.label}</label>
+  </components.Option>
+);
 
 export default function AddResource() {
   const [parcoursOptions, setParcoursOptions] = useState([]);
@@ -52,6 +48,20 @@ export default function AddResource() {
   const hiddenFileInputPdf = useRef(null);
   const hiddenFileInputVideo = useRef(null);
 
+  const token = React.useMemo(() => getToken(), []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchDataAndStore(token);
+        setParcoursOptions(getParcoursFromLocalStorage().map(p => ({ value: p.id, label: p.name })));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, [token]);
+
   const formik = useFormik({
     initialValues: {
       resourceName: "",
@@ -71,72 +81,69 @@ export default function AddResource() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const newResource = {
-          id: Date.now(),  // Use timestamp as a unique identifier
-          ...values,
-        };
-        setResources([...resources, newResource]);
-        await saveResource(values);
-        formik.resetForm();
-        setImage({ preview: "", raw: null });
-        setAudioFile(null);
-        setPdfFile(null);
-        setPdfPreview("");
-        setVideoFile(null);
-        setVideoPreview("");
-        setLink("");
-        setBookReference("");
-        setDisplayLinkInput(false);
-        setDisplayBookInput(false);
+        if (image.raw) {
+          const uploadedImage = await uploadFile(image.raw, token);
+          values.image = uploadedImage[0]; // Mettre à jour la valeur de l'image avec l'objet renvoyé
+        }
+        if (audioFile) {
+          const uploadedAudio = await uploadFile(audioFile, token);
+          values.audio = uploadedAudio[0]; // Mettre à jour la valeur de l'audio avec l'objet renvoyé
+        }
+        if (pdfFile) {
+          const uploadedPdf = await uploadFile(pdfFile, token);
+          values.pdf = uploadedPdf[0]; // Mettre à jour la valeur du PDF avec l'objet renvoyé
+        }
+        if (videoFile) {
+          const uploadedVideo = await uploadFile(videoFile, token);
+          values.video = uploadedVideo[0]; // Mettre à jour la valeur de la vidéo avec l'objet renvoyé
+        }
+
+        const response = await saveResource(values, token);
+        if (response && response.data) {
+          console.log('Resource created successfully:', response);
+          setResources([...resources, response.data]);
+          formik.resetForm();
+          setImage({ preview: "", raw: null });
+          setAudioFile(null);
+          setPdfFile(null);
+          setPdfPreview("");
+          setVideoFile(null);
+          setVideoPreview("");
+          setLink("");
+          setBookReference("");
+          setDisplayLinkInput(false);
+          setDisplayBookInput(false);
+        } else {
+          throw new Error("Failed to save resource");
+        }
       } catch (error) {
         console.error("Error saving resource:", error);
       }
     },
   });
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const parcours = await getAllParcours();
-      setParcoursOptions(parcours.map(p => ({ value: p.id, label: p.name })));
-    };
-    fetchData();
-  }, []);
-
-  // const handleParcoursChange = async (selectedParcours) => {
-  //   formik.setFieldValue("parcours", selectedParcours.map(p => p.value));
-  //   const modules = await getModulesByParcours(selectedParcours.map(p => p.value));
-  //   setModuleOptions(modules.map(m => ({ value: m.id, label: m.name })));
-  //   setLessonOptions([]);  // Reset lessons when parcours change
-  // };
-
-  // const handleModulesChange = async (selectedModules) => {
-  //   formik.setFieldValue("module", selectedModules.map(m => m.value));
-  //   const lessons = await getLessonsByModule(selectedModules.map(m => m.value));
-  //   setLessonOptions(lessons.map(l => ({ value: l.id, label: l.name })));
-  // };
-
-  const handleParcoursChange = async (selectedParcours) => {
+  const handleParcoursChange = (selectedParcours) => {
     formik.setFieldValue("parcours", selectedParcours.map(p => p.value));
-    const modules = await getModulesByParcours(selectedParcours.map(p => p.value));
-    setModuleOptions(modules.map(m => ({ value: m.id, label: m.name })));
-    setLessonOptions([]); // Réinitialise les leçons lorsque le parcours change
-};
+    const selectedParcoursIds = selectedParcours.map(p => p.value);
+    const filteredModules = getModulesFromLocalStorage().filter(m => selectedParcoursIds.includes(m.idparcour));
+    setModuleOptions(filteredModules.map(m => ({ value: m.id, label: m.name })));
+    setLessonOptions([]); 
+  };
 
-const handleModulesChange = async (selectedModules) => {
+  const handleModulesChange = (selectedModules) => {
     formik.setFieldValue("module", selectedModules.map(m => m.value));
-    const lessons = await getLessonsByModule(selectedModules.map(m => m.value));
-    setLessonOptions(lessons.map(l => ({ value: l.id, label: l.name })));
-};
+    const selectedModulesIds = selectedModules.map(m => m.value);
+    const filteredLessons = getLessonsFromLocalStorage().filter(l => selectedModulesIds.includes(l.idmodule));
+    setLessonOptions(filteredLessons.map(l => ({ value: l.id, label: l.name })));
+  };
+
   const handleLessonsChange = (selectedLessons) => {
     formik.setFieldValue("lesson", selectedLessons.map(l => l.value));
   };
 
-  const handleDescriptionChange = React.useCallback(
-    (content) => {
-      formik.setFieldValue("WriteText", content);
-    },
-    [formik]
-  );
+  const handleDescriptionChange = (content) => {
+    formik.setFieldValue("WriteText", content);
+  };
 
   const handleFileChange = (event, type) => {
     const file = event.target.files[0];
@@ -210,17 +217,17 @@ const handleModulesChange = async (selectedModules) => {
     }
   };
 
-
-    const handleFormatChange = (selectedOption) => {
+  const handleFormatChange = (selectedOption) => {
     formik.setFieldValue('format', selectedOption.value);
   };
+
   return (
     <Container>
       <Row className="justify-content-md-center">
         <Col md={8}>
           <Form onSubmit={formik.handleSubmit}>
             <Form.Group controlId="resourceName">
-              <Form.Label>Resource Name</Form.Label>
+              <Form.Label>Nom de la ressource</Form.Label>
               <Form.Control
                 type="text"
                 name="resourceName"
@@ -233,7 +240,7 @@ const handleModulesChange = async (selectedModules) => {
               </Form.Control.Feedback>
             </Form.Group>
 
-      <Form.Group controlId="format">
+            <Form.Group controlId="format">
               <Form.Label>Format</Form.Label>
               <Select
                 options={formatOptions}
@@ -279,7 +286,7 @@ const handleModulesChange = async (selectedModules) => {
             </Form.Group>
 
             <Form.Group controlId="lessons">
-              <Form.Label>Lessons</Form.Label>
+              <Form.Label>Leçons</Form.Label>
               <Select
                 isMulti
                 options={lessonOptions}
@@ -304,10 +311,8 @@ const handleModulesChange = async (selectedModules) => {
               )}
             </Form.Group>
 
-           
-
             <Form.Group>
-              <Form.Label>Upload Options:</Form.Label>
+              <Form.Label>Options de téléchargement :</Form.Label>
               <div className="d-flex justify-content-center">
                 <Button
                   onClick={() => handleClick("image")}
@@ -316,7 +321,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiImage size={35} />
-                    Upload Image
+                    Télécharger une image
                   </span>
                 </Button>
                 <input
@@ -334,7 +339,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiVolume2 size={35} />
-                    Upload Audio
+                    Télécharger un audio
                   </span>
                 </Button>
                 <input
@@ -352,7 +357,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiFile size={35} />
-                    Upload PDF
+                    Télécharger un PDF
                   </span>
                 </Button>
                 <input
@@ -370,7 +375,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiVideo size={35} />
-                    Upload Video
+                    Télécharger une vidéo
                   </span>
                 </Button>
                 <input
@@ -391,7 +396,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiLink size={35} />
-                    Add Link
+                    Ajouter un lien
                   </span>
                 </Button>
 
@@ -405,7 +410,7 @@ const handleModulesChange = async (selectedModules) => {
                 >
                   <span>
                     <FiBook size={35} />
-                    Add Book Reference
+                    Ajouter une référence de livre
                   </span>
                 </Button>
               </div>
@@ -413,7 +418,7 @@ const handleModulesChange = async (selectedModules) => {
 
             {displayLinkInput && (
               <Form.Group controlId="link">
-                <Form.Label>External Link</Form.Label>
+                <Form.Label>Lien externe</Form.Label>
                 <Form.Control
                   type="text"
                   name="link"
@@ -429,7 +434,7 @@ const handleModulesChange = async (selectedModules) => {
 
             {displayBookInput && (
               <Form.Group controlId="bookReference">
-                <Form.Label>Book Reference</Form.Label>
+                <Form.Label>Référence du livre</Form.Label>
                 <Form.Control
                   type="text"
                   name="bookReference"
@@ -445,9 +450,9 @@ const handleModulesChange = async (selectedModules) => {
 
             {image.preview && (
               <div className="image-preview">
-                <img src={image.preview} alt="Preview" style={{ width: "100%", height: "auto" }} />
+                <img src={image.preview} alt="Aperçu" style={{ width: "100%", height: "auto" }} />
                 <Button variant="outline-danger" onClick={() => removeFile("image")}>
-                  <FiTrash2 size={24} /> Remove Image
+                  <FiTrash2 size={24} /> Supprimer l'image
                 </Button>
               </div>
             )}
@@ -456,7 +461,7 @@ const handleModulesChange = async (selectedModules) => {
               <div className="audio-preview">
                 <AudioPlayer audioFile={audioFile} />
                 <Button variant="outline-danger" onClick={() => removeFile("audio")}>
-                  <FiTrash2 size={24} /> Remove Audio
+                  <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
               </div>
             )}
@@ -465,7 +470,7 @@ const handleModulesChange = async (selectedModules) => {
               <div className="pdf-preview">
                 <iframe src={pdfPreview} width="100%" height="500px" />
                 <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
-                  <FiTrash2 size={24} /> Remove PDF
+                  <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>
               </div>
             )}
@@ -474,12 +479,12 @@ const handleModulesChange = async (selectedModules) => {
               <div className="video-preview">
                 <video src={videoPreview} controls width="100%" />
                 <Button variant="outline-danger" onClick={() => removeFile("video")}>
-                  <FiTrash2 size={24} /> Remove Video
+                  <FiTrash2 size={24} /> Supprimer la vidéo
                 </Button>
               </div>
             )}
 
-            <Button type="submit" className="mt-3">Save Resource</Button>
+            <Button type="submit" className="mt-3">Enregistrer la ressource</Button>
           </Form>
         </Col>
       </Row>

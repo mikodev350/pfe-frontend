@@ -27,27 +27,27 @@ export const fetchLessons = async (page, token, search = "", moduleId) => {
   }
 };
 
-// Add a new lesson
-export const addLesson = async (lesson, token) => {
+export const createLesson = async (lessonData, moduleId, token) => {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/lessons`,
-      { data: lesson },
+      {
+        ...lessonData,
+        module: moduleId, // Include moduleId in the lesson data
+      },
       {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       }
     );
-
     return response.data;
   } catch (error) {
-    console.error("Error adding lesson:", error);
+    console.error("Error creating lesson:", error);
     throw error;
   }
 };
-
 // Update an existing lesson
 export const updateLesson = async (lessonId, lesson, token) => {
   try {
