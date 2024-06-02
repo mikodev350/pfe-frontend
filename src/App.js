@@ -9,7 +9,6 @@ import StudentDashboard from "./pages/dashboard/student/StudentDashboard";
 import "./components/table/Tables.css";
 import Profile from "./pages/Profile/Profile";
 import ChatApp from "./pages/chat/chatApp";
-
 // import PrivateRoute from "./path/to/PrivateRoute"; // Assuming PrivateRoute is a custom component, provide the correct path
 // import DashboardStudent from "./path/to/DashboardStudent"; // Provide the correct path to DashboardStudent
 

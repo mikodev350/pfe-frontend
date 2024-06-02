@@ -1,14 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import { loginAPI } from "../../api/authApi";
 import "./login.css";
 import Layout from "../../components/layout/Layout";
-// import { loginAPI } from "../../api/authApi";
-// import { getToken } from "../../util/authUtils";
-// import { ToastContainer } from "react-toastify";
 
 const LoginSchema = Yup.object().shape({
   identifier: Yup.string().email("Invalid email").required("Email Required"),
@@ -41,24 +40,28 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsSubmitting(true);
-    // try {
-    //   const response = await loginAPI(values);
-    //   if (response) {
-    //     // witchPage();
-    //     // const token = getToken();
-    //     // console.log("test token" + token);
-    //   }
-    // } catch (error) {
-    //   console.log("An error occurred:", error);
-    // }
+    try {
+      const response = await loginAPI(values);
+      if (response) {
+        witchPage();
+      }
+    } catch (error) {
+      toast.error("An error occurred: " + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
     setIsSubmitting(false);
   };
 
   return (
     <Layout fullcontent={true} backgroundColorIdentification={false}>
+      <ToastContainer />
       <Row className="justify-content-center">
-        {/* <ToastContainer /> */}
-
         <Col xs={12} md={4} id="login-box">
           <Formik
             initialValues={values}
