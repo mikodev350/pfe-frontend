@@ -44,3 +44,12 @@ export const updateModule = async (id, data, token) => {
     throw error;
   }
 };
+
+export const createModule = async (moduleData, token) => {
+  const response = await axios.post(`${API_BASE_URL}/modules`, moduleData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

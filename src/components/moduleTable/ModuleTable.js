@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import { fetchModules, updateModule } from "../../api/apiModule";
 import Loader from "../loader/Loader";
 import { Table } from "react-bootstrap";
@@ -28,7 +28,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   );
 
   const { data, isLoading, isError, error } = useQuery(
-    ["modules", currentPage, pageSize, searchValue, idParcours],
+    ["modules", searchValue, idParcours],
     async () => {
       if (searchValue) {
         return fetchModulesMemoized(currentPage, searchValue);
@@ -50,13 +50,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
         console.error("Error updating module:", error);
       },
       onSettled: () => {
-        queryClient.invalidateQueries([
-          "modules",
-          currentPage,
-          pageSize,
-          searchValue,
-          idParcours,
-        ]);
+        queryClient.invalidateQueries(["modules", searchValue, idParcours]);
       },
     }
   );

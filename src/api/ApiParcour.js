@@ -44,3 +44,28 @@ export const createPathway = async (pathwayData, token) => {
     throw error;
   }
 };
+
+// ******************************************************************
+// update parcorus
+export const updatePathway = async (id, pathwayData, token) => {
+  console.log(pathwayData);
+  const response = await axios.put(
+    `${API_BASE_URL}/parcours/${id}`,
+    { pathwayData: pathwayData },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getPathwayById = async (id, token) => {
+  const response = await axios.get(`${API_BASE_URL}/parcours/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

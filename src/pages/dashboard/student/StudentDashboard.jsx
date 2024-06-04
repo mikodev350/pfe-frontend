@@ -9,6 +9,9 @@ import AddPathwayForm from "../../../components/add-parcours/AddPathwayForm";
 import Parcours from "../../parcours/Parcours";
 import Module from "../../module/Module";
 import Lesson from "../../lesson/Lesson";
+import UpdatePathwayForm from "../../../components/update-parcours/updatePathwayForm";
+import UpdateResource from "../../update-resource/updateResource";
+import CreateProfile from "../../create-profile/createProfile";
 
 
 
@@ -22,8 +25,11 @@ export default function StudentDashboard() {
         <Route path="modules" element={<Section />} />
 
         <Route path="new-resource" element={<AddResource />} />
+        <Route path="update-resource/:id" element={<UpdateResource />} />
 
         <Route path="new-parcour" element={<AddPathwayForm />} />
+
+        <Route path="update-parcour/:pathwayId" element={<UpdatePathwayForm />} />
 
         <Route path="parcours" element={<Parcours />} />
 
@@ -31,7 +37,11 @@ export default function StudentDashboard() {
 
         <Route path="lessons/:idModule" element={<Lesson />} />
 
+
+
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
+                <Route path="create-profile" element={<CreateProfile />} />
+
       </Routes>
     </Layout>
   );

@@ -26,7 +26,7 @@ export default function TableIconeParcours({ parcoursId, dataLabel }) {
         </Link>
       </OverlayTrigger>
 
-      <Link to={`/pathways/edit/${parcoursId}`}>
+      <Link to={`/student/update-parcour/${parcoursId}`}>
         <span className="icon-option">
           <BiEdit size={24} />
         </span>

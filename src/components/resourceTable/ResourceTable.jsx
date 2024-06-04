@@ -9,6 +9,7 @@ import TableRow from "../table/TableRow";
 import TableCell from "../table/TableCell";
 import TableBody from "../table/TableBody";
 import { getToken } from "../../util/authUtils";
+import { useNavigate } from "react-router-dom";
 
 const header = ["#", "Name", "Type", "Date of Creation", "Action"];
 
@@ -21,7 +22,7 @@ const ResourceTable = ({ searchValue }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const token = React.useMemo(() => getToken(), []);
-
+  const navigate = useNavigate();
   const { data, isLoading, isError, error } = useQuery(
     ["resources", currentPage, pageSize, searchValue],
     () => fetchResources(currentPage, pageSize, "", searchValue, token)
@@ -78,11 +79,16 @@ const ResourceTable = ({ searchValue }) => {
                     : "Invalid Date"
                 }
               />
-              <TableCell
+                <TableCell
                 dataLabel={header[4]}
                 item={
                   <>
-                    <Button variant="primary">Edit</Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => navigate(`/student/update-resource/${resource.id}`)}
+                    >
+                      Edit
+                    </Button>
                     <Button variant="danger" className="ml-2">
                       Delete
                     </Button>

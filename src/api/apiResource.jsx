@@ -44,6 +44,29 @@ export const fetchResources = async (currentPage, pageSize, sectionid, searchVal
 };
 
 
+
+export const getResourceById = async (id, token) => {
+  const response = await axios.get(`${BASE_URL}/resources/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const updateResource = async (id, data, token) => {
+  const response = await axios.put(`${BASE_URL}/resources/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+/*******************************************************************/
+
+
+
 // const token = getToken();
 // const head = {
 //   Authorization: `Bearer ${token}`,

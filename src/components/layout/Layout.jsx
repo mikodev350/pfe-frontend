@@ -72,16 +72,13 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               <Col md={2} className="rc-side-bar">
                 <SidebarDesktop />
               </Col>
-              <Col md={7}>{children}</Col>
+              <Col md={9}>{children}</Col>
               {/* <Col md={2}>
                 <Messenger />
               </Col> */}
               {/* <Col md={3} style={{ backgroundColor: "#f8f9fa" }}>
                 <MessagingArea />
               </Col> */}
-              <div className="col-md-3">
-                {/* <ChatApplication /> Integrated ChatManager           */}
-                <ChatApp/>    </div>
             </Row>
           )}
         </Container>

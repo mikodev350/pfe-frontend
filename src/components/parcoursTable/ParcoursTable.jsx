@@ -17,7 +17,6 @@ export const ParcoursTable = ({ searchValue, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
-  const queryClient = useQueryClient();
 
   const fetchParcoursMemoized = React.useCallback(
     async (page, search) => {
