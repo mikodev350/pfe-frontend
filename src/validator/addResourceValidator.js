@@ -13,7 +13,7 @@ export const validationSchema = Yup.object().shape({
   parcours: Yup.array().of(Yup.number()).required("Parcours is required"),
   module: Yup.array().of(Yup.number()).required("Module is required"),
   lesson: Yup.array().of(Yup.number()).required("Lesson is required"),
-  WriteText: Yup.string()
+  note: Yup.string()
     .test(
       "textLength",
       "Text must be longer than 2 characters after conversion",
@@ -48,7 +48,7 @@ export const validationSchema = Yup.object().shape({
 // };
 
 // export const validationSchema = Yup.object().shape({
-//   WriteText: Yup.string()
+//   note: Yup.string()
 //     .test(
 //       "textLength",
 //       "Text must be longer than 2 characters after conversion",
@@ -83,7 +83,7 @@ export const validationSchema = Yup.object().shape({
 // });
 
 // // export const validationSchemaUpdateQuestion = Yup.object().shape({
-// //   WriteText: Yup.string()
+// //   note: Yup.string()
 // //     .test("textBeforeExam", "Validation failure message", (value) => {
 // //       return value && value.length > 2;
 // //     })

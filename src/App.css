@@ -418,3 +418,62 @@ div .btn-outline-light:hover{
 .message-input .form-control {
   flex-grow: 1;
 }
+
+/****************************************/
+.image-preview-container {
+  display: flex;
+  overflow-x: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  max-height: 150px;
+  background-color: #f8f9fa;
+  /* Background color for better visibility */
+}
+
+.image-preview {
+  position: relative;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.thumbnail-image {
+  width: 100px;
+  /* Taille des miniatures */
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.image-preview button {
+  position: absolute!important;
+  top: -10px!important;
+  right: -20px!important;
+  background: rgba(255, 0, 0, 0.8)!important;
+  border: none!important;
+  border-radius: 50% !important;
+  color: white !important;
+  width: 40px!important;
+  height: 40px!important;
+  display: flex!important;
+  align-items: center!important;
+  justify-content: center!important;
+  font-size: 16px!important;
+  /* Taille de la police pour le "X" */
+  font-weight: bold!important;
+  /* Gras pour le "X" */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.image-preview button:hover {
+  background: rgba(255, 0, 0, 1);
+    color: white !important;
+}
+
+
+.image-preview button svg {
+  width: 20px !important;
+  height: 20px !important;
+  color: white !important;
+}

@@ -3,12 +3,7 @@ import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import Select, { components } from "react-select";
 import { useFormik } from "formik";
 import { validationSchema } from "../../validator/addResourceValidator";
-import {
-  fetchDataAndStore,
-  getParcoursFromLocalStorage,
-  getModulesFromLocalStorage,
-  getLessonsFromLocalStorage,
-} from "../../api/apiDataSelect";
+import { fetchDataAndStore, getParcoursFromLocalStorage, getModulesFromLocalStorage, getLessonsFromLocalStorage } from "../../api/apiDataSelect";
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
@@ -36,7 +31,7 @@ export default function UpdateResource() {
   const [moduleOptions, setModuleOptions] = useState([]);
   const [lessonOptions, setLessonOptions] = useState([]);
 
-  const [image, setImage] = useState({ preview: "", raw: null });
+  const [images, setImages] = useState([]); // Multiple images
   const [audioFile, setAudioFile] = useState({ preview: "", raw: null });
   const [pdfFile, setPdfFile] = useState({ preview: "", raw: null });
   const [videoFile, setVideoFile] = useState({ preview: "", raw: null });
@@ -56,7 +51,8 @@ export default function UpdateResource() {
     const fetchData = async () => {
       try {
         await fetchDataAndStore(token);
-        setParcoursOptions(getParcoursFromLocalStorage().map((p) => ({ value: p.id, label: p.name })));
+        const parcours = getParcoursFromLocalStorage();
+        setParcoursOptions(parcours.map((p) => ({ value: p.id, label: p.name })));
 
         const resource = await getResourceById(id, token);
         formik.setValues({
@@ -65,9 +61,9 @@ export default function UpdateResource() {
           parcours: resource.parcours.map((p) => p.id),
           module: resource.modules.map((m) => m.id),
           lesson: resource.lessons.map((l) => l.id),
-          WriteText: resource.note,
+          note: resource.note,
           youtubeLink: resource.youtubeLink,
-          image: resource.image ? resource.image.url : "",
+          images: resource.images ? resource.images.map(image => ({ preview: image.url, raw: null })) : [],
           audio: resource.audio ? resource.audio.url : "",
           pdf: resource.pdf ? resource.pdf.url : "",
           video: resource.video ? resource.video.url : "",
@@ -75,12 +71,23 @@ export default function UpdateResource() {
           bookReference: resource.bookReference || "",
         });
 
-        if (resource.image) setImage({ preview: resource.image.url, raw: null });
+        // Set states with the fetched data
+        if (resource.images) setImages(resource.images.map(image => ({ preview: image.url, raw: null })));
         if (resource.audio) setAudioFile({ preview: resource.audio.url, raw: null });
         if (resource.pdf) setPdfFile({ preview: resource.pdf.url, raw: null });
         if (resource.video) setVideoFile({ preview: resource.video.url, raw: null });
         if (resource.link) setLink(resource.link);
         if (resource.bookReference) setBookReference(resource.bookReference);
+
+        // Filter and set module options based on selected parcours
+        const selectedParcoursIds = resource.parcours.map((p) => p.id);
+        const filteredModules = getModulesFromLocalStorage().filter((m) => selectedParcoursIds.includes(m.idparcour));
+        setModuleOptions(filteredModules.map((m) => ({ value: m.id, label: m.name })));
+
+        // Filter and set lesson options based on selected modules
+        const selectedModulesIds = resource.modules.map((m) => m.id);
+        const filteredLessons = getLessonsFromLocalStorage().filter((l) => selectedModulesIds.includes(l.idmodule));
+        setLessonOptions(filteredLessons.map((l) => ({ value: l.id, label: l.name })));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -95,9 +102,9 @@ export default function UpdateResource() {
       parcours: [],
       module: [],
       lesson: [],
-      WriteText: "",
+      note: "",
       youtubeLink: "",
-      image: "",
+      images: [],
       audio: "",
       pdf: "",
       video: "",
@@ -107,27 +114,27 @@ export default function UpdateResource() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        if (image.raw) {
-          const uploadedImage = await uploadFile(image.raw, token);
-          values.image = uploadedImage[0].url;
-        } else {
-          values.image = image.preview;
-        }
+        // Upload new images
+        const newImages = await Promise.all(images.filter(image => image.raw).map(image => uploadFile(image.raw, token)));
+        values.images = [...values.images, ...newImages.map(uploadedImage => uploadedImage[0])];
+
         if (audioFile.raw) {
           const uploadedAudio = await uploadFile(audioFile.raw, token);
-          values.audio = uploadedAudio[0].url;
+          values.audio = uploadedAudio[0];
         } else {
           values.audio = audioFile.preview;
         }
+
         if (pdfFile.raw) {
           const uploadedPdf = await uploadFile(pdfFile.raw, token);
-          values.pdf = uploadedPdf[0].url;
+          values.pdf = uploadedPdf[0];
         } else {
           values.pdf = pdfFile.preview;
         }
+
         if (videoFile.raw) {
           const uploadedVideo = await uploadFile(videoFile.raw, token);
-          values.video = uploadedVideo[0].url;
+          values.video = uploadedVideo[0];
         } else {
           values.video = videoFile.preview;
         }
@@ -136,7 +143,7 @@ export default function UpdateResource() {
         if (response && response.data) {
           console.log("Resource updated successfully:", response);
           formik.resetForm();
-          setImage({ preview: "", raw: null });
+          setImages([]);
           setAudioFile({ preview: "", raw: null });
           setPdfFile({ preview: "", raw: null });
           setVideoFile({ preview: "", raw: null });
@@ -173,27 +180,34 @@ export default function UpdateResource() {
   };
 
   const handleDescriptionChange = (content) => {
-    formik.setFieldValue("WriteText", content);
+    formik.setFieldValue("note", content);
   };
 
   const handleFileChange = (event, type) => {
-    const file = event.target.files[0];
+    const files = Array.from(event.target.files);
     setDisplayLinkInput(false);
     setDisplayBookInput(false);
-    if (file) {
-      const url = URL.createObjectURL(file);
+    if (files.length > 0) {
       if (type === "image") {
-        setImage({ preview: url, raw: file });
-        formik.setFieldValue("image", file);
-      } else if (type === "audio") {
-        setAudioFile({ preview: url, raw: file });
-        formik.setFieldValue("audio", file);
-      } else if (type === "pdf") {
-        setPdfFile({ preview: url, raw: file });
-        formik.setFieldValue("pdf", file);
-      } else if (type === "video") {
-        setVideoFile({ preview: url, raw: file });
-        formik.setFieldValue("video", file);
+        const newImages = files.map(file => ({
+          preview: URL.createObjectURL(file),
+          raw: file
+        }));
+        setImages([...images, ...newImages]);
+        formik.setFieldValue("images", [...images, ...newImages].map(image => image.raw));
+      } else {
+        const file = files[0];
+        const url = URL.createObjectURL(file);
+        if (type === "audio") {
+          setAudioFile({ preview: url, raw: file });
+          formik.setFieldValue("audio", file);
+        } else if (type === "pdf") {
+          setPdfFile({ preview: url, raw: file });
+          formik.setFieldValue("pdf", file);
+        } else if (type === "video") {
+          setVideoFile({ preview: url, raw: file });
+          formik.setFieldValue("video", file);
+        }
       }
     }
   };
@@ -210,10 +224,12 @@ export default function UpdateResource() {
     }
   };
 
-  const removeFile = (type) => {
+  const removeFile = (type, index) => {
     if (type === "image") {
-      setImage({ preview: "", raw: null });
-      formik.setFieldValue("image", "");
+      const newImages = [...images];
+      newImages.splice(index, 1);
+      setImages(newImages);
+      formik.setFieldValue("images", newImages.map(image => image.raw));
     } else if (type === "audio") {
       setAudioFile({ preview: "", raw: null });
       formik.setFieldValue("audio", "");
@@ -332,9 +348,9 @@ export default function UpdateResource() {
 
             <Form.Group controlId="note">
               <Form.Label>Note</Form.Label>
-              <RichTextEditor initialValue={formik.values.WriteText} getValue={handleDescriptionChange} />
-              {formik.errors.WriteText && (
-                <div className="text-danger">{formik.errors.WriteText}</div>
+              <RichTextEditor initialValue={formik.values.note} getValue={handleDescriptionChange} isUpdate={true} />
+              {formik.errors.note && (
+                <div className="text-danger">{formik.errors.note}</div>
               )}
             </Form.Group>
 
@@ -343,12 +359,12 @@ export default function UpdateResource() {
               <div className="d-flex justify-content-center">
                 <Button
                   onClick={() => handleClick("image")}
-                  className={`btn-tab-images ${image.preview ? "active-images" : ""}`}
+                  className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
                   disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
                 >
                   <span>
                     <FiImage size={35} />
-                    Télécharger une image
+                    Télécharger des images
                   </span>
                 </Button>
                 <input
@@ -356,13 +372,14 @@ export default function UpdateResource() {
                   accept="image/png, image/jpeg"
                   ref={hiddenFileInputImage}
                   onChange={(event) => handleFileChange(event, "image")}
+                  multiple
                   style={{ display: "none" }}
                 />
 
                 <Button
                   onClick={() => handleClick("audio")}
                   className={`btn-tab-audio ${audioFile.preview ? "active-audio" : ""}`}
-                  disabled={!!(image.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
+                  disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || bookReference)}
                 >
                   <span>
                     <FiVolume2 size={35} />
@@ -380,7 +397,7 @@ export default function UpdateResource() {
                 <Button
                   onClick={() => handleClick("pdf")}
                   className={`btn-tab-googleDrive ${pdfFile.preview ? "active-googleDrive" : ""}`}
-                  disabled={!!(audioFile.preview || image.preview || videoFile.preview || link || bookReference)}
+                  disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || bookReference)}
                 >
                   <span>
                     <FiFile size={35} />
@@ -398,7 +415,7 @@ export default function UpdateResource() {
                 <Button
                   onClick={() => handleClick("video")}
                   className={`btn-tab-video ${videoFile.preview ? "active-video" : ""}`}
-                  disabled={!!(audioFile.preview || image.preview || pdfFile.preview || link || bookReference)}
+                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || bookReference)}
                 >
                   <span>
                     <FiVideo size={35} />
@@ -419,7 +436,7 @@ export default function UpdateResource() {
                     setDisplayBookInput(false);
                   }}
                   className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-                  disabled={!!(audioFile.preview || image.preview || pdfFile.preview || videoFile.preview || bookReference)}
+                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || bookReference)}
                 >
                   <span>
                     <FiLink size={35} />
@@ -433,7 +450,7 @@ export default function UpdateResource() {
                     setDisplayLinkInput(false);
                   }}
                   className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
-                  disabled={!!(audioFile.preview || image.preview || pdfFile.preview || videoFile.preview || link)}
+                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || link)}
                 >
                   <span>
                     <FiBook size={35} />
@@ -471,18 +488,20 @@ export default function UpdateResource() {
               </Form.Group>
             )}
 
-            {image.preview && (
-              <div className="image-preview">
-                <img src={image.preview} alt="Aperçu" style={{ width: "100%", height: "auto" }} />
-                <Button variant="outline-danger" onClick={() => removeFile("image")}>
-                  <FiTrash2 size={24} /> Supprimer l'image
-                </Button>
-              </div>
-            )}
+            <div className="image-preview-container">
+              {images.length > 0 && images.map((image, index) => (
+                <div className="image-preview" key={index}>
+                  <img src={image.preview.startsWith('blob') ? image.preview : `http://localhost:1337${image.preview}`} alt={`Preview ${index}`} className="thumbnail-image" />
+                  <Button variant="outline-danger" onClick={() => removeFile("image", index)}>
+                    <FiTrash2 size={24} /> Supprimer
+                  </Button>
+                </div>
+              ))}
+            </div>
 
             {audioFile.preview && (
               <div className="audio-preview">
-                <AudioPlayer audioFile={audioFile.preview} />
+                <AudioPlayer audioFile={audioFile.preview.startsWith('blob') ? audioFile.preview : `http://localhost:1337${audioFile.preview}`} />
                 <Button variant="outline-danger" onClick={() => removeFile("audio")}>
                   <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
@@ -491,7 +510,7 @@ export default function UpdateResource() {
 
             {pdfFile.preview && (
               <div className="pdf-preview">
-                <iframe title="PDF Preview" src={`http://localhost:1337${pdfFile.preview}`} width="100%" height="500px" />
+                <iframe title="PDF Preview" src={pdfFile.preview.startsWith('blob') ? pdfFile.preview : `http://localhost:1337${pdfFile.preview}`} width="100%" height="500px" />
                 <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
                   <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>
@@ -500,7 +519,7 @@ export default function UpdateResource() {
 
             {videoFile.preview && (
               <div className="video-preview">
-                <video src={`http://localhost:1337${videoFile.preview}`} controls width="100%" />
+                <video src={videoFile.preview.startsWith('blob') ? videoFile.preview : `http://localhost:1337${videoFile.preview}`} controls width="100%" />
                 <Button variant="outline-danger" onClick={() => removeFile("video")}>
                   <FiTrash2 size={24} /> Supprimer la vidéo
                 </Button>

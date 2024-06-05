@@ -5,10 +5,8 @@ import { useFormik } from "formik";
 import { validationSchema } from "../../validator/addResourceValidator";
 import { fetchDataAndStore, getParcoursFromLocalStorage, getModulesFromLocalStorage, getLessonsFromLocalStorage } from "../../api/apiDataSelect";
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
-import YouTubeVideo from "../../components/youtube/YouTubeVideo";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
-import Loader from "../../components/loader/Loader";
-import { FiImage, FiTrash2, FiVolume2, FiYoutube, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
+import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
 import { getToken } from "../../util/authUtils"; 
 import { uploadFile } from "../../api/apiUpload";
 import { saveResource } from "../../api/apiResource";
@@ -32,14 +30,14 @@ export default function AddResource() {
   const [lessonOptions, setLessonOptions] = useState([]);
 
   const [resources, setResources] = useState([]);
-  const [image, setImage] = useState({ preview: "", raw: null });
+  const [images, setImages] = useState([]); // Multiple images
   const [audioFile, setAudioFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfPreview, setPdfPreview] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState("");
   const [link, setLink] = useState("");
-  const [bookReference, setBookReference] = useState("");
+  const [referenceLivre, setreferenceLivre] = useState("");
   const [displayLinkInput, setDisplayLinkInput] = useState(false);
   const [displayBookInput, setDisplayBookInput] = useState(false);
 
@@ -69,33 +67,42 @@ export default function AddResource() {
       parcours: [],
       module: [],
       lesson: [],
-      WriteText: "",
+      note: "",
       youtubeLink: "",
-      image: "",
+      images: [], // Change to multiple images
       audio: "",
       pdf: "",
       video: "",
       link: "",
-      bookReference: "",
+      referenceLivre: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        if (image.raw) {
+        // Upload images
+        const uploadedImages = [];
+        for (let image of images) {
           const uploadedImage = await uploadFile(image.raw, token);
-          values.image = uploadedImage[0]; // Mettre à jour la valeur de l'image avec l'objet renvoyé
+          uploadedImages.push(uploadedImage[0]);
         }
+        values.images = uploadedImages;
+
+        // Upload audio
         if (audioFile) {
-          const uploadedAudio = await uploadFile(audioFile, token);
-          values.audio = uploadedAudio[0]; // Mettre à jour la valeur de l'audio avec l'objet renvoyé
+          const uploadedAudio = await uploadFile(audioFile.raw, token);
+          values.audio = uploadedAudio[0];
         }
+
+        // Upload PDF
         if (pdfFile) {
-          const uploadedPdf = await uploadFile(pdfFile, token);
-          values.pdf = uploadedPdf[0]; // Mettre à jour la valeur du PDF avec l'objet renvoyé
+          const uploadedPdf = await uploadFile(pdfFile.raw, token);
+          values.pdf = uploadedPdf[0];
         }
+
+        // Upload video
         if (videoFile) {
-          const uploadedVideo = await uploadFile(videoFile, token);
-          values.video = uploadedVideo[0]; // Mettre à jour la valeur de la vidéo avec l'objet renvoyé
+          const uploadedVideo = await uploadFile(videoFile.raw, token);
+          values.video = uploadedVideo[0];
         }
 
         const response = await saveResource(values, token);
@@ -103,14 +110,14 @@ export default function AddResource() {
           console.log('Resource created successfully:', response);
           setResources([...resources, response.data]);
           formik.resetForm();
-          setImage({ preview: "", raw: null });
+          setImages([]); // Reset images
           setAudioFile(null);
           setPdfFile(null);
           setPdfPreview("");
           setVideoFile(null);
           setVideoPreview("");
           setLink("");
-          setBookReference("");
+          setreferenceLivre("");
           setDisplayLinkInput(false);
           setDisplayBookInput(false);
         } else {
@@ -142,29 +149,36 @@ export default function AddResource() {
   };
 
   const handleDescriptionChange = (content) => {
-    formik.setFieldValue("WriteText", content);
+    formik.setFieldValue("note", content);
   };
 
   const handleFileChange = (event, type) => {
-    const file = event.target.files[0];
+    const files = Array.from(event.target.files);
     setDisplayLinkInput(false);
     setDisplayBookInput(false);
-    if (file) {
-      const url = URL.createObjectURL(file);
+    if (files.length > 0) {
       if (type === "image") {
-        setImage({ preview: url, raw: file });
-        formik.setFieldValue("image", file);
-      } else if (type === "audio") {
-        setAudioFile(file);
-        formik.setFieldValue("audio", file);
-      } else if (type === "pdf") {
-        setPdfFile(file);
-        setPdfPreview(url);
-        formik.setFieldValue("pdf", file);
-      } else if (type === "video") {
-        setVideoFile(file);
-        setVideoPreview(url);
-        formik.setFieldValue("video", file);
+        const newImages = files.map(file => ({
+          preview: URL.createObjectURL(file),
+          raw: file
+        }));
+        setImages([...images, ...newImages]); // Append new images
+        formik.setFieldValue("images", [...images, ...newImages].map(image => image.raw)); // Update formik values with raw images
+      } else {
+        const file = files[0];
+        const url = URL.createObjectURL(file);
+        if (type === "audio") {
+          setAudioFile({ preview: url, raw: file });
+          formik.setFieldValue("audio", file);
+        } else if (type === "pdf") {
+          setPdfFile({ preview: url, raw: file });
+          setPdfPreview(url);
+          formik.setFieldValue("pdf", file);
+        } else if (type === "video") {
+          setVideoFile({ preview: url, raw: file });
+          setVideoPreview(url);
+          formik.setFieldValue("video", file);
+        }
       }
     }
   };
@@ -181,10 +195,12 @@ export default function AddResource() {
     }
   };
 
-  const removeFile = (type) => {
+  const removeFile = (type, index) => {
     if (type === "image") {
-      setImage({ preview: "", raw: null });
-      formik.setFieldValue("image", "");
+      const newImages = [...images];
+      newImages.splice(index, 1);
+      setImages(newImages);
+      formik.setFieldValue("images", newImages.map(image => image.raw));
     } else if (type === "audio") {
       setAudioFile(null);
       formik.setFieldValue("audio", "");
@@ -208,10 +224,10 @@ export default function AddResource() {
     }
   };
 
-  const handleBookReferenceChange = (event) => {
+  const handlereferenceLivreChange = (event) => {
     const value = event.target.value;
-    setBookReference(value);
-    formik.setFieldValue("bookReference", value);
+    setreferenceLivre(value);
+    formik.setFieldValue("referenceLivre", value);
     if (value) {
       setDisplayLinkInput(false);
     }
@@ -302,12 +318,9 @@ export default function AddResource() {
 
             <Form.Group controlId="note">
               <Form.Label>Note</Form.Label>
-              <RichTextEditor
-                initialValue={formik.values.WriteText}
-                getValue={handleDescriptionChange}
-              />
-              {formik.errors.WriteText && (
-                <div className="text-danger">{formik.errors.WriteText}</div>
+              <RichTextEditor initialValue={formik.values.note} getValue={handleDescriptionChange} />
+              {formik.errors.note && (
+                <div className="text-danger">{formik.errors.note}</div>
               )}
             </Form.Group>
 
@@ -316,12 +329,12 @@ export default function AddResource() {
               <div className="d-flex justify-content-center">
                 <Button
                   onClick={() => handleClick("image")}
-                  className={`btn-tab-images ${image.preview ? "active-images" : ""}`}
-                  disabled={!!(audioFile || pdfPreview || videoPreview || link || bookReference)}
+                  className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
+                  disabled={!!(audioFile || pdfPreview || videoPreview || link || referenceLivre)}
                 >
                   <span>
                     <FiImage size={35} />
-                    Télécharger une image
+                    Télécharger des images
                   </span>
                 </Button>
                 <input
@@ -329,13 +342,14 @@ export default function AddResource() {
                   accept="image/png, image/jpeg"
                   ref={hiddenFileInputImage}
                   onChange={(event) => handleFileChange(event, "image")}
+                  multiple
                   style={{ display: "none" }}
                 />
 
                 <Button
                   onClick={() => handleClick("audio")}
                   className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
-                  disabled={!!(image.preview || pdfPreview || videoPreview || link || bookReference)}
+                  disabled={!!(images.length > 0 || pdfPreview || videoPreview || link || referenceLivre)}
                 >
                   <span>
                     <FiVolume2 size={35} />
@@ -353,7 +367,7 @@ export default function AddResource() {
                 <Button
                   onClick={() => handleClick("pdf")}
                   className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
-                  disabled={!!(audioFile || image.preview  || videoPreview || link || bookReference)}
+                  disabled={!!(audioFile || images.length > 0 || videoPreview || link || referenceLivre)}
                 >
                   <span>
                     <FiFile size={35} />
@@ -370,8 +384,8 @@ export default function AddResource() {
 
                 <Button
                   onClick={() => handleClick("video")}
-                  className={`btn-tab-video ${videoPreview ? "active-video" : ""}`}
-                  disabled={!!(audioFile || image.preview || pdfPreview || link || bookReference)}
+                  className={`btn-tab-video ${videoFile ? "active-video" : ""}`}
+                  disabled={!!(audioFile || images.length > 0 || pdfPreview || link || referenceLivre)}
                 >
                   <span>
                     <FiVideo size={35} />
@@ -392,7 +406,7 @@ export default function AddResource() {
                     setDisplayBookInput(false);
                   }}
                   className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-                  disabled={!!(audioFile || image.preview || pdfPreview || videoPreview || bookReference)}
+                  disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || referenceLivre)}
                 >
                   <span>
                     <FiLink size={35} />
@@ -406,7 +420,7 @@ export default function AddResource() {
                     setDisplayLinkInput(false);
                   }}
                   className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
-                  disabled={!!(audioFile || image.preview || pdfPreview || videoPreview || link)}
+                  disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || link)}
                 >
                   <span>
                     <FiBook size={35} />
@@ -433,33 +447,35 @@ export default function AddResource() {
             )}
 
             {displayBookInput && (
-              <Form.Group controlId="bookReference">
+              <Form.Group controlId="referenceLivre">
                 <Form.Label>Référence du livre</Form.Label>
                 <Form.Control
                   type="text"
-                  name="bookReference"
-                  value={formik.values.bookReference}
-                  onChange={handleBookReferenceChange}
-                  isInvalid={!!formik.errors.bookReference}
+                  name="referenceLivre"
+                  value={formik.values.referenceLivre}
+                  onChange={handlereferenceLivreChange}
+                  isInvalid={!!formik.errors.referenceLivre}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {formik.errors.bookReference}
+                  {formik.errors.referenceLivre}
                 </Form.Control.Feedback>
               </Form.Group>
             )}
 
-            {image.preview && (
-              <div className="image-preview">
-                <img src={image.preview} alt="Aperçu" style={{ width: "100%", height: "auto" }} />
-                <Button variant="outline-danger" onClick={() => removeFile("image")}>
-                  <FiTrash2 size={24} /> Supprimer l'image
-                </Button>
-              </div>
-            )}
+            <div className="image-preview-container">
+              {images.length > 0 && images.map((image, index) => (
+                <div className="image-preview" key={index}>
+                  <img src={image.preview} alt={`Preview ${index}`} className="thumbnail-image" />
+                  <Button variant="outline-danger" onClick={() => removeFile("image", index)}>
+                    <FiTrash2 size={24} /> Supprimer
+                  </Button>
+                </div>
+              ))}
+            </div>
 
             {audioFile && (
               <div className="audio-preview">
-                <AudioPlayer audioFile={audioFile} />
+                <AudioPlayer audioFile={audioFile.preview} />
                 <Button variant="outline-danger" onClick={() => removeFile("audio")}>
                   <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
@@ -491,3 +507,4 @@ export default function AddResource() {
     </Container>
   );
 }
+
