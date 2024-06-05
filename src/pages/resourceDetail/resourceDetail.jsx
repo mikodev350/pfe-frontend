@@ -1,120 +1,143 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Col, Button, Container, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Card, Col, Row, Button, Modal, Carousel } from "react-bootstrap";
+import Zoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 
-// Sample data simulating different resource types
-const resources = [
-  {
-    id: 1,
-    type: 'text',
-    content: '<p>This is <strong>HTML</strong> text content.</p>',
-  },
-  {
-    id: 2,
-    type: 'image',
-    url: 'https://via.placeholder.com/150',
-    altText: 'Placeholder Image',
-  },
-  {
-    id: 3,
-    type: 'pdf',
-    url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-  },
-  {
-    id: 4,
-    type: 'audio',
-    url: 'https://www.w3schools.com/html/horse.ogg',
-  },
-  {
-    id: 5,
-    type: 'video',
-    url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-  }
-];
+const ResourceDetails = ({ resource }) => {
+  const [show, setShow] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-function ResourceDetail() {
-  const { resouceId } = useParams(); // Corrected typo here
-  const [resource, setResource] = useState(null);
-
-  useEffect(() => {
-    // Convert resouceId to a number and find the resource
-    const id = parseInt(resouceId, 10); // Ensure integer parsing with radix 10
-    console.log(id);
-    const foundResource = resources.find(res => res.id === id);
-    setResource(foundResource);
-  }, [resouceId]);
-
-  // Function to determine and render content based on resource type
-  const renderContent = () => {
-    if (!resource) return <p>No resource found for ID: {resouceId}</p>; // Correct variable name used here
-
-    switch (resource.type) {
-      case 'text':
-        return <div dangerouslySetInnerHTML={{ __html: resource.content }} />;
-      case 'image':
-        return <img src={resource.url} alt={resource.altText || 'Resource Image'} />;
-      case 'pdf':
-        return <iframe src={resource.url} style={{ width: '100%', height: '500px' }} title="PDF Content" />;
-      case 'audio':
-        return <audio controls src={resource.url} />;
-      case 'video':
-        return <video controls src={resource.url} style={{ width: '100%' }} />;
-      default:
-        return <p>Unsupported resource type.</p>;
-    }
+  const handleShow = (index) => {
+    setCurrentImageIndex(index);
+    setShow(true);
   };
 
-  const largeHTMLContent = `
-  <h1>Welcome to Our Learning Platform</h1>
-  <p>This platform is designed to help you <strong>learn and grow</strong> in your career. Here's what you can find in our resources:</p>
-  <ul>
-    <li>Interactive courses</li>
-    <li>Detailed articles</li>
-    <li>Hands-on projects</li>
-  </ul>
-  <p>Here are some tips to get the most out of your learning experience:</p>
-  <ol>
-    <li>Set clear goals for what you want to achieve.</li>
-    <li>Take notes as you go through the materials.</li>
-    <li>Practice regularly to reinforce new knowledge and skills.</li>
-  </ol>
-  <h2>Course Materials</h2>
-  <p>We provide a variety of courses across different subjects. Below is a table of some top courses you might be interested in:</p>
-  <table border="1">
-    <tr>
-      <th>Course Name</th>
-      <th>Subject</th>
-      <th>Duration</th>
-    </tr>
-    <tr>
-      <td>Introduction to Programming</td>
-      <td>Computer Science</td>
-      <td>4 weeks</td>
-    </tr>
-    <tr>
-      <td>Advanced Photography</td>
-      <td>Arts</td>
-      <td>6 weeks</td>
-    </tr>
-    <tr>
-      <td>Business Management Essentials</td>
-      <td>Business</td>
-      <td>8 weeks</td>
-    </tr>
-  </table>
-  <p>For more information, please <a href='#'>contact us</a> or visit our FAQ section.</p>
-  <footer>
-    <p>Thank you for choosing our platform to enhance your skills. We wish you the best of luck on your learning journey!</p>
-  </footer>
-`;
-  return (
-     <Container className="baground-exam ">
-          <Row className="padding-row-top margin-left padding-form ">
-            <div dangerouslySetInnerHTML={{ __html: largeHTMLContent }} />
-      {renderContent()}
-      </Row>
-      </Container>
-  );
-}
+  const handleClose = () => setShow(false);
 
-export default ResourceDetail;
+  return (
+    <Card className="mt-4">
+      <Card.Header>
+        <h2>{resource.nom}</h2>
+      </Card.Header>
+      <Card.Body>
+        <Row>
+          <Col md={6}>
+            <p><strong>Format:</strong> {resource.format}</p>
+            <p><strong>Note:</strong></p>
+            <div dangerouslySetInnerHTML={{ __html: resource.note }} />
+          </Col>
+          {resource.video && (
+            <Col md={6}>
+              <h3>Vidéo</h3>
+              <video controls width="100%">
+                <source src={`http://localhost:1337${resource.video.url}`} type={resource.video.mime} />
+                Your browser does not support the video tag.
+              </video>
+            </Col>
+          )}
+        </Row>
+        <Row className="mt-4">
+          <Col md={6}>
+            <h3>Parcours</h3>
+            {resource.parcours.map((parcours) => (
+              <Card key={parcours.id} className="mb-2">
+                <Card.Body>
+                  <p>Nom du parcours: {parcours.nom}</p>
+                  {/* Affichez d'autres propriétés du parcours ici */}
+                </Card.Body>
+              </Card>
+            ))}
+          </Col>
+          <Col md={6}>
+            <h3>Modules</h3>
+            {resource.modules.map((module) => (
+              <Card key={module.id} className="mb-2">
+                <Card.Body>
+                  <p>Nom du module: {module.nom}</p>
+                  {/* Affichez d'autres propriétés du module ici */}
+                </Card.Body>
+              </Card>
+            ))}
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col md={6}>
+            <h3>Leçons</h3>
+            {resource.lessons.map((lesson) => (
+              <Card key={lesson.id} className="mb-2">
+                <Card.Body>
+                  <p>Nom de la leçon: {lesson.nom}</p>
+                  {/* Affichez d'autres propriétés de la leçon ici */}
+                </Card.Body>
+              </Card>
+            ))}
+          </Col>
+          <Col md={6}>
+            {resource.audio && (
+              <div>
+                <h3>Audio</h3>
+                <audio controls src={`http://localhost:1337${resource.audio.url}`} className="w-100">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
+            {resource.pdf && (
+              <div className="mt-4">
+                <h3>PDF</h3>
+                <iframe title="PDF Viewer" src={`http://localhost:1337${resource.pdf.url}`} width="100%" height="500px"></iframe>
+              </div>
+            )}
+            {resource.images && resource.images.length > 0 && (
+              <div className="mt-4">
+                <h3>Images</h3>
+                <Row>
+                  {resource.images.map((image, index) => (
+                    <Col md={4} key={index}>
+                      <Zoom>
+                        <img 
+                          src={`http://localhost:1337${image.url}`} 
+                          alt={`Image ${index + 1}`} 
+                          className="img-fluid" 
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </Zoom>
+                      <Button variant="link" onClick={() => handleShow(index)}>
+                        Voir en plein écran
+                      </Button>
+                    </Col>
+                  ))}
+                </Row>
+                <Modal show={show} onHide={handleClose} size="lg" centered>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Images</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <Carousel activeIndex={currentImageIndex} onSelect={(selectedIndex) => setCurrentImageIndex(selectedIndex)}>
+                      {resource.images.map((image, index) => (
+                        <Carousel.Item key={index}>
+                          <img
+                            className="d-block w-100"
+                            src={`http://localhost:1337${image.url}`}
+                            alt={`Image ${index + 1}`}
+                          />
+                        </Carousel.Item>
+                      ))}
+                    </Carousel>
+                  </Modal.Body>
+                </Modal>
+              </div>
+            )}
+            {resource.link && (
+              <div className="mt-4">
+                <h3>Lien</h3>
+                <a href={resource.link} target="_blank" rel="noopener noreferrer">{resource.link}</a>
+              </div>
+            )}
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
+  );
+};
+
+export default ResourceDetails;
