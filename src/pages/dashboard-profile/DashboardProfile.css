@@ -1,0 +1,54 @@
+/* DashboardProfile.css */
+
+.custom-btn {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.custom-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.table-title {
+    margin-bottom: 20px;
+}
+
+.table-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.delete-account-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.delete-account-btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+@media (max-width: 768px) {
+    .custom-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .delete-account-btn {
+        width: 100%;
+    }
+}

@@ -13,6 +13,9 @@ import UpdatePathwayForm from "../../../components/update-parcours/updatePathway
 import UpdateResource from "../../update-resource/updateResource";
 import CreateProfile from "../../create-profile/createProfile";
 import ResourcePreviewPage from "../../resourcePreviewPage/ResourcePreviewPage";
+import AddEducation from "../../add-education/AddEducation";
+import AddExperience from "../../add-experience/AddExperience";
+import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 
 
 
@@ -22,27 +25,34 @@ export default function StudentDashboard() {
       <Routes>
         {/* <Route path="modules" element={<Section />} /> */}
         <Route path="resource" element={<Resource />} />
-
         <Route path="modules" element={<Section />} />
-
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
-
         <Route path="new-parcour" element={<AddPathwayForm />} />
         <Route path="resource-preview/:id" element={<ResourcePreviewPage />} />
-
         <Route path="update-parcour/:pathwayId" element={<UpdatePathwayForm />} />
-
         <Route path="parcours" element={<Parcours />} />
-
         <Route path="modules/:idParcours" element={<Module />} />
-
         <Route path="lessons/:idModule" element={<Lesson />} />
 
 
-
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
-                <Route path="create-profile" element={<CreateProfile />} />
+        <Route path="create-profile" element={<CreateProfile />} />
+
+
+
+        <Route path="Dashboard-profile" element={<DashboardProfile />} />
+
+
+                {/* thisss parttt iss for the teachherrrrrr  */}
+
+                <Route path="add-education" element={<AddEducation />} />
+                <Route path="update-education/:educationId" element={<AddEducation />} />
+               <Route path="add-experience" element={<AddExperience />} />
+               <Route path="update-experience/:experienceId" element={<AddExperience />} />
+
+                
+
 
       </Routes>
     </Layout>
