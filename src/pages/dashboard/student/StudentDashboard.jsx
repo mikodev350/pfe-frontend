@@ -40,16 +40,13 @@ export default function StudentDashboard() {
         <Route path="create-profile" element={<CreateProfile />} />
 
 
-
         <Route path="Dashboard-profile" element={<DashboardProfile />} />
 
-
                 {/* thisss parttt iss for the teachherrrrrr  */}
-
-                <Route path="add-education" element={<AddEducation />} />
-                <Route path="update-education/:educationId" element={<AddEducation />} />
-               <Route path="add-experience" element={<AddExperience />} />
-               <Route path="update-experience/:experienceId" element={<AddExperience />} />
+     <Route path="add-education" element={<AddEducation />} />
+    <Route path="update-education/:educationId" element={<AddEducation />} />
+   <Route path="add-experience" element={<AddExperience />} />
+   <Route path="update-experience/:experienceId" element={<AddExperience />} />
 
                 
 

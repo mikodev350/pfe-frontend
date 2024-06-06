@@ -134,3 +134,13 @@ export const getExperience = async (id, token) => {
     throw error;
   }
 };
+
+/*************************************************************************/
+export const fetchUserProfile = async (token) => {
+  const response = await axios.get(`${API_BASE_URL}/get-my-profile/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
