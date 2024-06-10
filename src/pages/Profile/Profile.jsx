@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ProfileHeader } from './ProfileHeader';
-import { Experience, Education } from './Experience';
 import { Bio } from './Bio';
+import Experience  from './Experience';
+import  Education  from './Education';
 import { Container, Row, Col } from 'react-bootstrap';
 import Layout from '../../components/layout/Layout';
 import { fetchUserProfile } from '../../api/apiProfile';
@@ -23,12 +24,10 @@ export default function Profile() {
 
   if (!profile) return <div>Loading...</div>;
 
-
-
   return (
     <Layout fullcontent={true}>
       <ProfileHeader profile={profile.profil} nomComplet={profile.username} />
-      <Bio bio={profile.profil.bio}  nomComplet={profile.username} competences={profile.profil.competences}/>
+      <Bio bio={profile.profil.bio} nomComplet={profile.username} competences={profile.profil.competences} />
       <Container>
         <Row>
           <Col sm={6}>

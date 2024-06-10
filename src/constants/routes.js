@@ -49,13 +49,23 @@ const PageRouteDashbordTeacher = [
 
 const PageRouteDashbordStudent = [
   {
-    name: "parcours",
-    route: "/student/section",
+    name: "Mon Profile",
+    route: "/student/Profile",
     icon: BiCategory,
   },
   {
-    name: "resource",
-    route: "/student/section",
+    name: "mon parcours",
+    route: "/student/parcours",
+    icon: BiCategory,
+  },
+  {
+    name: "mes resource",
+    route: "/student/resources",
+    icon: BiCategory,
+  },
+  {
+    name: "Communoter",
+    route: "/student/Profile",
     icon: BiCategory,
   },
   // {

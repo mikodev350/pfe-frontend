@@ -8,7 +8,7 @@ import uploadFilesSlice from "./features/upload-slice";
 import imageSlice from "./features/image-slice";
 import sidebarState from "./features/sidebarSlice";
 import logoutState from "./features/logoutSlice";
-
+import searchSlice from "./features/search-slice.js";
 const rootReducer = combineReducers({
   //user: userSlice,
   socket: socketSlice,
@@ -18,6 +18,7 @@ const rootReducer = combineReducers({
   image: imageSlice,
   sidebar: sidebarState,
   logout: logoutState,
+  search: searchSlice, // Add the search slice
   // tickets: ticketSlice,
 });
 

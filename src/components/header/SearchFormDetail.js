@@ -1,14 +1,11 @@
+// path: ./src/components/searchForm/SearchFormDetail.js
+
 import React, { useState, useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 import Select from "react-select";
-import {
-  getAllParcours,
-  getModulesByParcours,
-  getLessonsByModule,
-  getResources,
-} from "../../api/apiData";
 import { FaSearch } from "react-icons/fa";
-import useOnClickOutside from "../header/useOnClickOutside";
+import useOnClickOutside from "../../util/useOnClickOutside";
+import axios from "axios";
 
 let styles = {
   filterButton: {
@@ -123,8 +120,27 @@ const SearchFormDetail = ({ onFilterChange }) => {
     setFilters(newFilters);
   };
 
-  const applyFilters = () => {
-    onFilterChange(filters);
+  const applyFilters = async () => {
+    const queryParams = new URLSearchParams();
+
+    if (filters.parcoursFilter.length) {
+      queryParams.append("parcours", filters.parcoursFilter.join(","));
+    }
+    if (filters.moduleFilter.length) {
+      queryParams.append("modules", filters.moduleFilter.join(","));
+    }
+    if (filters.lessonFilter.length) {
+      queryParams.append("lessons", filters.lessonFilter.join(","));
+    }
+    if (filters.resourceFilter.length) {
+      queryParams.append("resources", filters.resourceFilter.join(","));
+    }
+
+    const response = await axios.get(
+      `http://localhost:1337/api/custom-search/advanced?${queryParams.toString()}`
+    );
+
+    onFilterChange(response.data);
     setIsFilterOpen(false); // Close the dropdown after applying filters
   };
 

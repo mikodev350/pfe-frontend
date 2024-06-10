@@ -23,8 +23,7 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <Routes>
-        {/* <Route path="modules" element={<Section />} /> */}
-        <Route path="resource" element={<Resource />} />
+        <Route path="resources" element={<Resource />} />
         <Route path="modules" element={<Section />} />
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />

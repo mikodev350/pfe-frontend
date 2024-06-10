@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Form, Container, Row, Col, Image, Card } from 'react-bootstrap';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import axios from 'axios';
 import { BiTrash } from 'react-icons/bi';
 import { getToken } from '../../util/authUtils';
+import {
+  validationProfileSchemaStudent,
+  validationProfileSchemaTeacher,
+} from '../../validator/profileValidator';
 
 // Fonction pour télécharger l'image
 const apiUpload = async (file, token) => {
@@ -20,6 +23,8 @@ const apiUpload = async (file, token) => {
   return response.data[0];
 };
 
+    const userRole = localStorage.getItem('role');
+
 // Fonction pour soumettre le formulaire
 const submitForm = async (values, profile, token, isUpdate, profileId) => {
   try {
@@ -31,11 +36,25 @@ const submitForm = async (values, profile, token, isUpdate, profileId) => {
       photoProfilId = uploadedPhoto.id;
     }
 
+    
+    if(userRole === "teacher"){
+      values.typeEtudes="teacher"
+      values.niveauEtudes="rien"
+    }
     const payload = {
       ...values,
       competences: values.competences.split(',').map(comp => comp.trim()), // Convertir les compétences en tableau
+      matieresEnseignees: values.matieresEnseignees.split(',').map(mat => mat.trim()), // Convertir les matières enseignées en tableau
       photoProfil: photoProfilId
     };
+
+    if (values.typeEtudes === 'continue') {
+      payload.niveauEtudes = '';
+      payload.niveauSpecifique = '';
+      payload.specialite = '';
+    } else if (values.typeEtudes === 'académique') {
+      payload.nomFormation = '';
+    }
 
     const url = isUpdate ? `http://localhost:1337/api/profils/${profileId}` : 'http://localhost:1337/api/profils';
     const method = isUpdate ? 'PUT' : 'POST';
@@ -75,56 +94,55 @@ const fetchProfile = async (token) => {
   }
 };
 
-
-
-// Schéma de validation avec Yup
-const validationSchema = Yup.object().shape({
-  niveauEtudes: Yup.string().required('Niveau d\'études est obligatoire'),
-  programmeEtudes: Yup.string().nullable().when('niveauEtudes', {
-    is: (val) => val === 'Formation',
-    then: (schema) => schema.required('Programme d\'études est obligatoire'),
-    otherwise: (schema) => schema.nullable()
-  }),
-  
-  anneeEtudes: Yup.string().nullable().when('niveauEtudes', {
-    is: (val) => ['Moyen', 'Lycée', 'Université','Formation'].includes(val),
-    then: (schema) => schema.required('Année d\'études est obligatoire'),
-    otherwise: (schema) => schema.nullable()
-  }),
-  institution: Yup.string().nullable(),
-  competences: Yup.string()
-    .required('Compétences sont obligatoires')
-    .test('is-valid-competences', 'Les compétences doivent être séparées par des virgules et ne doivent pas être vides', (value) => {
-      if (!value) return false;
-      const competences = value.split(',').map(comp => comp.trim());
-      return competences.every(comp => comp !== '');
-    }),
-  experienceStage: Yup.string().nullable(),
-  projets: Yup.string().nullable(),
-  bio: Yup.string().nullable(),
-  // niveauFormation: Yup.string().nullable().when('niveauEtudes', {
-  //   is: 'Formation',
-  //   then: (schema) => schema.required('Niveau de formation est obligatoire'),
-  //   otherwise: (schema) => schema.nullable()
-  // })
-});
+// Options pour les niveaux d'études
+const levelsOptions = {
+  Primaire: [
+    { value: 'AP1', label: '1ère année primaire (AP1)' },
+    { value: 'AP2', label: '2ème année primaire (AP2)' },
+    { value: 'AP3', label: '3ème année primaire (AP3)' },
+    { value: 'AP4', label: '4ème année primaire (AP4)' },
+    { value: 'AP5', label: '5ème année primaire (AP5)' },
+  ],
+  Moyen: [
+    { value: 'AM1', label: '1ère année moyenne (AM1)' },
+    { value: 'AM2', label: '2ème année moyenne (AM2)' },
+    { value: 'AM3', label: '3ème année moyenne (AM3)' },
+    { value: 'AM4', label: '4ème année moyenne (AM4)' },
+  ],
+  Lycée: [
+    { value: 'AS1', label: '1ère année secondaire (AS1)' },
+    { value: 'AS2', label: '2ème année secondaire (AS2)' },
+    { value: 'AS3', label: '3ème année secondaire (AS3)' },
+  ],
+  Université: [
+    { value: 'L1', label: '1ère année Licence (L1)' },
+    { value: 'L2', label: '2ème année Licence (L2)' },
+    { value: 'L3', label: '3ème année Licence (L3)' },
+    { value: 'M1', label: '1ère année Master (M1)' },
+    { value: 'M2', label: '2ème année Master (M2)' },
+  ],
+};
 
 const CreerProfil = () => {
   const [role, setRole] = useState('');
-  const [niveau, setNiveau] = useState('');
+  const [typeEtudes, setTypeEtudes] = useState('');
+  const [niveauEtudes, setNiveauEtudes] = useState('');
+  const [niveauEnseigne, setNiveauEnseigne] = useState('');
   const [isUpdate, setIsUpdate] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
   const [initialValues, setInitialValues] = useState({
+    typeEtudes: '',
     niveauEtudes: '',
-    programmeEtudes: '',
-    anneeEtudes: '',
-    institution: '',
+    niveauSpecifique: '',
+    specialite: '',
+    etablisement: '',
     competences: '',
-    experienceStage: '',
-    projets: '',
     bio: '',
-    // niveauFormation: ''
+    matieresEnseignees: '',
+    niveauEnseigne: '',
+    specialiteEnseigne: '',
+    nomFormation: '',
   });
 
   const [profile, setProfile] = useState({
@@ -134,7 +152,6 @@ const CreerProfil = () => {
 
   useEffect(() => {
     // Récupérer le rôle depuis le localStorage lors du chargement de la page
-    const userRole = localStorage.getItem('role');
     if (userRole) {
       setRole(userRole);
     }
@@ -146,26 +163,30 @@ const CreerProfil = () => {
           setIsUpdate(true);
           setProfileId(profile.id);
           setInitialValues({
+            typeEtudes: profile.typeEtudes || '',
             niveauEtudes: profile.niveauEtudes || '',
-            programmeEtudes: profile.programmeEtudes || '',
-            anneeEtudes: profile.anneeEtudes || '',
-            institution: profile.institution || '',
+            niveauSpecifique: profile.niveauSpecifique || '',
+            specialite: profile.specialite || '',
+            etablisement: profile.etablisement || '',
             competences: profile.competences ? profile.competences.join(', ') : '',
-            experienceStage: profile.experienceStage || '',
-            projets: profile.projets || '',
             bio: profile.bio || '',
-            // niveauFormation: profile.niveauFormation || ''
+            matieresEnseignees: profile.matieresEnseignees ? profile.matieresEnseignees.join(', ') : '',
+            niveauEnseigne: profile.niveauEnseigne || '',
+            specialiteEnseigne: profile.specialiteEnseigne || '',
+            nomFormation: profile.nomFormation || '',
           });
 
           if (profile.photoProfil) {
             setProfile({
               ...profile,
               photoProfilPreview: `http://localhost:1337${profile.photoProfil.url}`,
-              photoProfilId: profile.photoProfil.id,
+              photoProfilId: profile.photoProfil.id
             });
           }
 
-          setNiveau(profile.niveauEtudes);
+          setTypeEtudes(profile.typeEtudes);
+          setNiveauEtudes(profile.niveauEtudes);
+          setNiveauEnseigne(profile.niveauEnseigne);
         }
       });
     }
@@ -173,10 +194,12 @@ const CreerProfil = () => {
 
   const token = useMemo(() => getToken(), []);
 
+  const validationSchema = role === 'student' ? validationProfileSchemaStudent : validationProfileSchemaTeacher;
+
   const formik = useFormik({
     initialValues,
     enableReinitialize: true,
-    validationSchema: role === 'student' ? validationSchema : Yup.object({}),
+    validationSchema,
     onSubmit: async (values) => {
       console.log('Form values:', values); // Log des valeurs du formulaire pour débogage
       await submitForm(values, profile, token, isUpdate, profileId);
@@ -204,23 +227,38 @@ const CreerProfil = () => {
     });
   };
 
-  const handleNiveauChange = (e) => {
+  const handleTypeEtudesChange = (e) => {
     const value = e.target.value;
-    setNiveau(value);
+    setTypeEtudes(value);
+    formik.setFieldValue('typeEtudes', value);
+    if (value === 'académique') {
+      formik.setFieldValue('nomFormation', '');
+    } else if (value === 'continue') {
+      formik.setFieldValue('niveauEtudes', '');
+      formik.setFieldValue('niveauSpecifique', '');
+      formik.setFieldValue('specialite', '');
+    }
+  };
+
+  const handleNiveauEtudesChange = (e) => {
+    const value = e.target.value;
+    setNiveauEtudes(value);
     formik.setFieldValue('niveauEtudes', value);
   };
 
+  const handleNiveauEnseigneChange = (e) => {
+    const value = e.target.value;
+    setNiveauEnseigne(value);
+    formik.setFieldValue('niveauEnseigne', value);
+  };
 
-  console.log('====================================');
-console.log(formik);
-console.log('====================================');
   return (
     <Container>
       <Row className="justify-content-md-center">
         <Col md={8}>
           <h2 className="text-center">Créer Votre Profil</h2>
           <p className="text-center">Fournissez quelques informations pour faire ressortir votre profil</p>
-          
+
           <Card className="mb-4 text-center">
             <Card.Body>
               <div className="mb-3">
@@ -251,70 +289,167 @@ console.log('====================================');
           <Form onSubmit={formik.handleSubmit}>
             {role === 'student' && (
               <>
-                <Form.Group controlId="niveauEtudes">
-                  <Form.Label>Niveau d'Études <span className="text-danger">*</span></Form.Label>
+                <Form.Group controlId="typeEtudes">
+                  <Form.Label>Type d'Études <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     as="select"
-                    name="niveauEtudes"
-                    value={niveau}
-                    onChange={handleNiveauChange}
-                    isInvalid={!!formik.errors.niveauEtudes}>
-                    <option value="">Sélectionner le niveau d'études</option>
-                    <option value="Moyen">Enseignement Moyen</option>
-                    <option value="Lycée">Lycée</option>
-                    <option value="Université">Université</option>
-                    <option value="Formation">Formation</option>
+                    name="typeEtudes"
+                    value={typeEtudes}
+                    onChange={handleTypeEtudesChange}
+                    isInvalid={!!formik.errors.typeEtudes}>
+                    <option value="">Sélectionner le type d'études</option>
+                    <option value="académique">Académique</option>
+                    <option value="continue">Continue</option>
                   </Form.Control>
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.niveauEtudes}
+                    {formik.errors.typeEtudes}
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                {['Moyen', 'Lycée', 'Université'].includes(niveau) && (
-                  <Form.Group controlId="anneeEtudes">
-                    <Form.Label>Année d'Études <span className="text-danger">*</span></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="anneeEtudes"
-                      value={formik.values.anneeEtudes}
-                      onChange={formik.handleChange}
-                      isInvalid={!!formik.errors.anneeEtudes}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {formik.errors.anneeEtudes}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                {typeEtudes === 'académique' && (
+                  <>
+                    <Form.Group controlId="niveauEtudes">
+                      <Form.Label>Niveau d'Études <span className="text-danger">*</span></Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="niveauEtudes"
+                        value={niveauEtudes}
+                        onChange={handleNiveauEtudesChange}
+                        isInvalid={!!formik.errors.niveauEtudes}>
+                        <option value="">Sélectionner le niveau d'études</option>
+                        <option value="Primaire">Primaire</option>
+                        <option value="Moyen">Moyen</option>
+                        <option value="Lycée">Lycée</option>
+                        <option value="Université">Université</option>
+                      </Form.Control>
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.niveauEtudes}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+
+                    {niveauEtudes && (
+                      <Form.Group controlId="niveauSpecifique">
+                        <Form.Label>Niveau spécifique <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="niveauSpecifique"
+                          value={formik.values.niveauSpecifique}
+                          onChange={formik.handleChange}
+                          isInvalid={!!formik.errors.niveauSpecifique}>
+                          <option value="">Sélectionner le niveau spécifique</option>
+                          {levelsOptions[niveauEtudes] && levelsOptions[niveauEtudes].map(option => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {formik.errors.niveauSpecifique}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    )}
+
+                    {niveauEtudes === 'Université' && (
+                      <Form.Group controlId="specialite">
+                        <Form.Label>Spécialité <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="specialite"
+                          value={formik.values.specialite}
+                          onChange={formik.handleChange}
+                          isInvalid={!!formik.errors.specialite}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {formik.errors.specialite}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    )}
+                  </>
                 )}
 
-                {niveau === 'Formation' && (
-                  <Form.Group controlId="programmeEtudes">
-                    <Form.Label>Programme d'Études <span className="text-danger">*</span></Form.Label>
+                {typeEtudes === 'continue' && (
+                  <Form.Group controlId="nomFormation">
+                    <Form.Label>Nom de la formation <span className="text-danger">*</span></Form.Label>
                     <Form.Control
                       type="text"
-                      name="programmeEtudes"
-                      value={formik.values.programmeEtudes}
+                      name="nomFormation"
+                      value={formik.values.nomFormation}
                       onChange={formik.handleChange}
-                      isInvalid={!!formik.errors.programmeEtudes}
+                      isInvalid={!!formik.errors.nomFormation}
                     />
                     <Form.Control.Feedback type="invalid">
-                      {formik.errors.programmeEtudes}
+                      {formik.errors.nomFormation}
                     </Form.Control.Feedback>
                   </Form.Group>
                 )}
               </>
             )}
 
-            <Form.Group controlId="institution">
-              <Form.Label>Institution</Form.Label>
+            {role === 'teacher' && (
+              <>
+                <Form.Group controlId="matieresEnseignees">
+                  <Form.Label>Matières enseignées <span className="text-danger">*</span></Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="matieresEnseignees"
+                    value={formik.values.matieresEnseignees}
+                    onChange={formik.handleChange}
+                    placeholder="Ex: Mathématiques, Physique, Chimie"
+                    isInvalid={!!formik.errors.matieresEnseignees}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formik.errors.matieresEnseignees}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="niveauEnseigne">
+                  <Form.Label>Niveau(x) enseigné(s) <span className="text-danger">*</span></Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="niveauEnseigne"
+                        value={niveauEnseigne}
+                        onChange={handleNiveauEnseigneChange}
+                        isInvalid={!!formik.errors.niveauEnseigne}>
+                        <option value="">Sélectionner le niveau enseigné</option>
+                        <option value="Primaire">Primaire</option>
+                        <option value="Moyen">Moyen</option>
+                        <option value="Lycée">Lycée</option>
+                        <option value="Université">Université</option>
+                      </Form.Control>
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.niveauEnseigne}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+
+                    {niveauEnseigne === 'Université' && (
+                      <Form.Group controlId="specialiteEnseigne">
+                        <Form.Label>Spécialité <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="specialiteEnseigne"
+                          value={formik.values.specialiteEnseigne}
+                          onChange={formik.handleChange}
+                          isInvalid={!!formik.errors.specialiteEnseigne}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {formik.errors.specialiteEnseigne}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    )}
+              </>
+            )}
+
+            <Form.Group controlId="etablisement">
+              <Form.Label>etablisement</Form.Label>
               <Form.Control
                 type="text"
-                name="institution"
-                value={formik.values.institution}
+                name="etablisement"
+                value={formik.values.etablisement}
                 onChange={formik.handleChange}
-                isInvalid={!!formik.errors.institution}
+                isInvalid={!!formik.errors.etablisement}
               />
               <Form.Control.Feedback type="invalid">
-                {formik.errors.institution}
+                {formik.errors.etablisement}
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -332,32 +467,6 @@ console.log('====================================');
                 {formik.errors.competences}
               </Form.Control.Feedback>
             </Form.Group>
-
-            {role === 'student' && (
-              <>
-                <Form.Group controlId="experienceStage">
-                  <Form.Label>Expérience de Stage/Travail</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    name="experienceStage"
-                    value={formik.values.experienceStage}
-                    onChange={formik.handleChange}
-                    rows={3}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="projets">
-                  <Form.Label>Projets</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    name="projets"
-                    value={formik.values.projets}
-                    onChange={formik.handleChange}
-                    rows={3}
-                  />
-                </Form.Group>
-              </>
-            )}
 
             <Form.Group controlId="bio">
               <Form.Label>Bio</Form.Label>

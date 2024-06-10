@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   Navbar,
   Nav,
-  Form,
-  FormControl,
   Container,
   NavDropdown,
+  Form,
+  FormControl,
   Badge,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -14,16 +14,10 @@ import {
   FaEnvelope,
   FaUserCircle,
   FaSignOutAlt,
-  FaSearchPlus,
   FaCog,
 } from "react-icons/fa";
-import Select from "react-select";
-import useOnClickOutside from "../header/useOnClickOutside";
-import {
-  getAllParcours,
-  getModulesByParcours,
-  getLessonsByModule,
-} from "../../api/apiData";
+import useOnClickOutside from "../../util/useOnClickOutside";
+import ButtonSearchFormDetail from "../searchForm/ButtonSearchFormDetail";
 
 const styles = {
   navIcon: {
@@ -58,69 +52,6 @@ const styles = {
     maxWidth: "500px",
     flex: "1 1 auto",
   },
-  customDropdown: {
-    position: "absolute",
-    backgroundColor: "#fff",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-    padding: "10px",
-    borderRadius: "5px",
-    width: "300px",
-    zIndex: 1000,
-    right: 0,
-  },
-  dropdownItem: {
-    padding: "10px 20px",
-    textDecoration: "none",
-    color: "black",
-    display: "flex",
-    justifyContent: "space-between",
-  },
-  filterButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    backgroundColor: "#6c757d",
-    color: "#fff",
-    cursor: "pointer",
-    position: "relative",
-    marginRight: "15px",
-  },
-  filterDropdown: {
-    position: "absolute",
-    top: "100%",
-    right: 0,
-    backgroundColor: "#fff",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-    padding: "10px",
-    borderRadius: "5px",
-    width: "300px",
-    zIndex: 1000,
-  },
-  filterGroup: {
-    marginBottom: "10px",
-  },
-  filterLabel: {
-    display: "block",
-    marginBottom: "5px",
-  },
-  filterInput: {
-    width: "100%",
-    padding: "8px",
-    boxSizing: "border-box",
-  },
-  customButton: {
-    width: "100%",
-    backgroundColor: "#007bff",
-    borderColor: "#007bff",
-    padding: "10px 0",
-    color: "#fff",
-    textAlign: "center",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
 };
 
 const notifications = [
@@ -133,147 +64,7 @@ const messages = [
   { id: 2, text: "Message 2" },
 ];
 
-const SearchFormDetail = ({ onFilterChange }) => {
-  const [filters, setFilters] = useState({
-    searchValue: "",
-    parcoursFilter: [],
-    moduleFilter: [],
-    lessonFilter: [],
-  });
-
-  const [parcoursOptions, setParcoursOptions] = useState([]);
-  const [moduleOptions, setModuleOptions] = useState([]);
-  const [lessonOptions, setLessonOptions] = useState([]);
-
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const filterDropdownRef = useRef(null);
-  useOnClickOutside(filterDropdownRef, () => setIsFilterOpen(false));
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const parcours = await getAllParcours();
-      setParcoursOptions(parcours.map((p) => ({ value: p.id, label: p.name })));
-    };
-    fetchData();
-  }, []);
-
-  const handleParcoursChange = async (selectedParcours) => {
-    const newFilters = {
-      ...filters,
-      parcoursFilter: selectedParcours.map((p) => p.value),
-    };
-    setFilters(newFilters);
-
-    const modules = await getModulesByParcours(
-      selectedParcours.map((p) => p.value)
-    );
-    setModuleOptions(modules.map((m) => ({ value: m.id, label: m.name })));
-    setLessonOptions([]); // Reset lessons when parcours changes
-  };
-
-  const handleModulesChange = async (selectedModules) => {
-    const newFilters = {
-      ...filters,
-      moduleFilter: selectedModules.map((m) => m.value),
-    };
-    setFilters(newFilters);
-
-    const lessons = await getLessonsByModule(
-      selectedModules.map((m) => m.value)
-    );
-    setLessonOptions(lessons.map((l) => ({ value: l.id, label: l.name })));
-  };
-
-  const handleLessonsChange = (selectedLessons) => {
-    const newFilters = {
-      ...filters,
-      lessonFilter: selectedLessons.map((l) => l.value),
-    };
-    setFilters(newFilters);
-  };
-
-  const handleFilterChange = (field, value) => {
-    const newFilters = { ...filters, [field]: value };
-    setFilters(newFilters);
-  };
-
-  const applyFilters = () => {
-    onFilterChange(filters);
-    setIsFilterOpen(false); // Close the dropdown after applying filters
-  };
-
-  return (
-    <div style={{ position: "relative" }} ref={filterDropdownRef}>
-      <div
-        style={styles.filterButton}
-        onClick={() => setIsFilterOpen(!isFilterOpen)}
-      >
-        <FaSearchPlus />
-      </div>
-      {isFilterOpen && (
-        <div style={styles.filterDropdown}>
-          <Form>
-            <div style={styles.filterGroup}>
-              <Form.Control
-                type="text"
-                placeholder="Search by name..."
-                value={filters.searchValue}
-                onChange={(e) =>
-                  handleFilterChange("searchValue", e.target.value)
-                }
-              />
-            </div>
-            <div style={styles.filterGroup}>
-              <Select
-                isMulti
-                options={parcoursOptions}
-                name="parcours"
-                placeholder="Select parcours..."
-                onChange={handleParcoursChange}
-                classNamePrefix="select"
-                value={parcoursOptions.filter((option) =>
-                  filters.parcoursFilter.includes(option.value)
-                )}
-              />
-            </div>
-            <div style={styles.filterGroup}>
-              <Select
-                isMulti
-                options={moduleOptions}
-                name="module"
-                placeholder="Select modules..."
-                onChange={handleModulesChange}
-                classNamePrefix="select"
-                value={moduleOptions.filter((option) =>
-                  filters.moduleFilter.includes(option.value)
-                )}
-              />
-            </div>
-            <div style={styles.filterGroup}>
-              <Select
-                isMulti
-                options={lessonOptions}
-                name="lesson"
-                placeholder="Select lessons..."
-                onChange={handleLessonsChange}
-                classNamePrefix="select"
-                value={lessonOptions.filter((option) =>
-                  filters.lessonFilter.includes(option.value)
-                )}
-              />
-            </div>
-            <div style={styles.customButton} onClick={applyFilters}>
-              Apply Filters
-            </div>
-          </Form>
-        </div>
-      )}
-    </div>
-  );
-};
-
-function SocialMediaNavbar() {
-  const [searchTerm, setSearchTerm] = useState("");
+function SocialMediaNavbar({ onFilterChange }) {
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
@@ -283,10 +74,6 @@ function SocialMediaNavbar() {
   useOnClickOutside(notificationDropdownRef, () =>
     setIsNotificationsOpen(false)
   );
-
-  const handleFilterChange = (newFilters) => {
-    console.log("Applied Filters: ", newFilters);
-  };
 
   return (
     <Navbar bg="light" expand="lg" className="shadow-sm p-3 rounded">
@@ -308,10 +95,9 @@ function SocialMediaNavbar() {
               placeholder="Search"
               className="me-auto"
               aria-label="Search"
-              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </Form>
-          <SearchFormDetail onFilterChange={handleFilterChange} />
+          <ButtonSearchFormDetail onFilterChange={onFilterChange} />
         </div>
         <Nav className="ms-auto">
           <div style={{ position: "relative" }} ref={messageDropdownRef}>

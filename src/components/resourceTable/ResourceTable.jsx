@@ -10,6 +10,7 @@ import TableCell from "../table/TableCell";
 import TableBody from "../table/TableBody";
 import { getToken } from "../../util/authUtils";
 import { useNavigate } from "react-router-dom";
+import TableIconeResource from "../table/TableIconeResource";
 
 const header = ["#", "Name", "Type", "Date of Creation", "Action"];
 
@@ -79,7 +80,12 @@ const ResourceTable = ({ searchValue }) => {
                     : "Invalid Date"
                 }
               />
-                <TableCell
+
+              <TableIconeResource
+                dataLabel={header[4]}
+                id={resource.id}
+               />
+                {/* <TableCell
                 dataLabel={header[4]}
                 item={
                   <>
@@ -94,7 +100,7 @@ const ResourceTable = ({ searchValue }) => {
                     </Button>
                   </>
                 }
-              />
+              /> */}
             </TableRow>
           ))}
         </TableBody>
