@@ -64,8 +64,8 @@ const PageRouteDashbordStudent = [
     icon: BiCategory,
   },
   {
-    name: "Communoter",
-    route: "/student/Profile",
+    name: "communauté",
+    route: "/student/communauté",
     icon: BiCategory,
   },
   // {

@@ -1,32 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { ProfileHeader } from './ProfileHeader';
 import { Bio } from './Bio';
-import Experience  from './Experience';
-import  Education  from './Education';
+import Experience from './Experience';
+import Education from './Education';
 import { Container, Row, Col } from 'react-bootstrap';
-import Layout from '../../components/layout/Layout';
-import { fetchUserProfile } from '../../api/apiProfile';
+import { fetchMyProfile, fetchUserProfile } from '../../api/apiProfile';
 import { getToken } from '../../util/authUtils';
+import { useParams } from 'react-router-dom';
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
-
+  const { id } = useParams();
   const token = React.useMemo(() => getToken(), []);
+
   useEffect(() => {
-    const getUserProfile = async () => {
-      const profileData = await fetchUserProfile(token);
+    const getMyUserProfile = async () => {
+      const profileData = await fetchMyProfile(token);
       setProfile(profileData);
     };
 
-    getUserProfile();
-    // eslint-disable-next-line
-  }, []);
+    const getUserProfile = async () => {
+      const profileData = await fetchUserProfile(id, token);
+      setProfile(profileData);
+    };
+
+    if (id) {
+      getUserProfile();
+    } else {
+      getMyUserProfile();
+    }
+  }, [id, token]);
 
   if (!profile) return <div>Loading...</div>;
 
   return (
-    <Layout fullcontent={true}>
-      <ProfileHeader profile={profile.profil} nomComplet={profile.username} />
+    <>
+      <ProfileHeader id={id} token={token} profile={profile.profil} nomComplet={profile.username} />
       <Bio bio={profile.profil.bio} nomComplet={profile.username} competences={profile.profil.competences} />
       <Container>
         <Row>
@@ -38,6 +47,6 @@ export default function Profile() {
           </Col>
         </Row>
       </Container>
-    </Layout>
+    </>
   );
 }

@@ -79,7 +79,7 @@ const UserResults = ({ results }) => {
                 <Card.Text style={goo.cardText}>
                   {user.profil && user.profil.matieresEnseignees && user.profil.matieresEnseignees.join(', ')}
                 </Card.Text>
-                <Button as={Link} to={`student/profile/${user.id}`} style={goo.button}>
+                <Button as={Link} to={`/student/find-profil//${user.id}`} style={goo.button}>
                   View Profile
                 </Button>
               </Card.Body>

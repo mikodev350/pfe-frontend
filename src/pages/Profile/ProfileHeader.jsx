@@ -1,8 +1,20 @@
 import React from 'react';
 import { Container, Image, Button, Badge } from 'react-bootstrap';
 import { MdPersonAddAlt } from "react-icons/md";
+import { sendFriendRequest } from '../../api/apiFriendRequest';
 
-export const ProfileHeader = ({ profile, nomComplet }) => {
+export const ProfileHeader = ({ id, token, profile, nomComplet }) => {
+  const [message, setMessage] = React.useState('');
+
+  const handleSendRequest = async () => {
+    try {
+      await sendFriendRequest(id, token);
+      setMessage('Invitation sent!');
+    } catch (error) {
+      setMessage('Error sending invitation: ' + error.message);
+    }
+  };
+
   return (
     <Container className="text-center my-3 container-profile Bagrond-Profils">
       <Image
@@ -16,25 +28,26 @@ export const ProfileHeader = ({ profile, nomComplet }) => {
       <p className="lead text-light">{profile.programmeEtudes}</p>
       <p className="text-light">{profile.niveauEtudes === "rien" ? profile.nomFormation : profile.niveauEtudes}</p>
       {profile.specialite && <p className="text-light">Spécialité: {profile.specialite}</p>}
-            {profile.institution && <p className="text-light"> Institution: {profile.institution}</p>}
-
-      {profile.niveauSpecifique && <p className="text-light"> Niveaux : {profile.niveauSpecifique}</p>}
+      {profile.institution && <p className="text-light">Institution: {profile.institution}</p>}
+      {profile.niveauSpecifique && <p className="text-light">Niveaux: {profile.niveauSpecifique}</p>}
       <div>
-        <p className="text-light">  les matiers : </p>
-            {profile.matieresEnseignees.map((matiere, index) => (
-              <Badge  key={index} pill bg="light" text="dark" className="mx-1">
-                {matiere}
-              </Badge>
-            ))}
-
-          </div>
-      {/* {profile.bio && <p className="text-light">Bio: {profile.bio}</p>} */}
+        <p className="text-light">Les matières:</p>
+        {profile.matieresEnseignees.map((matiere, index) => (
+          <Badge key={index} pill bg="light" text="dark" className="mx-1">
+            {matiere}
+          </Badge>
+        ))}
+      </div>
       <div>
-                            <br />
-
-        <Button variant="outline-light" className="custom-light-button">
-          <span><MdPersonAddAlt size={19} /> Ajouter</span>
-        </Button>
+        <br />
+        {id && (
+          <>
+            {message && <p className="text-light">{message}</p>}
+            <Button variant="outline-light" onClick={handleSendRequest} className="custom-light-button">
+              <MdPersonAddAlt size={19} /> Ajouter
+            </Button>
+          </>
+        )}
       </div>
     </Container>
   );
