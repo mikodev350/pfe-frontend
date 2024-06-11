@@ -16,6 +16,7 @@ import AddEducation from "../../add-education/AddEducation";
 import AddExperience from "../../add-experience/AddExperience";
 import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 import Profile from "../../Profile/Profile";
+import Communaute from "../../communauté/Communaute";
 
 
 
@@ -47,11 +48,8 @@ export default function StudentDashboard() {
     <Route path="update-education/:educationId" element={<AddEducation />} />
    <Route path="add-experience" element={<AddExperience />} />
    <Route path="update-experience/:experienceId" element={<AddExperience />} />
-
-
-
-
-   {/* <Route path="Communauter" element={<Commu />} /> */}
+   
+   <Route path="communaute" element={<Communaute />} />
 
 
 
