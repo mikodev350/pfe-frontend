@@ -30,7 +30,7 @@ const ResourceDetails = ({ resource }) => {
             <Col md={6}>
               <h3>Vidéo</h3>
               <video controls width="100%">
-                <source src={`http://localhost:1337${resource.video.url}`} type={resource.video.mime} />
+                <source src={`https://localhost:1337${resource.video.url}`} type={resource.video.mime} />
                 Your browser does not support the video tag.
               </video>
             </Col>

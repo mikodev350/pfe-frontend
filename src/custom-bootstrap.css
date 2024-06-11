@@ -779,6 +779,12 @@ div.accordion div.accordion-collapse div.accordion-body div.row div.col-md-2 {
     /* Couleur de la bordure au survol */
 }
 
+
+/* **************************** */
+/* custom profillee  */
+.custom-nav-dropdown .dropdown-toggle::after {
+    display: none !important;
+}
 /* @media screen and (max-width: 576px) {
 
     .QuestionTest {

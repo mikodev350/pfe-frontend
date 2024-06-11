@@ -43,8 +43,13 @@ const ResourceResults = ({ results }) => {
                   <strong>Resources:</strong> {result.resources}
                 </Card.Text>
               </Card.Body>
+              {/* <Link to={`/student/resource-preview/${result.id}`}>
+        <span className="icon-option">
+          <BiDetail size={23} />
+        </span>
+      </Link>` */}
               <div className="d-flex justify-content-between p-3">
-                <Badge as={Link} to={`/resource/${result.id}`} bg="info" className="me-2">
+                <Badge as={Link} to={`/student/resource-preview/${result.id}`} bg="info" className="me-2">
                   View Resource
                 </Badge>
               </div>
