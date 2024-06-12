@@ -13,11 +13,30 @@ export default function Profile() {
   const { id } = useParams();
   const token = React.useMemo(() => getToken(), []);
 
+<<<<<<< HEAD
   const { data: profile, isLoading } = useQuery(
     ['profile', id],
     () => (id ? fetchUserProfile(id, token) : fetchMyProfile(token)),
     {
       enabled: !!token,
+=======
+  useEffect(() => {
+    alert(id);
+    const getMyUserProfile = async () => {
+      const profileData = await fetchMyProfile(token);
+      setProfile(profileData);
+    };
+
+    const getUserProfile = async () => {
+      const profileData = await fetchUserProfile(id, token);
+      setProfile(profileData);
+    };
+
+    if (id) {
+      getUserProfile();
+    } else {
+      getMyUserProfile();
+>>>>>>> origin/filter
     }
   );
 
