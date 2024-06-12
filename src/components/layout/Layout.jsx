@@ -4,7 +4,12 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useLocation } from "react-router-dom";
-import { fetchAdvancedSearch, fetchUserSearch, setFilterType, clearResults } from "../../redux/features/search-slice";
+import {
+  fetchAdvancedSearch,
+  fetchUserSearch,
+  setFilterType,
+  clearResults,
+} from "../../redux/features/search-slice";
 import useStorage from "../../hooks/useStorage";
 import SidebarDesktop from "../sideBar/SideBarDesktop/SidebarDesktop";
 import SideBarMobile from "../sideBar/sideBarMobile/SideBarMobile";
@@ -28,16 +33,16 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
     const params = {
       ...rest,
-      parcours: parcoursFilter ? parcoursFilter.join(",") : '',
-      modules: moduleFilter ? moduleFilter.join(",") : '',
-      lessons: lessonFilter ? lessonFilter.join(",") : '',
+      parcours: parcoursFilter ? parcoursFilter.join(",") : "",
+      modules: moduleFilter ? moduleFilter.join(",") : "",
+      lessons: lessonFilter ? lessonFilter.join(",") : "",
     };
 
     if (userType) {
-      dispatch(setFilterType('user'));
+      dispatch(setFilterType("user"));
       dispatch(fetchUserSearch(params));
     } else {
-      dispatch(setFilterType('resource'));
+      dispatch(setFilterType("resource"));
       dispatch(fetchAdvancedSearch(params));
     }
   };
@@ -50,6 +55,12 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
     } else if (currentRoute === "SETTINGS") {
       if (role === "STUDENT") setType("type", "SETTINGS_STUDENT");
       else setType("type", "SETTINGS_TEACHER");
+    }
+    if(role ==='STUDENT'){
+            setType("type", "DASHEBOARD_STUDENT");
+
+    }else{
+      setType("type", "DASHEBOARD_TEACHER");
     }
 
     // Clear search results and filters when the location changes
@@ -71,7 +82,13 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
           ) : (
             <Row>
               <Col md={3} className="rc-side-bar">
-                <SidebarDesktop />
+                {role === "STUDENT" ? (
+                  <SidebarDesktop student />
+                ) : role === "TEACHER" ? (
+                  <SidebarDesktop teacher />
+                ) : (
+                  <SidebarDesktop />
+                )}
               </Col>
               <Col md={9}>
                 {searchStatus === "loading" && <div>Loading...</div>}

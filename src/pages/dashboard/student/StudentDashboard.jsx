@@ -27,21 +27,25 @@ export default function StudentDashboard() {
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
-        {/* <Route path="modules" element={<Section />} /> */}
+
+
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
         <Route path="resource-preview/:id" element={<ResourcePreviewPage />} />
         <Route path="update-parcour/:pathwayId" element={<UpdatePathwayForm />} />
+
+
+        
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
 
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
-        <Route path="create-profile" element={<CreateProfile />} />
+        <Route path="custom-profile" element={<CreateProfile />} />
 
 
-        <Route path="Dashboard-profile" element={<DashboardProfile />} />
+        <Route path="edit-profile" element={<DashboardProfile />} />
 
                 {/* thisss parttt iss for the teachherrrrrr  */}
      <Route path="add-education" element={<AddEducation />} />

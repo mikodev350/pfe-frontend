@@ -1,11 +1,9 @@
+// components/Resource.js
 import React, { useState } from "react";
 import { Row, Container, Col, Button } from "react-bootstrap";
-
-// import "./Exam.css";
 import { Link, useParams } from "react-router-dom";
 import SearchForm from "../../components/searchForm/SearchForm";
 import ResourceTable from "../../components/resourceTable/ResourceTable";
-
 
 const Resource = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -24,7 +22,6 @@ const Resource = () => {
                 <span className="button-span-size btn-write-white">Add resource </span>
               </Button>
             </Link>
-            
           </Col>
           <Col xs={12} md={12} lg={4}>
             <SearchForm searchValue={searchValue} onSearch={handleSearch} />

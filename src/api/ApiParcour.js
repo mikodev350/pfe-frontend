@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants/constante";
+
 export const fetchParcours = async (page, search, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/parcours`, {
@@ -45,8 +46,7 @@ export const createPathway = async (pathwayData, token) => {
   }
 };
 
-// ******************************************************************
-// update parcorus
+// Update parcours
 export const updatePathway = async (id, pathwayData, token) => {
   console.log(pathwayData);
   const response = await axios.put(
@@ -68,4 +68,18 @@ export const getPathwayById = async (id, token) => {
     },
   });
   return response.data;
+};
+
+export const deletePathway = async (id, token) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/parcours/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting pathway:", error);
+    throw error;
+  }
 };

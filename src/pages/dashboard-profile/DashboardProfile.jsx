@@ -3,6 +3,7 @@ import { Container, Row, Col, Table, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { deleteEducation, deleteExperience, getEducations, getExperiences } from '../../api/apiProfile';
 import { getToken } from '../../util/authUtils';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import './DashboardProfile.css'; // Assurez-vous d'importer le fichier CSS
 
 const DashboardProfile = () => {
@@ -51,28 +52,25 @@ const DashboardProfile = () => {
   }
 
   return (
-    <Container>
-      <h1 className="mt-5 mb-4 text-center">Tableau de Bord</h1>
+    <Container style={{backgroundColor:"white"}}>
+      <h1 className="mt-5 mb-4 text-center">Mon profil</h1>
       <Row className="mb-4 justify-content-center">
         <Col className="text-center mb-2" xs={12} md={3}>
-           
           <Link to="/student/add-experience">
-            <Button variant="primary" className="custom-btn w-100">Ajouter Expérience</Button>
+            <Button variant="outline-primary" className="custom-btn w-100">Ajouter Expérience</Button>
           </Link>
         </Col>
         <Col className="text-center mb-2" xs={12} md={3}>
           <Link to="/student/add-education">
-            <Button variant="primary" className="custom-btn w-100">Ajouter Éducation</Button>
+            <Button variant="outline-primary" className="custom-btn w-100">Ajouter Éducation</Button>
           </Link>
         </Col>
-  <Col className="text-center mb-2" xs={12} md={3}>
-           <Link to="/student/create-profile">
-            <Button variant="primary" className="custom-btn w-100">gere profil </Button>
+        <Col className="text-center mb-2" xs={12} md={3}>
+          <Link to="/student/custom-profile">
+            <Button variant="outline-primary" className="custom-btn w-100">Gérer Profil</Button>
           </Link>
-                  </Col>
+        </Col>
       </Row>
-
-         
       <Row>
         <Col md={12} className="mb-4">
           <h2 className="table-title">Expériences Professionnelles</h2>
@@ -88,14 +86,20 @@ const DashboardProfile = () => {
             <tbody>
               {experiences.map((exp, index) => (
                 <tr key={index}>
-                  <td>{exp.entreprise}</td>
-                  <td>{exp.titrePoste}</td>
-                  <td>{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</td>
-                  <td>
-                    <Link to={`/student/update-experience/${exp.id}`}>
-                      <Button variant="warning" className="edit-btn mr-2">Modifier</Button>
-                    </Link>
-                    <Button variant="danger" className="delete-btn" onClick={() => handleDeleteExperience(exp.id)}>Supprimer</Button>
+                  <td className="table-cell">{exp.entreprise}</td>
+                  <td className="table-cell">{exp.titrePoste}</td>
+                  <td className="table-cell">{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</td>
+                  <td className="table-cell">
+                    <div className="d-flex justify-content-center">
+                      <Link to={`/student/update-experience/${exp.id}`}>
+                        <Button variant="outline-warning" size="sm" className="edit-btn mr-2">
+                          <FaEdit style={{ marginRight: '5px' }} /> Modifier
+                        </Button>
+                      </Link>
+                      <Button variant="outline-danger" size="sm" className="delete-btn" onClick={() => handleDeleteExperience(exp.id)}>
+                        <FaTrashAlt style={{ marginRight: '5px' }} /> Supprimer
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -116,14 +120,20 @@ const DashboardProfile = () => {
             <tbody>
               {educations.map((edu, index) => (
                 <tr key={index}>
-                  <td>{edu.ecole}</td>
-                  <td>{edu.diplome}</td>
-                  <td>{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</td>
-                  <td>
-                    <Link to={`/student/update-education/${edu.id}`}>
-                      <Button variant="warning" className="edit-btn mr-2">Modifier</Button>
-                    </Link>
-                    <Button variant="danger" className="delete-btn" onClick={() => handleDeleteEducation(edu.id)}>Supprimer</Button>
+                  <td className="table-cell">{edu.ecole}</td>
+                  <td className="table-cell">{edu.diplome}</td>
+                  <td className="table-cell">{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</td>
+                  <td className="table-cell">
+                    <div className="d-flex justify-content-center">
+                      <Link to={`/student/update-education/${edu.id}`}>
+                        <Button variant="outline-warning" size="sm" className="edit-btn mr-2">
+                          <FaEdit style={{ marginRight: '5px' }} /> Modifier
+                        </Button>
+                      </Link>
+                      <Button variant="outline-danger" size="sm" className="delete-btn" onClick={() => handleDeleteEducation(edu.id)}>
+                        <FaTrashAlt style={{ marginRight: '5px' }} /> Supprimer
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -132,7 +142,7 @@ const DashboardProfile = () => {
         </Col>
       </Row>
       <Row className="justify-content-center">
-        <Button variant="danger" className="delete-account-btn mt-4">Supprimer Mon Compte</Button>
+        <Button variant="outline-danger" size="sm" className="delete-account-btn mt-4">Supprimer Mon Compte</Button>
       </Row>
     </Container>
   );

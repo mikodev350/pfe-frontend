@@ -23,7 +23,7 @@ const apiUpload = async (file, token) => {
   return response.data[0];
 };
 
-    const userRole = localStorage.getItem('role');
+    const userRole = localStorage.getItem('role').toLocaleLowerCase();
 
 // Fonction pour soumettre le formulaire
 const submitForm = async (values, profile, token, isUpdate, profileId) => {
