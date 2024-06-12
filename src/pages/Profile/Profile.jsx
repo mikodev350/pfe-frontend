@@ -14,7 +14,6 @@ export default function Profile() {
   const token = React.useMemo(() => getToken(), []);
 
   useEffect(() => {
-    alert(id);
     const getMyUserProfile = async () => {
       const profileData = await fetchMyProfile(token);
       setProfile(profileData);
@@ -33,7 +32,7 @@ export default function Profile() {
   }, [id, token]);
 
   if (!profile) return <div>Loading...</div>;
-
+  console.log(profile);
   return (
     <>
       <ProfileHeader
@@ -41,6 +40,9 @@ export default function Profile() {
         token={token}
         profile={profile?.profil}
         nomComplet={profile?.username}
+        isRequestSender={profile?.isRequestSender}
+        relationIsExist={profile?.relationIsExist}
+        isFriends={profile?.isFriends}
       />
       <Bio
         bio={profile?.profil?.bio}
