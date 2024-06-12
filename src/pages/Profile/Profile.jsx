@@ -14,6 +14,7 @@ export default function Profile() {
   const token = React.useMemo(() => getToken(), []);
 
   useEffect(() => {
+    alert(id);
     const getMyUserProfile = async () => {
       const profileData = await fetchMyProfile(token);
       setProfile(profileData);
