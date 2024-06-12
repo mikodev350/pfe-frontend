@@ -13,11 +13,17 @@
 
 .table-title {
     margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 1.5em;
 }
 
 .table-header {
     background-color: #007bff;
     color: white;
+}
+
+.table-cell {
+    background-color: white;
 }
 
 .delete-btn {
@@ -29,6 +35,17 @@
 .delete-btn:hover {
     background-color: #c82333;
     border-color: #bd2130;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
 }
 
 .delete-account-btn {

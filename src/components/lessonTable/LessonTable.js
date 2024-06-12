@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { fetchLessons, updateLesson } from "../../api/apiLesson";
+import { fetchLessons, updateLesson, deleteLesson } from "../../api/apiLesson";
 import Loader from "../loader/Loader";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
@@ -10,8 +10,10 @@ import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import { parseISO, format } from "date-fns";
 import { BiEdit, BiTrash } from "react-icons/bi";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
-const header = ["#", "Lesson", "Date", "Options"];
+const header = ["#", "Leçon", "Date", "Options"];
 
 const LessonTable = ({ searchValue, token, moduleId }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +39,22 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
         queryClient.invalidateQueries("lessons");
       },
       onError: (error) => {
-        console.error("Error updating lesson:", error);
+        console.error("Erreur lors de la mise à jour de la leçon:", error);
+      },
+    }
+  );
+
+  const deleteLessonMutation = useMutation(
+    (lessonId) => deleteLesson(lessonId, token),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("lessons");
+        toast.success("Leçon supprimée avec succès !");
+      },
+      onError: (error) => {
+        toast.error(
+          `Erreur lors de la suppression de la leçon : ${error.message}`
+        );
       },
     }
   );
@@ -63,12 +80,30 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
     setCurrentLesson({ ...currentLesson, nom: e.target.value });
   };
 
+  const handleDelete = (lessonId) => {
+    Swal.fire({
+      title: "Êtes-vous sûr?",
+      text: "Vous ne pourrez pas annuler cette action!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Oui, supprimez-la!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteLessonMutation.mutate(lessonId);
+      }
+    });
+  };
+
   if (isLoading) {
     return <Loader />;
   }
 
   if (isError) {
-    return <div>Error fetching data: {error.message}</div>;
+    return (
+      <div>Erreur lors de la récupération des données : {error.message}</div>
+    );
   }
 
   return (
@@ -94,7 +129,7 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
               />
               <TableCell dataLabel={header[3]}>
                 <BiEdit size={24} onClick={() => handleEdit(item)} />
-                <BiTrash size={24} />
+                <BiTrash size={24} onClick={() => handleDelete(item.id)} />
               </TableCell>
             </TableRow>
           ))}
@@ -110,12 +145,12 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
 
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Lesson</Modal.Title>
+          <Modal.Title>Modifier la leçon</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group controlId="lessonName">
-              <Form.Label>Lesson Name</Form.Label>
+              <Form.Label>Nom de la leçon</Form.Label>
               <Form.Control
                 type="text"
                 value={currentLesson.nom || ""}
@@ -126,10 +161,10 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Close
+            Fermer
           </Button>
           <Button variant="primary" onClick={handleSave}>
-            Save Changes
+            Enregistrer les modifications
           </Button>
         </Modal.Footer>
       </Modal>

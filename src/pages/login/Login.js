@@ -43,10 +43,6 @@ const Login = () => {
     try {
       const response = await loginAPI(values);
       if (response) {
-        console.log("====================================");
-        console.log(" ial here to go to dasheboard ");
-        console.log("====================================");
-        witchPage();
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {

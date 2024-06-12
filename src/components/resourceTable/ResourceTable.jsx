@@ -1,5 +1,6 @@
+// components/resourceTable/ResourceTable.js
 import React, { useState } from "react";
-import { Row, Table, Button } from "react-bootstrap";
+import { Row, Table } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
 import { useQuery } from "react-query";
 import { fetchResources } from "../../api/apiResource";
@@ -26,7 +27,8 @@ const ResourceTable = ({ searchValue }) => {
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useQuery(
     ["resources", currentPage, pageSize, searchValue],
-    () => fetchResources(currentPage, pageSize, "", searchValue, token)
+    () => fetchResources(currentPage, pageSize, "", searchValue, token),
+    { keepPreviousData: true }
   );
 
   const totalPages = data?.totalPages || 1;
@@ -80,27 +82,7 @@ const ResourceTable = ({ searchValue }) => {
                     : "Invalid Date"
                 }
               />
-
-              <TableIconeResource
-                dataLabel={header[4]}
-                id={resource.id}
-               />
-                {/* <TableCell
-                dataLabel={header[4]}
-                item={
-                  <>
-                    <Button
-                      variant="primary"
-                      onClick={() => navigate(`/student/update-resource/${resource.id}`)}
-                    >
-                      Edit
-                    </Button>
-                    <Button variant="danger" className="ml-2">
-                      Delete
-                    </Button>
-                  </>
-                }
-              /> */}
+              <TableIconeResource dataLabel={header[4]} id={resource.id} />
             </TableRow>
           ))}
         </TableBody>

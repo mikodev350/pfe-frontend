@@ -1,5 +1,4 @@
-import { BiBookBookmark, BiCategory, BiArchive } from "react-icons/bi";
-import { FaPencilRuler } from "react-icons/fa";
+import { BiCategory, BiArchive } from "react-icons/bi";
 
 // const role = localStorage.getItem("role"); // Get the role from local storage
 
@@ -31,26 +30,31 @@ let PageRouteSettingsStudent = [
 
 const PageRouteDashbordTeacher = [
   {
-    name: "Section",
-    route: "/teacher/section",
+    name: "Mon Profile",
+    route: "/student/my-profile",
     icon: BiCategory,
   },
   {
-    name: "Exam",
-    route: "/teacher/exam",
-    icon: BiBookBookmark,
+    name: "mon parcours",
+    route: "/student/parcours",
+    icon: BiCategory,
   },
   {
-    name: "Archive",
-    route: "/teacher/archive",
-    icon: BiArchive,
+    name: "mes resource",
+    route: "/student/resources",
+    icon: BiCategory,
+  },
+  {
+    name: "gere coatching",
+    route: "/student/coatching",
+    icon: BiCategory,
   },
 ];
 
 const PageRouteDashbordStudent = [
   {
     name: "Mon Profile",
-    route: "/student/Profile",
+    route: "/student/my-profile",
     icon: BiCategory,
   },
   {
@@ -68,11 +72,6 @@ const PageRouteDashbordStudent = [
     route: "/student/communaute",
     icon: BiCategory,
   },
-  // {
-  //   name: "Result",
-  //   route: "/student/result",
-  //   icon: FaPencilRuler,
-  // },
 ];
 
 export const routesSide = {

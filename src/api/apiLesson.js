@@ -48,6 +48,7 @@ export const createLesson = async (lessonData, moduleId, token) => {
     throw error;
   }
 };
+
 // Update an existing lesson
 export const updateLesson = async (lessonId, lesson, token) => {
   try {
@@ -65,6 +66,22 @@ export const updateLesson = async (lessonId, lesson, token) => {
     return response.data;
   } catch (error) {
     console.error("Error updating lesson:", error);
+    throw error;
+  }
+};
+
+// Delete a lesson
+export const deleteLesson = async (lessonId, token) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/lessons/${lessonId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting lesson:", error);
     throw error;
   }
 };
