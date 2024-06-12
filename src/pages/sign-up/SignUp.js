@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Form, Button, ProgressBar, Row, Col } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { register, updateRole } from "../../api/authApi"; // Assurez-vous que ces fonctions sont correctement exportées de authApi.js
+import { register, updateRole } from "../../api/authApi"; // Ensure these functions are correctly exported from authApi.js
 import { useNavigate } from "react-router-dom";
 import wilayas from "./../../api/fakeData/wilayas.json";
 import { ToastContainer, toast } from "react-toastify";
 import Layout from "../../components/layout/Layout";
+
 const SignUpSchema = Yup.object().shape({
   username: Yup.string().required("Nom d'utilisateur requis"),
   email: Yup.string().email("Email invalide").required("Email requis"),
@@ -30,7 +31,7 @@ const SignUpSchema = Yup.object().shape({
   wilaya: Yup.string().required("Wilaya requise"),
   postalCode: Yup.string().required("Code postal requis"),
   gender: Yup.string().required("Sexe requis"),
-  role: Yup.string().required("Rôle requis"),
+  type: Yup.string().required("Rôle requis"),
 });
 
 const SignUp = () => {
@@ -48,21 +49,20 @@ const SignUp = () => {
     wilaya: "",
     postalCode: "",
     gender: "",
-    role: "",
+    type: "",
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await register(values);
       if (response) {
-        const updateRoleResponse = await updateRole(values.role);
+        const updateRoleResponse = await updateRole(values.type);
 
         if (updateRoleResponse) {
-          localStorage.setItem("role", updateRoleResponse.role);
-
           const token = localStorage.getItem("token");
           if (token) {
-            if (values.role === "student") {
+            console.log(token);
+            if (values.type === "STUDENT") {
               navigate("/student/parcour");
             } else {
               navigate("/teacher/parcour");
@@ -119,24 +119,24 @@ const SignUp = () => {
                   <ProgressBar now={(step / 4) * 100} />
                   {step === 1 && (
                     <>
-                      <Form.Group className="mb-3" controlId="formRole">
+                      <Form.Group className="mb-3" controlId="formtype">
                         <Form.Label>Rôle :</Form.Label>
                         <Form.Control
                           as="select"
-                          name="role"
-                          value={values.role}
+                          name="type"
+                          value={values.type}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           className={
-                            touched.role && errors.role ? "is-invalid" : ""
+                            touched.type && errors.type ? "is-invalid" : ""
                           }
                         >
                           <option value="">Sélectionner le rôle</option>
-                          <option value="student">Étudiant</option>
-                          <option value="teacher">Enseignant</option>
+                          <option value="STUDENT">Étudiant</option>
+                          <option value="TEACHER">Enseignant</option>
                         </Form.Control>
                         <Form.Control.Feedback type="invalid">
-                          {errors.role}
+                          {errors.type}
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group className="mb-3" controlId="formusername">

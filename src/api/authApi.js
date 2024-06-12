@@ -10,6 +10,7 @@ export const updateRole = async (role) => {
     if (!token) {
       throw new Error("Token non trouvé. Veuillez vous reconnecter.");
     }
+
     const response = await axios.put(
       `${API_BASE_URL}/user-custom/update-role`,
       { role },
@@ -19,6 +20,8 @@ export const updateRole = async (role) => {
         },
       }
     );
+
+    localStorage.setItem("role", response.data.role.toUpperCase());
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -54,8 +57,11 @@ export async function register(userData) {
       userData
     );
     localStorage.setItem("token", response.data.jwt);
+    // console.log("====================================");
+    // console.log(response.data.user.type);
+    // console.log("====================================");
     // localStorage.setItem("role", response.data.user.type.toUpperCase());
-
+    console.log(response);
     return { ...response.data };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -93,6 +99,9 @@ export async function loginAPI(IdentifierData) {
 
     alert("Success");
     localStorage.setItem("token", response.data.jwt);
+    console.log("====================================");
+    console.log(response.data.user.type.toUpperCase());
+    console.log("====================================");
     localStorage.setItem("role", response.data.user.type.toUpperCase());
     return response.data;
   } catch (error) {
