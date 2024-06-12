@@ -56,28 +56,27 @@ const SignUp = () => {
     try {
       const response = await register(values);
       if (response) {
-        const updateRoleResponse = await updateRole(values.type);
+        // const updateRoleResponse = await updateRole(values.type);
 
-        if (updateRoleResponse) {
-          const token = localStorage.getItem("token");
-          if (token) {
-            console.log(token);
-            if (values.type === "STUDENT") {
-              navigate("/student/parcour");
-            } else {
-              navigate("/teacher/parcour");
-            }
+        // if (updateRoleResponse) {
+        const token = localStorage.getItem("token");
+        if (token) {
+          if (values.type === "STUDENT") {
+            navigate("/student/parcour");
           } else {
-            toast.error("Token is missing, please login again.", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            });
+            navigate("/teacher/parcour");
           }
+        } else {
+          toast.error("Token is missing, please login again.", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
         }
+        // }
       }
     } catch (error) {
       toast.error("An error occurred, please try again.", {
