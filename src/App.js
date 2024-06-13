@@ -19,12 +19,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-<<<<<<< HEAD
-          <Route path="/signup" element={<SignUp />} />
-=======
           <Route path="/login/:token" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />\
->>>>>>> origin/filter
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/student/*" element={<StudentDashboard />} />
