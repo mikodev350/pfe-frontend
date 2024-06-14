@@ -18,7 +18,8 @@ export default function Profile() {
     () => (id ? fetchUserProfile(id, token) : fetchMyProfile(token)),
     {
       enabled: !!token,
-
+    } 
+  )
 
 
 
