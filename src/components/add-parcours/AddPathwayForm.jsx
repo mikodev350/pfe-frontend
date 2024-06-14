@@ -5,6 +5,9 @@ import * as Yup from "yup";
 import AddModuleModal from "../AddModuleForm/AddModuleModal";
 import { getToken } from "../../util/authUtils";
 import { createPathway } from "../../api/ApiParcour";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -14,14 +17,16 @@ const validationSchema = Yup.object({
   autoApprentissage: Yup.boolean(),
 });
 
-
 const AddPathwayForm = ({ onSave }) => {
   const [showModuleModal, setShowModuleModal] = useState(false);
   const [modules, setModules] = useState([]);
   const [editingModuleIndex, setEditingModuleIndex] = useState(null);
 
-  // get the token 
+  // Get the token 
   const token = React.useMemo(() => getToken(), []);
+  
+  // Use useNavigate for navigation
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -36,11 +41,25 @@ const AddPathwayForm = ({ onSave }) => {
       console.log("Enregistrer le parcours:", pathwayData); // Afficher les données dans la console
       
       try {
-        const response = await createPathway(pathwayData,token);
+        const response = await createPathway(pathwayData, token);
         console.log('Pathway created successfully:', response);
-        onSave(response);
+        
+        if (onSave) {
+          onSave(response);
+        }
+
+        // Show success notification
+        toast.success("Parcours créé avec succès!");
+
+        // Redirect to the previous page or another page
+        setTimeout(() => {
+          navigate(-1);
+        }, 2000);
       } catch (error) {
         console.error('Error creating pathway:', error);
+
+        // Show error notification
+        toast.error("Erreur lors de la création du parcours.");
       }
     },
   });
@@ -57,7 +76,6 @@ const AddPathwayForm = ({ onSave }) => {
     setShowModuleModal(false);
   };
 
-  console.log(formik);
   const handleEditModule = (index) => {
     setEditingModuleIndex(index);
     setShowModuleModal(true);
@@ -155,7 +173,7 @@ const AddPathwayForm = ({ onSave }) => {
               <div key={index} className="mb-3 p-2 border rounded">
                 <Row className="align-items-center">
                   <Col md={4}>
-                    <strong>{module.nom}</strong> ({module.lessons.length} {formik.values.type === 'continu' ? 'cours' : 'leçons'})
+                    <strong>{module.nom}</strong> ({module.lessons.length} {formik.values.type === 'continue' ? 'cours' : 'leçons'})
                   </Col>
                   <Col md={4} className="text-right">
                     <Button variant="link" onClick={() => handleEditModule(index)} className="mr-2">Modifier</Button>
@@ -187,6 +205,8 @@ const AddPathwayForm = ({ onSave }) => {
         initialData={editingModuleIndex !== null ? modules[editingModuleIndex] : null}
         type={formik.values.type}  // Pass the type to the modal
       />
+
+      <ToastContainer />
     </Container>
   );
 };

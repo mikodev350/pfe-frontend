@@ -51,6 +51,17 @@ const PageRouteDashbordTeacher = [
   },
 ];
 
+let PageRouteSettings = [
+  {
+    name: "Informations du compte",
+    route: "/settings/information-account",
+  },
+  {
+    name: "Changez votre mot de passe",
+    route: "/settings/change-password",
+  },
+];
+
 const PageRouteDashbordStudent = [
   {
     name: "Mon Profile",
@@ -79,4 +90,5 @@ export const routesSide = {
   DASHEBOARD_TEACHER: PageRouteDashbordTeacher,
   DASHEBOARD_STUDENT: PageRouteDashbordStudent,
   SETTINGS_STUDENT: PageRouteSettingsStudent,
+  SETTINGS: PageRouteSettings,
 };

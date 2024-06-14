@@ -9,6 +9,7 @@ import StudentDashboard from "./pages/dashboard/student/StudentDashboard";
 import "./components/table/Tables.css";
 import Profile from "./pages/Profile/Profile";
 import ChatApp from "./pages/chat/chatApp";
+import Settings from "./pages/settings/settings";
 // import PrivateRoute from "./path/to/PrivateRoute"; // Assuming PrivateRoute is a custom component, provide the correct path
 // import DashboardStudent from "./path/to/DashboardStudent"; // Provide the correct path to DashboardStudent
 
@@ -19,12 +20,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/login/:token" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />\
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/student/*" element={<StudentDashboard />} />
           <Route path="/chat" element={<ChatApp />} />
+          <Route path="/settings/*" element={<Settings />} />
         </Routes>
       </Router>
     </>

@@ -34,7 +34,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
     searchValue: '',
     username: '',
     role: '',
-    typeEtude: '',
+    typeEtudes: '',
     niveauEtudes: '',
     nomFormation: '',
     matieresEnseignees: '',
@@ -102,15 +102,15 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
               <Form.Group>
                 <Form.Control
                   as="select"
-                  value={filters.typeEtude}
-                  onChange={(e) => handleFilterChange('typeEtude', e.target.value)}
+                  value={filters.typeEtudes}
+                  onChange={(e) => handleFilterChange('typeEtudes', e.target.value)}
                 >
                   <option value="">Sélectionner le type d'étude</option>
                   <option value="academique">Académique</option>
                   <option value="continue">Continue</option>
                 </Form.Control>
               </Form.Group>
-              {filters.typeEtude === 'academique' && (
+              {filters.typeEtudes === 'academique' && (
                 <>
                   <Form.Group>
                     <Select
@@ -132,7 +132,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                   )}
                 </>
               )}
-              {filters.typeEtude === 'continue' && (
+              {filters.typeEtudes === 'continue' && (
                 <Form.Group>
                   <Form.Control
                     type="text"

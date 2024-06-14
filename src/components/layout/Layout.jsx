@@ -10,20 +10,20 @@ import {
   setFilterType,
   clearResults,
 } from "../../redux/features/search-slice";
-import useStorage from "../../hooks/useStorage";
+import { setRole, setType } from "../../redux/features/role-slice";
 import SidebarDesktop from "../sideBar/SideBarDesktop/SidebarDesktop";
 import SideBarMobile from "../sideBar/sideBarMobile/SideBarMobile";
 import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
+import ErrorPage from "../../pages/error-page/ErrorPage";
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
-  const role = React.useMemo(() => localStorage.getItem("role"), []);
   const location = useLocation();
   const currentRoute = location.pathname.split("/")[1].toUpperCase();
-  const [, , setType] = useStorage({ key: "type" });
 
   const dispatch = useDispatch();
+  const { role, type } = useSelector((state) => state.role);
   const searchResults = useSelector((state) => state.search.results);
   const searchStatus = useSelector((state) => state.search.status);
   const filterType = useSelector((state) => state.search.filterType);
@@ -48,24 +48,44 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   };
 
   useEffect(() => {
-    if (currentRoute === "STUDENT") {
-      setType("type", "DASHEBOARD_STUDENT");
-    } else if (currentRoute === "TEACHER") {
-      setType("type", "DASHEBOARD_TEACHER");
-    } else if (currentRoute === "SETTINGS") {
-      if (role === "STUDENT") setType("type", "SETTINGS_STUDENT");
-      else setType("type", "SETTINGS_TEACHER");
-    }
-    if(role ==='STUDENT'){
-            setType("type", "DASHEBOARD_STUDENT");
+    let newType;
+    let newRole = role;
 
-    }else{
-      setType("type", "DASHEBOARD_TEACHER");
+    switch (currentRoute) {
+      case "STUDENT":
+        newType = "DASHEBOARD_STUDENT";
+        newRole = "STUDENT";
+        break;
+      case "TEACHER":
+        newType = "DASHEBOARD_TEACHER";
+        newRole = "TEACHER";
+        break;
+      case "SETTINGS":
+        newType = "SETTINGS";
+        break;
+      default:
+        const storedRole = localStorage.getItem("role");
+        if (storedRole === "STUDENT") {
+          newType = "DASHEBOARD_STUDENT";
+        } else if (storedRole === "TEACHER") {
+          newType = "DASHEBOARD_TEACHER";
+        } else {
+          newType = "DEFAULT";
+        }
+        break;
+    }
+
+    if (newType !== type) {
+      dispatch(setType(newType));
+    }
+
+    if (newRole !== role) {
+      dispatch(setRole(newRole));
     }
 
     // Clear search results and filters when the location changes
     dispatch(clearResults());
-  }, [currentRoute, role, setType, dispatch, location.pathname]);
+  }, [currentRoute, dispatch, role, type]);
 
   const backgroundColor = backgroundColorIdentification ? "white" : "#F1F1F1";
 
@@ -82,24 +102,24 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
           ) : (
             <Row>
               <Col md={3} className="rc-side-bar">
-                {role === "STUDENT" ? (
-                  <SidebarDesktop student />
-                ) : role === "TEACHER" ? (
-                  <SidebarDesktop teacher />
-                ) : (
-                  <SidebarDesktop />
-                )}
+                {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
+                {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
+                {type === "SETTINGS" && <SidebarDesktop settings />}
               </Col>
               <Col md={9}>
                 {searchStatus === "loading" && <div>Loading...</div>}
-                {searchResults.length > 0 ? (
-                  filterType === "resource" ? (
-                    <ResourceResults results={searchResults} />
-                  ) : (
-                    <UserResults results={searchResults} />
-                  )
+                {searchStatus === "succeeded" && searchResults.length === 0 ? (
+                  <ErrorPage message="Aucun résultat trouvé." />
                 ) : (
-                  children
+                  searchResults.length > 0 ? (
+                    filterType === "resource" ? (
+                      <ResourceResults results={searchResults} />
+                    ) : (
+                      <UserResults results={searchResults} />
+                    )
+                  ) : (
+                    children
+                  )
                 )}
               </Col>
             </Row>

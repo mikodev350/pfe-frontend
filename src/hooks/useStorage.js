@@ -1,22 +1,25 @@
 import React from "react";
 
-export default function useStorage({ key, value }) {
-  const [storage, setUpdateStorage] = React.useState(null);
+export default function useStorage({ key, initialValue = null }) {
+  const [storage, setUpdateStorage] = React.useState(() => {
+    return localStorage.getItem(key) || initialValue;
+  });
 
-  const getStorage = React.useCallback((key) => {
-    return localStorage.getItem(key) || null;
-  }, []);
+  const getStorage = React.useCallback(() => {
+    return localStorage.getItem(key) || initialValue;
+  }, [key, initialValue]);
 
-  const setStorage = React.useCallback((key, value) => {
-    localStorage.setItem(key, value);
-    console.log(value);
-  }, []);
+  const setStorage = React.useCallback(
+    (value) => {
+      localStorage.setItem(key, value);
+      setUpdateStorage(value);
+    },
+    [key]
+  );
 
   React.useEffect(() => {
-    if (key) {
-      setUpdateStorage(localStorage.getItem(key));
-    }
-  }, [key]);
+    setUpdateStorage(localStorage.getItem(key) || initialValue);
+  }, [key, initialValue]);
 
   return [storage, getStorage, setStorage];
 }

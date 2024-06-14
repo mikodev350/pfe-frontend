@@ -5,7 +5,7 @@ import { getParcoursFromLocalStorage, getModulesFromLocalStorage, getLessonsFrom
 
 const ResourceFilterModal = ({ show, handleClose, onFilterChange }) => {
   const [filters, setFilters] = useState({
-    searchValue: '',
+    name: '',
     parcoursFilter: [],
     moduleFilter: [],
     lessonFilter: [],
@@ -61,8 +61,8 @@ const ResourceFilterModal = ({ show, handleClose, onFilterChange }) => {
             <Form.Control
               type="text"
               placeholder="Rechercher par nom"
-              value={filters.searchValue}
-              onChange={(e) => handleFilterChange('searchValue', e.target.value)}
+              value={filters.name}
+              onChange={(e) => handleFilterChange('name', e.target.value)}
             />
           </Form.Group>
           <Form.Group>
