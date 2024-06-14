@@ -31,7 +31,6 @@ const niveauEnseigneOptions = [
 
 const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
   const [filters, setFilters] = useState({
-    searchValue: '',
     username: '',
     role: '',
     typeEtudes: '',
@@ -58,14 +57,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
       </Modal.Header>
       <Modal.Body>
         <Form>
-          <Form.Group>
-            <Form.Control
-              type="text"
-              placeholder="Rechercher par nom"
-              value={filters.searchValue}
-              onChange={(e) => handleFilterChange('searchValue', e.target.value)}
-            />
-          </Form.Group>
+        
           <Form.Group>
             <Form.Control
               type="text"
@@ -75,7 +67,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
             />
           </Form.Group>
           {/*<Form.Group>
-             <Form.Control
+             <Form.Controlmikito
               type="text"
               placeholder="Rôle"
               value={filters.role}

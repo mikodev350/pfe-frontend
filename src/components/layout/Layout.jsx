@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -27,6 +27,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const searchResults = useSelector((state) => state.search.results);
   const searchStatus = useSelector((state) => state.search.status);
   const filterType = useSelector((state) => state.search.filterType);
+  const [prevLocation, setPrevLocation] = useState(location.pathname);
 
   const handleSearchResults = (filters) => {
     const { parcoursFilter, moduleFilter, lessonFilter, userType, ...rest } = filters;
@@ -83,9 +84,11 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       dispatch(setRole(newRole));
     }
 
-    // Clear search results and filters when the location changes
-    dispatch(clearResults());
-  }, [currentRoute, dispatch, role, type]);
+    if (location.pathname !== prevLocation) {
+      dispatch(clearResults());
+      setPrevLocation(location.pathname);
+    }
+  }, [currentRoute, location.pathname, prevLocation, dispatch, role, type]);
 
   const backgroundColor = backgroundColorIdentification ? "white" : "#F1F1F1";
 

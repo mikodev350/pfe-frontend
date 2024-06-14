@@ -4,36 +4,43 @@ import { getToken } from "../../util/authUtils";
 
 export const fetchAdvancedSearch = createAsyncThunk(
   "search/fetchAdvancedSearch",
-  async (params) => {
-    const token = getToken();
-    const { data } = await axios.get(
-      `http://localhost:1337/api/custom-search/advanced`,
-      {
-        params,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(data);
-    return data;
+  async (params, { rejectWithValue }) => {
+    try {
+      const token = getToken();
+      const { data } = await axios.get(
+        `http://localhost:1337/api/custom-search/advanced`,
+        {
+          params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
 );
 
 export const fetchUserSearch = createAsyncThunk(
   "search/fetchUserSearch",
-  async (params) => {
-    const token = getToken();
-    const { data } = await axios.get(
-      `http://localhost:1337/api/custom-search/users`,
-      {
-        params,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return data;
+  async (params, { rejectWithValue }) => {
+    try {
+      const token = getToken();
+      const { data } = await axios.get(
+        `http://localhost:1337/api/custom-search/users`,
+        {
+          params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
 );
 
@@ -62,22 +69,22 @@ const searchSlice = createSlice({
       })
       .addCase(fetchAdvancedSearch.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.results = action.payload;
+        state.results = action.payload || [];
       })
       .addCase(fetchAdvancedSearch.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
       .addCase(fetchUserSearch.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchUserSearch.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.results = action.payload;
+        state.results = action.payload || [];
       })
       .addCase(fetchUserSearch.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       });
   },
 });
