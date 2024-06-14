@@ -19,7 +19,7 @@ export default function Profile() {
     {
       enabled: !!token,
 
-
+    })
 
 
   if (isLoading) return <div>Loading...</div>;
