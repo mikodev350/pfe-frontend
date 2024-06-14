@@ -14,12 +14,11 @@ export default function Profile() {
   const token = React.useMemo(() => getToken(), []);
 
   const { data: profile, isLoading } = useQuery(
-    ['profile', id],
+    ["profile", id ? id : "me"],
     () => (id ? fetchUserProfile(id, token) : fetchMyProfile(token)),
     {
       enabled: !!token,
-    } 
-  )
+
 
 
 
@@ -27,15 +26,13 @@ export default function Profile() {
 
   return (
     <>
-     <Row >
-          <Col className="mt-3 d-flex justify-content-end">
+      <Row>
+        <Col className="mt-3 d-flex justify-content-end">
           <Link to={"/student/edit-profile"}>
-          <Button variant="primary" >
-              Edit Profile
-            </Button></Link>
-            
-          </Col>
-        </Row>
+            <Button variant="primary">Edit Profile</Button>
+          </Link>
+        </Col>
+      </Row>
       <ProfileHeader
         id={id}
         token={token}
@@ -59,7 +56,6 @@ export default function Profile() {
             <Education educations={profile?.educations} />
           </Col>
         </Row>
-       
       </Container>
     </>
   );

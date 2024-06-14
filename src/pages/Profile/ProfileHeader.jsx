@@ -8,6 +8,7 @@ import {
 } from "../../api/apiFriendRequest";
 import { IoClose } from "react-icons/io5";
 import Swal from "sweetalert2";
+import { useQueryClient } from "react-query";
 
 export const ProfileHeader = ({
   id,
@@ -20,9 +21,22 @@ export const ProfileHeader = ({
 }) => {
   const [message, setMessage] = React.useState("");
 
+  const queryClient = useQueryClient();
   const handleSendRequest = async () => {
     try {
-      await sendFriendRequest(id, token);
+      const result = await sendFriendRequest(id, token);
+      console.log(result);
+      // Function to manually update the profile data
+
+      queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
+        return {
+          ...oldData,
+          isRequestSender: false,
+          relationIsExist: true,
+          isFriends: false,
+        };
+      });
+
       setMessage("Invitation sent!");
     } catch (error) {
       setMessage("Error sending invitation: " + error.message);
@@ -32,7 +46,6 @@ export const ProfileHeader = ({
     try {
       Swal.fire({
         title: "Do you want to save the changes?",
-
         showCancelButton: true,
         confirmButtonText: "Remove Relation",
       }).then(async (result) => {
@@ -40,6 +53,15 @@ export const ProfileHeader = ({
         if (result.isConfirmed) {
           await cancelFriendRequest(id, token);
           Swal.fire("Saved!", "", "success");
+
+          queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
+            return {
+              ...oldData,
+              isRequestSender: false,
+              relationIsExist: false,
+              isFriends: false,
+            };
+          });
         } else if (result.isDenied) {
           Swal.fire("Changes are not saved", "", "info");
         }
@@ -51,6 +73,14 @@ export const ProfileHeader = ({
   const handleAcceptRequest = async () => {
     try {
       await acceptFriendRequest(id, token);
+      queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
+        return {
+          ...oldData,
+          isRequestSender: false,
+          relationIsExist: false,
+          isFriends: false,
+        };
+      });
     } catch (error) {
       setMessage("Error sending invitation: " + error.message);
     }
@@ -86,7 +116,7 @@ export const ProfileHeader = ({
       )}
       <div>
         <p className="text-light">Les matières:</p>
-        {profile?.matieresEnseignees.map((matiere, index) => (
+        {profile?.matieresEnseignees?.map((matiere, index) => (
           <Badge key={index} pill bg="light" text="dark" className="mx-1">
             {matiere}
           </Badge>
