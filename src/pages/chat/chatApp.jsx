@@ -1,36 +1,53 @@
 import React, { useState } from "react";
-import { Container, Row, Col, ListGroup } from "react-bootstrap";
+import { Container, Row, Col, ListGroup, Image } from "react-bootstrap";
 import ChatWindow from "./ChatWindow"; // Ensure the path to ChatWindow is correct
 import "./ChatApp.css"; // Importing custom CSS
+import { useQuery } from "react-query";
+import { fetchConversations } from "../../api/apiConversation";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
+const API_BASE_URL = "http://localhost:1337";
+
+const AvatarWithName = (participants, type, id) => {
+  let imageUrl = "";
+  let name = "";
+  if (type === "PRIVATE") {
+    const usersFiltered = participants.filter((item) => item.id !== id);
+    console.log("usersFiltered");
+    console.log(usersFiltered);
+    const {
+      username,
+      profil: {
+        photoProfil: { url },
+      },
+    } = usersFiltered[0];
+    name = username;
+    imageUrl = API_BASE_URL + url;
+  }
+  return (
+    <ItemCard>
+      <Image
+        style={{ width: "40px", height: "40px", borderRadius: "100%" }}
+        src={imageUrl}
+      />
+      <div> {name}</div>{" "}
+    </ItemCard>
+  );
+};
 
 const ChatApp = () => {
-  const [friends, setFriends] = useState([
-    { id: 1, name: "Alice", messages: [] },
-    { id: 2, name: "Bob", messages: [] },
-    { id: 3, name: "Charlie", messages: [] }, // Added more friends for demonstration
-  ]);
-  const [selectedFriendId, setSelectedFriendId] = useState(friends[0].id);
-  const currentUserId = 2; // Your current user's ID
-
-  const handleSendMessage = (friendId, message) => {
-    const updatedFriends = friends.map((friend) => {
-      if (friend.id === friendId) {
-        return {
-          ...friend,
-          messages: [
-            ...friend.messages,
-            { ...message, senderId: currentUserId },
-          ],
-        };
-      }
-      return friend;
-    });
-    setFriends(updatedFriends);
+  const handleSendMessage = (friendId, message) => {};
+  const navigate = useNavigate();
+  const handleShowConversation = (id) => {
+    navigate(`/chat?id=${id}`);
   };
 
-  const selectedFriend = friends.find(
-    (friend) => friend.id === selectedFriendId
+  const { isLoading, data, error } = useQuery(["conversation"], () =>
+    fetchConversations()
   );
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>error...</div>;
 
   return (
     <Container>
@@ -38,26 +55,24 @@ const ChatApp = () => {
       <Row>
         <Col md={4}>
           <ListGroup>
-            {friends.map((friend) => (
+            {data?.conversations?.map((item) => (
               <ListGroup.Item
-                key={friend.id}
-                active={friend.id === selectedFriendId}
-                onClick={() => setSelectedFriendId(friend.id)}
+                key={item.id}
+                //active={item.id === selectedFriendId}
+                onClick={() => handleShowConversation(item.id)}
                 className="friend-list-item"
               >
-                {friend.name}
+                {AvatarWithName(
+                  item.participants,
+                  item.type,
+                  data?.currentUserId
+                )}
               </ListGroup.Item>
             ))}
           </ListGroup>
         </Col>
         <Col md={8}>
-          {selectedFriend && (
-            <ChatWindow
-              friend={selectedFriend}
-              onSendMessage={handleSendMessage}
-              currentUserId={currentUserId}
-            />
-          )}
+          <ChatWindow onSendMessage={handleSendMessage} />
         </Col>
       </Row>
     </Container>
@@ -65,3 +80,9 @@ const ChatApp = () => {
 };
 
 export default ChatApp;
+const ItemCard = styled.div`
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 50px auto;
+  gap: 15px;
+`;

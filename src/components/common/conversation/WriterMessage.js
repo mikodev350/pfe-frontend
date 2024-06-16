@@ -67,7 +67,7 @@ export default function WriterMessage({
   //       };
   //     }
   //   }, [conversationId, socket]);
-  console.log(images);
+
   return (
     <div className="writer-message-section">
       <div className="writer-message-card">
