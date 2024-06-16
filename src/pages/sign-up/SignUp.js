@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Form, Button, ProgressBar, Row, Col } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { register, updateRole } from "../../api/authApi"; // Ensure these functions are correctly exported from authApi.js
+import { register } from "../../api/authApi"; // Ensure these functions are correctly exported from authApi.js
 import { useNavigate } from "react-router-dom";
 import wilayas from "./../../api/fakeData/wilayas.json";
 import { ToastContainer, toast } from "react-toastify";
 import Layout from "../../components/layout/Layout";
+import "react-toastify/dist/ReactToastify.css";
+// import "./signup.css";
 
 const SignUpSchema = Yup.object().shape({
   username: Yup.string().required("Nom d'utilisateur requis"),
@@ -56,9 +58,6 @@ const SignUp = () => {
     try {
       const response = await register(values);
       if (response) {
-        // const updateRoleResponse = await updateRole(values.type);
-
-        // if (updateRoleResponse) {
         const token = localStorage.getItem("token");
         if (token) {
           if (values.type === "STUDENT") {
@@ -76,7 +75,6 @@ const SignUp = () => {
             draggable: true,
           });
         }
-        // }
       }
     } catch (error) {
       toast.error("An error occurred, please try again.", {
@@ -96,10 +94,13 @@ const SignUp = () => {
 
   return (
     <Layout fullcontent={true}>
-      <div id="signUp-box">
+      <div className="main-signup-container">
         <ToastContainer />
-        <Row className="position-relative justify-content-center overflow-hidden">
-          <Col xs={12} md={8} id="signUp-column">
+        <Row className="justify-content-center">
+          <Col md={6} className="image-signup">
+            <div className="background-image"></div>
+          </Col>
+          <Col md={6} id="signup-box">
             <Formik
               initialValues={initialValues}
               validationSchema={SignUpSchema}
@@ -115,7 +116,8 @@ const SignUp = () => {
                 isSubmitting,
               }) => (
                 <Form id="signUp-form" onSubmit={handleSubmit}>
-                  <ProgressBar now={(step / 4) * 100} />
+                  <h2 className="text-center custom-heading">S'inscrire</h2>
+                  <ProgressBar now={(step / 4) * 100} className="mb-4" />
                   {step === 1 && (
                     <>
                       <Form.Group className="mb-3" controlId="formtype">
@@ -175,13 +177,15 @@ const SignUp = () => {
                           {errors.email}
                         </Form.Control.Feedback>
                       </Form.Group>
-                      <Button
-                        variant="primary"
-                        onClick={nextStep}
-                        className="button-Login btn-color"
-                      >
-                        Suivant
-                      </Button>
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          variant="primary"
+                          onClick={nextStep}
+                          className="button-Login btn-color w-100"
+                        >
+                          Suivant
+                        </Button>
+                      </div>
                     </>
                   )}
                   {step === 2 && (
@@ -230,20 +234,22 @@ const SignUp = () => {
                           {errors.confirmPassword}
                         </Form.Control.Feedback>
                       </Form.Group>
-                      <Button
-                        variant="secondary"
-                        onClick={prevStep}
-                        className="button-Login btn-color"
-                      >
-                        Précédent
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={nextStep}
-                        className="button-Login btn-color"
-                      >
-                        Suivant
-                      </Button>
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          variant="secondary"
+                          onClick={prevStep}
+                          className="button-Login btn-color w-45"
+                        >
+                          Précédent
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={nextStep}
+                          className="button-Login btn-color w-45"
+                        >
+                          Suivant
+                        </Button>
+                      </div>
                     </>
                   )}
                   {step === 3 && (
@@ -284,20 +290,22 @@ const SignUp = () => {
                           {errors.dateOfBirth}
                         </Form.Control.Feedback>
                       </Form.Group>
-                      <Button
-                        variant="secondary"
-                        onClick={prevStep}
-                        className="button-Login btn-color"
-                      >
-                        Précédent
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={nextStep}
-                        className="button-Login btn-color"
-                      >
-                        Suivant
-                      </Button>
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          variant="secondary"
+                          onClick={prevStep}
+                          className="button-Login btn-color w-45"
+                        >
+                          Précédent
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={nextStep}
+                          className="button-Login btn-color w-45"
+                        >
+                          Suivant
+                        </Button>
+                      </div>
                     </>
                   )}
                   {step === 4 && (
@@ -381,22 +389,23 @@ const SignUp = () => {
                           {errors.gender}
                         </Form.Control.Feedback>
                       </Form.Group>
-
-                      <Button
-                        variant="secondary"
-                        onClick={prevStep}
-                        className="button-Login btn-color"
-                      >
-                        Précédent
-                      </Button>
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="button-Login btn-color"
-                      >
-                        Register
-                      </Button>
+                      <div className="d-flex justify-content-between">
+                        <Button
+                          variant="secondary"
+                          onClick={prevStep}
+                          className="button-Login btn-color w-45"
+                        >
+                          Précédent
+                        </Button>
+                        <Button
+                          variant="primary"
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="button-Login btn-color w-45"
+                        >
+                          S'inscrire
+                        </Button>
+                      </div>
                     </>
                   )}
                 </Form>
