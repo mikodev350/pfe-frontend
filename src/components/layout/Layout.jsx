@@ -17,6 +17,7 @@ import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
+import CustomNavbar from "../../pages/home/other-header";
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const location = useLocation();
@@ -94,7 +95,8 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
   return (
     <>
-      <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      {/* <SocialMediaNavbar onFilterChange={handleSearchResults} /> */}
+      <CustomNavbar />
       <aside>
         <SideBarMobile />
       </aside>

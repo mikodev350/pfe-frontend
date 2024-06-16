@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import { loginAPI } from "../../api/authApi";
 import "./login.css";
@@ -15,8 +14,6 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-  const { token } = useParams();
-
   const [values] = useState({
     identifier: "",
     password: "",
@@ -25,7 +22,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  function witchPage() {
+  function witchPage(token) {
     const role = localStorage.getItem("role");
 
     if (role === "STUDENT") {
@@ -42,7 +39,9 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       const response = await loginAPI(values);
-      if (response) {
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
+        witchPage(response.token);
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {
@@ -58,89 +57,89 @@ const Login = () => {
   };
 
   return (
-    <Layout fullcontent={true} backgroundColorIdentification={false}>
+    <Layout fullcontent={true} backgroundColorIdentification={true}>
       <ToastContainer />
-      <Row className="justify-content-center">
-        <Col xs={12} md={4} id="login-box">
-          <Formik
-            initialValues={values}
-            validationSchema={LoginSchema}
-            onSubmit={handleSubmit}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-            }) => (
-              <Form onSubmit={handleSubmit} className="mt-5">
-                <h2 className="text-center">Login</h2>
-                <div className="text-center forgot">
-                  <Button variant="light" className="button-login">
-                    <span>
-                      <FaGoogle size={24} />
-                    </span>
-                  </Button>
-                  <Button variant="light" className="button-login">
-                    <span>
-                      <FaFacebookF size={24} />
-                    </span>
-                  </Button>
-                </div>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    name="identifier"
-                    value={values.identifier}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={
-                      touched.identifier && errors.identifier
-                        ? "is-invalid"
-                        : ""
-                    }
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.identifier}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group controlId="formBasicPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={
-                      touched.password && errors.password ? "is-invalid" : ""
-                    }
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group className="mb-3 text-center">
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-100 button-Login btn-color"
-                  >
-                    Login
-                  </Button>
-                  <div className="text-center forgot">
-                    <Link to={"/"}>Forgot your password?</Link>
-                  </div>
-                </Form.Group>
-              </Form>
-            )}
-          </Formik>
-        </Col>
-      </Row>
+      <div className="main-login-container">
+        <Row className="justify-content-center">
+          <Col md={6} className="image-login">
+            <div className="background-image"></div>
+          </Col>
+          <Col md={6} id="login-box">
+            <Formik
+              initialValues={values}
+              validationSchema={LoginSchema}
+              onSubmit={handleSubmit}
+            >
+              {({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+              }) => (
+                <Form onSubmit={handleSubmit} className="mt-5">
+                  <h2 className="text-center custom-heading">Login</h2>
+                  <Form.Group className="mb-3 mt-5" controlId="formBasicEmail">
+                    <Form.Label className="ms-4">Email address</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="identifier"
+                      value={values.identifier}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={
+                        touched.identifier && errors.identifier
+                          ? "is-invalid"
+                          : "border-1"
+                      }
+                      style={{ borderColor: "#1e7fc9c2" }}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.identifier}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group controlId="formBasicPassword">
+                    <Form.Label className="ms-4">Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={
+                        touched.password && errors.password
+                          ? "is-invalid"
+                          : "border-1"
+                      }
+                      style={{ borderColor: "#1e7fc9c2" }}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3 text-center">
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-50 button-Login btn-color mt-5"
+                    >
+                      Login
+                    </Button>
+                    <div className="text-center mt-2 forgot">
+                      <p>
+                        Having trouble logging in?&nbsp;
+                        <Link to={"/"}>Forgot your password?</Link>
+                      </p>
+                    </div>
+                  </Form.Group>
+                </Form>
+              )}
+            </Formik>
+          </Col>
+        </Row>
+      </div>
     </Layout>
   );
 };
