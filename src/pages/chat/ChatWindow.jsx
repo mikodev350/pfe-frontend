@@ -2,28 +2,26 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   Card,
-  Form,
-  Button,
   Image,
   // Badge,
   Modal,
 } from "react-bootstrap";
-import { IoMdCheckmark } from "react-icons/io";
+import { CiClock1 } from "react-icons/ci";
+import { FiCheck } from "react-icons/fi";
+import Moment from "react-moment";
 import { v4 as uuidv4 } from "uuid";
-// import { BiImageAdd, BiXCircle } from "react-icons/bi";
-// import { IoMdSend } from "react-icons/io";
-// import { Picker as EmojiPicker } from "emoji-mart";
 import WriterMessage from "../../components/common/conversation/WriterMessage";
 import styled from "styled-components";
 import { useQuery, useQueryClient } from "react-query";
 import { addMessage, fetchConversation } from "../../api/apiConversation";
 import { useSearchParams } from "react-router-dom";
-import { FiClock } from "react-icons/fi";
+
 import axios from "axios";
 import UploadedImage from "../../components/common/conversation/UploadedImage";
 import UploadedFile from "../../components/common/conversation/UploadedFile";
 import { getToken } from "../../util/authUtils";
-import { uploadFile } from "../../api/apiUpload";
+import { useAppDispatch } from "../../hooks/hooks";
+import { onClearFile, onClearImages } from "../../redux/features/upload-slice";
 
 const API_BASE_URL = "http://localhost:1337";
 
@@ -122,6 +120,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     setSelectedImage(image);
     setShowImageModal(true);
   };
+  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { isLoading, data, error } = useQuery(
     ["conversation", searchQuery.get("id")],
@@ -214,12 +213,13 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       // setData(update);
       // });
     } else if (body.type === "IMAGES" || body.type === "FILES") {
-      // dispatch(onClearImages());
-      // dispatch(onClearFile());
+      dispatch(onClearImages());
+      dispatch(onClearFile());
       const newMessages = body.message.map((file) => ({
         id: uuidv4(),
         type: body.type,
-        message: null,
+        contenu: null,
+        attachement: file.file,
         file: file.file,
         blobURL: body.type === "IMAGES" ? file.blobURL : null,
         member: {
@@ -230,15 +230,17 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         createdAt: new Date(),
         status: "PENDING",
       }));
-      console.log(newMessages);
+
       let data = await queryClient.getQueryData([
         "conversation",
         searchQuery.get("id"),
       ]);
+      console.log(data);
       data = {
         ...data,
-        messages: [...data.messages, newMessages],
+        messages: [...data.messages, ...newMessages],
       };
+      console.log(data);
       queryClient.setQueryData(["conversation", searchQuery.get("id")], {
         ...data,
       });
@@ -267,8 +269,10 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       queryClient.setQueryData(["conversation", searchQuery.get("id")], {
         ...data,
       });
+
       // const updated = [...data, newMessages];
     }
+    messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     // else if (body.type === "VOICE") {
     //   const newMessages = {
     //     id: uuidv4(),
@@ -344,6 +348,29 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     //   alert("something wrong");
     // }
   };
+  const setUploaded = React.useCallback(async (targetItem) => {
+    console.log(targetItem);
+    let data = await queryClient.getQueryData([
+      "conversation",
+      searchQuery.get("id"),
+    ]);
+    console.log(data);
+    data = {
+      ...data,
+      messages: data.messages.map((item) => {
+        if (item.id === targetItem.id) {
+          item.status = "success";
+          item.attachement = targetItem.attachement;
+        }
+        return item;
+      }),
+    };
+    console.log(data);
+    queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+      ...data,
+    });
+  }, []);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>error...</div>;
 
@@ -368,30 +395,49 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
           {data?.messages?.map((message, index) => (
             <div
               key={index}
-              className={`message ${
-                message.senderId === currentUserId
-                  ? "my-message"
-                  : "frie nd-message"
-              }`}
+              // className={`message ${
+              //   message.senderId === currentUserId
+              //     ? "my-message"
+              //     : "frie nd-message"
+              // }`}
             >
-              <p>{message.contenu}</p>
-              <div style={{ float: "right" }}>
+              <ItemMessage>
+                <img
+                  src={"https://avatars.hsoubcdn.com/default?s=128"}
+                  alt=""
+                  style={{ width: "100%" }}
+                />
+                <div>
+                  <p color="text.muted" style={{ padding: "0px 0px 10px 0" }}>
+                    <h5 color="gray.700" mb="10px" lineHeight="1.3">
+                      SImail
+                    </h5>
+                  </p>
+                  <PreUploadItem
+                    item={{
+                      ...message,
+                      type: message.type
+                        ? message.type
+                        : getFileType(message.attachement?.url),
+                    }}
+                    conversationId={searchQuery.get("id")}
+                    setUploaded={setUploaded}
+                    onClick={toggleImageModal}
+                  />
+                </div>
+              </ItemMessage>
+              <div style={{ textAlign: "right" }}>
+                {message.status === "PENDING" ? <CiClock1 /> : <FiCheck />}{" "}
+                <Moment format="hh:mm">{new Date(message.createdAt)}</Moment>
+              </div>
+
+              {/* <div style={{ float: "right" }}>
                 {message?.status === "PENDING" ? (
                   <FiClock />
                 ) : (
                   <IoMdCheckmark />
                 )}
-              </div>
-              <PreUploadItem
-                item={{
-                  ...message,
-                  type: message.type
-                    ? message.type
-                    : getFileType(message.attachement?.url),
-                }}
-                conversationId={searchQuery.get("id")}
-                setUploaded={(e) => console.log(e)}
-              />
+              </div> */}
 
               {/* {message.attachement?.map((item, idx) => (
                 <div key={idx} style={{ marginBottom: "10px" }}>
@@ -560,7 +606,7 @@ async function uploadBlobUrlToStrapi(blobUrl) {
   return uploadResult;
 }
 
-function PreUploadItem({ item, setUploaded, conversationId }) {
+function PreUploadItem({ item, setUploaded, conversationId, onClick }) {
   const [progress, setProgress] = React.useState(0);
   const [status, setStatus] = React.useState(null);
   const [source, setsource] = React.useState();
@@ -619,14 +665,14 @@ function PreUploadItem({ item, setUploaded, conversationId }) {
       };
 
       const result = await axios.post(
-        `${API_BASE_URL}/upload/`,
+        `${process.env.REACT_APP_API_BASE_URL}/upload/`,
         formData,
         options
       );
       console.log(result.data[0]);
       axios
         .post(
-          `${API_BASE_URL}/conversation/${conversationId}`,
+          `${process.env.REACT_APP_API_BASE_URL}/conversation/${conversationId}`,
           {
             data: {
               file: result.data[0],
@@ -640,8 +686,9 @@ function PreUploadItem({ item, setUploaded, conversationId }) {
           setStatus("UPLOADED");
           setUploaded({
             ...item,
+            id: item.id,
             status: "success",
-            file: result.data[0],
+            attachement: result.data[0],
             type: item.type,
           });
         })
@@ -660,21 +707,32 @@ function PreUploadItem({ item, setUploaded, conversationId }) {
   if (item.type === "FILES")
     return (
       <UploadedFile
-        file={item.file}
+        file={item.attachement}
         progress={progress}
         status={status}
         source={source}
       />
     );
+  if (item.type === "TEXT") return <ItemText>{item?.contenu}</ItemText>;
   if (item.type === "IMAGES")
     return (
-      <UploadedImage
-        url={
-          item.status === "pending"
-            ? item?.blobURL
-            : process.env.REACT_APP_DOMAIN_BACKEND + item?.file?.url
+      <div
+        onClick={() =>
+          onClick(
+            item.status === "PENDING"
+              ? item?.blobURL
+              : process.env.REACT_APP_UPLOAD + item?.attachement?.url
+          )
         }
-      />
+      >
+        <UploadedImage
+          url={
+            item.status === "PENDING"
+              ? item?.blobURL
+              : process.env.REACT_APP_UPLOAD + item?.attachement?.url
+          }
+        />
+      </div>
     );
   if (item.type === "VOICE")
     return (
@@ -723,11 +781,11 @@ function getFileType(url) {
   }
 }
 const ItemText = styled.div`
-  // background-color: #2386c8;
-  // padding: 10px;
-  // color: white;
-  // width: 96%;
-  // border-radius: 12px;
+  background-color: #2386c8;
+  padding: 10px;
+  color: white;
+  width: 96%;
+  border-radius: 12px;
 `;
 
 const ActionSection = styled.div`
@@ -746,4 +804,13 @@ const TextAreaStylled = styled.div`
     // margin-top: 220px;
     position: static;
   }
+`;
+
+const ItemMessage = styled.div`
+  display: grid;
+  grid-template-columns: 45px auto;
+  gap: 20px;
+  // background-color: white;
+  margin: 20px 0px 0px 0px;
+  padding: 10px;
 `;
