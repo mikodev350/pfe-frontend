@@ -1,4 +1,4 @@
-/* login and signup styles */
+login and signup styles */
 
 #login,
 #signup {
@@ -189,4 +189,4 @@ button:hover,
 .button-login:hover {
     background: #1e7fc9c2 !important;
     box-shadow: #5d5df0a9 0 10px 20px -10px !important;
-} */
+}

@@ -106,12 +106,12 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
             children
           ) : (
             <Row>
-              <Col md={3} className="rc-side-bar">
+              <Col md={2} className="rc-side-bar">
                 {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
                 {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
                 {type === "SETTINGS" && <SidebarDesktop settings />}
               </Col>
-              <Col md={9}>
+              <Col md={10}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
                   <ErrorPage message="Aucun résultat trouvé." />

@@ -1,73 +1,95 @@
+/* Table Styles */
+.table-responsive {
+  margin-top: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.table thead th {
+  background-color: #2F80ED;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  padding: 15px;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+  background-color: #e3e3e3;
+}
+
+.table tbody tr td {
+  border-top: 1px solid #ddd;
+  /* Add line between rows */
+  border-bottom: 1px solid #ddd;
+  /* Add line between rows */
+  padding: 15px;
+}
+
+.table tbody tr td:last-child {
+  text-align: center;
+}
+
+/* .table td button {
+  background-color: #2F80ED;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+} */
+
+/* .table td button:hover {
+  background-color: #1c56a2;
+} */
 
 @media screen and (max-width: 983px) {
-  table.table-dashboard {
+  .table-responsive {
     border: 0;
   }
 
+  .table thead {
+    display: none;
+  }
 
-  @media screen and (max-width: 983px) {
-    /* Suppression de la bordure de la table */
-    table.table-dashboard {
-      border: 0;
-    }
+  .table tr {
+    display: block;
+    margin-bottom: 0.625em;
+    border-bottom: 3px solid #ddd;
+  }
 
-    table.table-dashboard thead tr th:first-child, tbody tr td:first-child,
-    table.table-dashboard thead tr th:last-child, table.table tbody tr td:last-child{
-      border-radius:0 0 0 0!important;
-    }
-  
-    /* Rétablissement de la largeur automatique pour les cellules de la ligne de données */
-    table.table-dashboard tbody tr td,
-    table.table-dashboard tbody tr td:first-child,
-    table.table-dashboard tbody tr td:last-child {
-      width: auto;
-    }
-  
-    /* Modification de la taille de la légende de la table */
-    table.table-dashboard caption {
-      font-size: 1.3em;
-    }
-  
-    /* Masquage de l'en-tête de la table */
-    table.table-dashboard thead {
-      display: none;
-    }
-  
-    /* Affichage des lignes de la table en tant que blocs avec une bordure inférieure */
-    table.table-dashboard tr {
-      border-bottom: 3px solid #ddd;
-      display: block;
-      margin-bottom: 0.625em;
-    }
-  
-    /* Affichage des cellules de la table en tant que blocs avec une bordure inférieure */
-    table.table-dashboard td {
-      border-bottom: 1px solid #ddd;
-      display: block;
-      font-size: 0.8em;
-      text-align: right;
-    }
-  
-    /* Ajout d'une étiquette avant le contenu de chaque cellule */
-    table.table-dashboard td::before {
-      content: attr(data-label);
-      float: left;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-  
-    /* Suppression de la bordure inférieure de la dernière cellule de chaque ligne */
-    table.table-dashboard td:last-child {
-      border-bottom: 0;
-    }
-  
-    /* Rétablissement de l'alignement à gauche et de la bordure de la première cellule de chaque ligne */
-    table.table-dashboard tbody tr td:first-child {
-      word-break: break-all !important;
-      border-radius: 0;
-      width: auto;
-      text-align: left;
-    }
+  .table td {
+    display: block;
+    font-size: 0.8em;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-left: 15px;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table tbody tr td:first-child {
+    word-break: break-all !important;
+    width: auto;
+    text-align: left;
   }
 }
-  

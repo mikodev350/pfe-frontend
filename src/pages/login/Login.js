@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import { loginAPI } from "../../api/authApi";
-import "./login.css";
+// import "./login.css";
 import Layout from "../../components/layout/Layout";
 
 const LoginSchema = Yup.object().shape({
