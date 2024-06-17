@@ -10,6 +10,9 @@ import { IoClose } from "react-icons/io5";
 import Swal from "sweetalert2";
 import { useQueryClient } from "react-query";
 
+
+ const userRole = localStorage.getItem("role")?.toUpperCase();
+
 export const ProfileHeader = ({
   id,
   token,
@@ -22,26 +25,25 @@ export const ProfileHeader = ({
   const [message, setMessage] = React.useState("");
 
   const queryClient = useQueryClient();
+
   const handleSendRequest = async () => {
     try {
       const result = await sendFriendRequest(id, token);
       console.log(result);
-      // Function to manually update the profile data
-
       queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
         return {
           ...oldData,
-          isRequestSender: false,
+          isRequestSender: true,
           relationIsExist: true,
           isFriends: false,
         };
       });
-
       setMessage("Invitation sent!");
     } catch (error) {
       setMessage("Error sending invitation: " + error.message);
     }
   };
+
   const handleCancelRequest = async () => {
     try {
       Swal.fire({
@@ -49,7 +51,6 @@ export const ProfileHeader = ({
         showCancelButton: true,
         confirmButtonText: "Remove Relation",
       }).then(async (result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           await cancelFriendRequest(id, token);
           Swal.fire("Saved!", "", "success");
@@ -70,6 +71,7 @@ export const ProfileHeader = ({
       setMessage("Error sending invitation: " + error.message);
     }
   };
+
   const handleAcceptRequest = async () => {
     try {
       await acceptFriendRequest(id, token);
@@ -77,14 +79,15 @@ export const ProfileHeader = ({
         return {
           ...oldData,
           isRequestSender: false,
-          relationIsExist: false,
-          isFriends: false,
+          relationIsExist: true,
+          isFriends: true,
         };
       });
     } catch (error) {
-      setMessage("Error sending invitation: " + error.message);
+      setMessage("Error accepting invitation: " + error.message);
     }
   };
+
   return (
     <Container className="text-center my-3 container-profile Bagrond-Profils">
       <Image
@@ -114,15 +117,24 @@ export const ProfileHeader = ({
       {profile?.niveauSpecifique && (
         <p className="text-light">Niveaux: {profile?.niveauSpecifique}</p>
       )}
+  <div>
+  {profile?.matieresEnseignees?.length > 0 && userRole === "TEACHER"&& (
+    <>
+      <p className="text-light">Les matières:</p>
+      {profile.matieresEnseignees.map((matiere, index) => (
+        <Badge key={index} pill bg="light" text="dark" className="mx-1">
+          {matiere}
+        </Badge>
+      ))}
+    </>
+  )}
+</div>
       <div>
-        <p className="text-light">Les matières:</p>
-        {profile?.matieresEnseignees?.map((matiere, index) => (
-          <Badge key={index} pill bg="light" text="dark" className="mx-1">
-            {matiere}
-          </Badge>
-        ))}
-      </div>
-      <div>
+        {profile?.additionalAttribute && (
+          <p className="text-light">
+            Additional Attribute: {profile?.additionalAttribute}
+          </p>
+        )}
         <br />
         {id && (
           <>
@@ -139,15 +151,13 @@ export const ProfileHeader = ({
                     <IoClose size={19} /> Remove Relation
                   </Button>
                 ) : !isRequestSender ? (
-                  <>
-                    <Button
-                      variant="danger"
-                      onClick={handleCancelRequest}
-                      className="custom-light-button"
-                    >
-                      <IoClose size={19} /> Cancel
-                    </Button>
-                  </>
+                  <Button
+                    variant="danger"
+                    onClick={handleCancelRequest}
+                    className="custom-light-button"
+                  >
+                    <IoClose size={19} /> Cancel
+                  </Button>
                 ) : (
                   <>
                     <Button
@@ -155,7 +165,7 @@ export const ProfileHeader = ({
                       onClick={handleAcceptRequest}
                       className="custom-light-button"
                     >
-                      <MdPersonAddAlt size={19} /> Accpect
+                      <MdPersonAddAlt size={19} /> Accept
                     </Button>
                     <Button
                       variant="danger"
@@ -173,7 +183,7 @@ export const ProfileHeader = ({
                 onClick={handleSendRequest}
                 className="custom-light-button"
               >
-                <MdPersonAddAlt size={19} /> Ajouter
+                <MdPersonAddAlt size={19} /> Add Friend
               </Button>
             )}
           </>

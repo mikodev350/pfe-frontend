@@ -7,9 +7,11 @@ import { fetchConversations } from "../../api/apiConversation";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
+import { Helmet } from "react-helmet";
 const API_BASE_URL = "http://localhost:1337";
 
 const AvatarWithName = (participants, type, id) => {
+  
   let imageUrl = "";
   let name = "";
   if (type === "PRIVATE") {
@@ -51,6 +53,10 @@ const ChatApp = () => {
   if (error) return <div>error...</div>;
 
   return (
+    <>
+         <Helmet>
+        <link rel="stylesheet" type="text/css" href="/css/chatStyle.css" />
+      </Helmet>
     <Layout>
       <Container>
         <h1>Chat Application</h1>
@@ -79,6 +85,7 @@ const ChatApp = () => {
         </Row>
       </Container>
     </Layout>
+    </>
   );
 };
 
