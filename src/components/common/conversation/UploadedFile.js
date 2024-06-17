@@ -7,7 +7,7 @@ import byteSize from "byte-size";
 
 import styled from "styled-components";
 import { onUpdateFile } from "../../../redux/features/upload-slice";
-
+import { AiOutlineDownload } from "react-icons/ai";
 const ItemUploadContainer = styled.div`
   width: 93%;
   display: flex;
@@ -70,6 +70,9 @@ export default function UploadedFile({ file, progress, status, source }) {
   const handleCancelUpload = () => {
     source.abort("Cancelled by user");
   };
+  const onDonwload = () => {
+    alert("ترميك");
+  };
   return (
     <div className="item-upload" style={{ width: "93%" }}>
       <div className="item-upload-box-icon">
@@ -77,8 +80,9 @@ export default function UploadedFile({ file, progress, status, source }) {
       </div>
       <div className="item-upload-text" style={{ overflow: "hidden" }}>
         <p style={{ overflow: "hidden", height: "20px", margin: 0 }}>
-          {file.name}
+          {file?.name}
         </p>
+
         <span>
           {calculateByteSize} | {progress}/100
         </span>
@@ -92,11 +96,11 @@ export default function UploadedFile({ file, progress, status, source }) {
           />
         </div>
       )} */}
-      {status === "PREUPLOAD" && (
-        <div onClick={() => handleRemoveFile(file)}>
-          <FiTrash2
+      {status !== "PENDING" && (
+        <div onClick={() => onDonwload(file)}>
+          <AiOutlineDownload
             size={20}
-            color="#F18A90"
+            color="black"
             className="item-upload-delete-icon"
           />
         </div>

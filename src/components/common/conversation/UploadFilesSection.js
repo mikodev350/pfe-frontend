@@ -51,7 +51,7 @@ export default function UploadFilesSection() {
       </ClearButtonContainer>
       <ScrollableContainer>
         {files?.map((item, index) => (
-          <UploadedFile file={item.file} key={index} />
+          <UploadedFile file={item.file} status={"PENDING"} key={index} />
         ))}
       </ScrollableContainer>
     </SectionContainer>
