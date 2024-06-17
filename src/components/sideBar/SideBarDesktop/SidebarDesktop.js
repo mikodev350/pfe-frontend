@@ -4,7 +4,12 @@ import { NavLink } from "react-router-dom";
 import "./SidebarDesktop.css";
 import useStorage from "../../../hooks/useStorage";
 import { routesSide } from "../../../constants/routes";
-
+import styled from "styled-components";
+const StyledSidebar = styled.div`
+  position: fixed;
+  top: 100px;
+  z-index: 28;
+`;
 const SidebarDesktop = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentRoute] = useStorage({ key: "type" });
@@ -19,7 +24,7 @@ const SidebarDesktop = () => {
     const handleMouseLeave = () => setIsExpanded(false);
 
     return (
-      <div
+      <StyledSidebar
         className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -35,7 +40,7 @@ const SidebarDesktop = () => {
             </Nav.Item>
           ))}
         </Nav>
-      </div>
+      </StyledSidebar>
     );
   }
 
