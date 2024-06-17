@@ -31,7 +31,8 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const [prevLocation, setPrevLocation] = useState(location.pathname);
 
   const handleSearchResults = (filters) => {
-    const { parcoursFilter, moduleFilter, lessonFilter, userType, ...rest } = filters;
+    const { parcoursFilter, moduleFilter, lessonFilter, userType, ...rest } =
+      filters;
 
     const params = {
       ...rest,
@@ -100,31 +101,27 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       <aside>
         <SideBarMobile />
       </aside>
+      {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
+      {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
+      {type === "SETTINGS" && <SidebarDesktop settings />}
       <main style={{ backgroundColor, minHeight: "100vh" }}>
         <Container>
           {fullcontent ? (
             children
           ) : (
             <Row>
-              <Col md={2} className="rc-side-bar">
-                {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
-                {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
-                {type === "SETTINGS" && <SidebarDesktop settings />}
-              </Col>
-              <Col md={10}>
+              <Col md={12}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
                   <ErrorPage message="Aucun résultat trouvé." />
-                ) : (
-                  searchResults.length > 0 ? (
-                    filterType === "resource" ? (
-                      <ResourceResults results={searchResults} />
-                    ) : (
-                      <UserResults results={searchResults} />
-                    )
+                ) : searchResults.length > 0 ? (
+                  filterType === "resource" ? (
+                    <ResourceResults results={searchResults} />
                   ) : (
-                    children
+                    <UserResults results={searchResults} />
                   )
+                ) : (
+                  children
                 )}
               </Col>
             </Row>

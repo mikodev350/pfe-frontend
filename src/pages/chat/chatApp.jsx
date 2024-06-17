@@ -6,6 +6,7 @@ import { useQuery } from "react-query";
 import { fetchConversations } from "../../api/apiConversation";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import Layout from "../../components/layout/Layout";
 const API_BASE_URL = "http://localhost:1337";
 
 const AvatarWithName = (participants, type, id) => {
@@ -50,32 +51,34 @@ const ChatApp = () => {
   if (error) return <div>error...</div>;
 
   return (
-    <Container>
-      <h1>Chat Application</h1>
-      <Row>
-        <Col md={4}>
-          <ListGroup>
-            {data?.conversations?.map((item) => (
-              <ListGroup.Item
-                key={item.id}
-                //active={item.id === selectedFriendId}
-                onClick={() => handleShowConversation(item.id)}
-                className="friend-list-item"
-              >
-                {AvatarWithName(
-                  item.participants,
-                  item.type,
-                  data?.currentUserId
-                )}
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        </Col>
-        <Col md={8}>
-          <ChatWindow onSendMessage={handleSendMessage} />
-        </Col>
-      </Row>
-    </Container>
+    <Layout>
+      <Container>
+        <h1>Chat Application</h1>
+        <Row>
+          <Col md={4}>
+            <ListGroup>
+              {data?.conversations?.map((item) => (
+                <ListGroup.Item
+                  key={item.id}
+                  //active={item.id === selectedFriendId}
+                  onClick={() => handleShowConversation(item.id)}
+                  className="friend-list-item"
+                >
+                  {AvatarWithName(
+                    item.participants,
+                    item.type,
+                    data?.currentUserId
+                  )}
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Col>
+          <Col md={8}>
+            <ChatWindow onSendMessage={handleSendMessage} />
+          </Col>
+        </Row>
+      </Container>
+    </Layout>
   );
 };
 
