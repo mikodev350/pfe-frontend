@@ -52,7 +52,7 @@ const DashboardProfile = () => {
   }
 
   return (
-    <Container style={{backgroundColor:"white"}}>
+    <Container className="container-dashboard">
       <h1 className="mt-5 mb-4 text-center">Mon profil</h1>
       <Row className="mb-4 justify-content-center">
         <Col className="text-center mb-2" xs={12} md={3}>
@@ -92,12 +92,12 @@ const DashboardProfile = () => {
                   <td className="table-cell">
                     <div className="d-flex justify-content-center">
                       <Link to={`/student/update-experience/${exp.id}`}>
-                        <Button variant="outline-warning" size="sm" className="edit-btn mr-2">
-                          <FaEdit style={{ marginRight: '5px' }} /> Modifier
+                        <Button variant="outline-warning"  className="edit-btn">
+                          <FaEdit className="icon" /> Modifier
                         </Button>
                       </Link>
-                      <Button variant="outline-danger" size="sm" className="delete-btn" onClick={() => handleDeleteExperience(exp.id)}>
-                        <FaTrashAlt style={{ marginRight: '5px' }} /> Supprimer
+                      <Button variant="outline-danger"  className="delete-btn" onClick={() => handleDeleteExperience(exp.id)}>
+                        <FaTrashAlt className="icon" /> Supprimer
                       </Button>
                     </div>
                   </td>
@@ -126,12 +126,12 @@ const DashboardProfile = () => {
                   <td className="table-cell">
                     <div className="d-flex justify-content-center">
                       <Link to={`/student/update-education/${edu.id}`}>
-                        <Button variant="outline-warning" size="sm" className="edit-btn mr-2">
-                          <FaEdit style={{ marginRight: '5px' }} /> Modifier
+                        <Button variant="outline-warning" size="sm" className="edit-btn">
+                          <FaEdit className="icon" /> Modifier
                         </Button>
                       </Link>
                       <Button variant="outline-danger" size="sm" className="delete-btn" onClick={() => handleDeleteEducation(edu.id)}>
-                        <FaTrashAlt style={{ marginRight: '5px' }} /> Supprimer
+                        <FaTrashAlt className="icon" /> Supprimer
                       </Button>
                     </div>
                   </td>
@@ -142,7 +142,7 @@ const DashboardProfile = () => {
         </Col>
       </Row>
       <Row className="justify-content-center">
-        <Button variant="outline-danger" size="sm" className="delete-account-btn mt-4">Supprimer Mon Compte</Button>
+        <Button variant="outline-danger"  className="delete-account-btn mt-4">Supprimer Mon Compte</Button>
       </Row>
     </Container>
   );

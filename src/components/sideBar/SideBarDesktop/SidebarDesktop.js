@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { FaHome, FaBook, FaFolder, FaUsers, FaCog } from "react-icons/fa";
 import "./SidebarDesktop.css";
 import useStorage from "../../../hooks/useStorage";
 import { routesSide } from "../../../constants/routes";
