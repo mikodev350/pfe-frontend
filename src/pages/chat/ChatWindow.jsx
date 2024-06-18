@@ -65,13 +65,17 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const messageEndRef = useRef(null);
-  const id = searchQuery.get("id");
-  useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [id, showEmojiPicker, uploadedImages]); // Use optional chaining to safely access messages
+  // Create a ref for the scrollable container
+  const scrollableContainerRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (scrollableContainerRef.current) {
+      scrollableContainerRef.current.scrollTo({
+        top: scrollableContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, []);
   const toggleImageModal = (image) => {
     setSelectedImage(image);
     setShowImageModal(true);
@@ -83,6 +87,12 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     () => fetchConversation({ id: searchQuery.get("id") })
   );
   const handleSubmit = async (body) => {
+    if (scrollableContainerRef.current) {
+      scrollableContainerRef.current.scrollTo({
+        top: scrollableContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
     if (body.type === "TEXT") {
       const form = {
         message: body.message,
@@ -221,7 +231,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
 
       // const updated = [...data, newMessages];
     }
-    messageEndRef.current.scrollIntoView({ behavior: "smooth" });
   };
   const setUploaded = React.useCallback(async (targetItem) => {
     console.log(targetItem);
@@ -265,6 +274,12 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         queryClient.setQueryData(["conversation", searchQuery.get("id")], {
           ...data,
         });
+        if (scrollableContainerRef.current) {
+          scrollableContainerRef.current.scrollTo({
+            top: scrollableContainerRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
         // formik.setFieldTouched("message", false); // Disable field touched status
         // formik.setFieldValue("message", ""); // Reset field value
         // const newMessage = {
@@ -291,46 +306,56 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         <Card.Header>
           {AvatarWithName(data?.participants, data?.type, data?.currentUserId)}
         </Card.Header>
-        <Card.Body style={{ height: "70vh", overflowY: "auto" }}>
-          {data?.messages?.map((message, index) => (
-            <div key={index}>
-              <ItemMessage>
-                <img
-                  src={
-                    message?.expediteur?.profil?.photoProfil?.url
-                      ? API_BASE_URL +
-                        message?.expediteur?.profil?.photoProfil?.url
-                      : "https://avatars.hsoubcdn.com/default?s=128"
-                  }
-                  alt=""
-                  style={{ width: "100%" }}
-                />
-                <div>
-                  <p color="text.muted" style={{ padding: "0px 0px 10px 0" }}>
-                    <h5 color="gray.700" mb="10px" lineHeight="1.3">
-                      {message?.expediteur?.username}
-                    </h5>
-                  </p>
-                  <PreUploadItem
-                    item={{
-                      ...message,
-                      type: message.type
-                        ? message.type
-                        : getFileType(message.attachement?.url),
-                    }}
-                    conversationId={searchQuery.get("id")}
-                    setUploaded={setUploaded}
-                    onClick={toggleImageModal}
+        <Card.Body>
+          <div
+            ref={scrollableContainerRef}
+            style={{
+              //height: "100%", // Full height of the Card
+              minHeight: "350px",
+              overflowY: "auto", // Allow scrolling
+              height: `${window.innerHeight - 450}px`,
+              maxHeight: `400px`,
+            }}
+          >
+            {data?.messages?.map((message, index) => (
+              <div key={index}>
+                <ItemMessage>
+                  <img
+                    src={
+                      message?.expediteur?.profil?.photoProfil?.url
+                        ? API_BASE_URL +
+                          message?.expediteur?.profil?.photoProfil?.url
+                        : "https://avatars.hsoubcdn.com/default?s=128"
+                    }
+                    alt=""
+                    style={{ width: "100%" }}
                   />
+                  <div>
+                    <p color="text.muted" style={{ padding: "0px 0px 10px 0" }}>
+                      <h5 color="gray.700" mb="10px" lineHeight="1.3">
+                        {message?.expediteur?.username}
+                      </h5>
+                    </p>
+                    <PreUploadItem
+                      item={{
+                        ...message,
+                        type: message.type
+                          ? message.type
+                          : getFileType(message.attachement?.url),
+                      }}
+                      conversationId={searchQuery.get("id")}
+                      setUploaded={setUploaded}
+                      onClick={toggleImageModal}
+                    />
+                  </div>
+                </ItemMessage>
+                <div style={{ textAlign: "right" }}>
+                  {message.status === "PENDING" ? <CiClock1 /> : <FiCheck />}{" "}
+                  <Moment format="hh:mm">{new Date(message.createdAt)}</Moment>
                 </div>
-              </ItemMessage>
-              <div style={{ textAlign: "right" }}>
-                {message.status === "PENDING" ? <CiClock1 /> : <FiCheck />}{" "}
-                <Moment format="hh:mm">{new Date(message.createdAt)}</Moment>
               </div>
-            </div>
-          ))}
-          <div ref={messageEndRef} />
+            ))}
+          </div>
         </Card.Body>
         <Card.Footer>
           <ActionSection>
