@@ -8,6 +8,7 @@ import "./components/table/Tables.css";
 import Profile from "./pages/Profile/Profile";
 import ChatApp from "./pages/chat/chatApp";
 import Settings from "./pages/settings/settings";
+import Socket from "./components/Socket/Socket";
 // import PrivateRoute from "./path/to/PrivateRoute"; // Assuming PrivateRoute is a custom component, provide the correct path
 // import DashboardStudent from "./path/to/DashboardStudent"; // Provide the correct path to DashboardStudent
 
@@ -18,6 +19,7 @@ import "./custom-bootstrap.css";
 function App() {
   return (
     <>
+      <Socket />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

@@ -10,11 +10,12 @@ import sidebarState from "./features/sidebarSlice";
 import logoutState from "./features/logoutSlice";
 import searchSlice from "./features/search-slice.js";
 import roleReducer from "./features/role-slice.js";
+import notificationSlice from "./features/notification-slice.js";
 
 const rootReducer = combineReducers({
   //user: userSlice,
   socket: socketSlice,
-  // notification: notificationSlice,
+  notification: notificationSlice,
   recorder: recorderSlice,
   upload: uploadFilesSlice,
   image: imageSlice,
