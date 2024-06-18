@@ -22,6 +22,7 @@ import UploadedFile from "../../components/common/conversation/UploadedFile";
 import { getToken } from "../../util/authUtils";
 import { useAppDispatch } from "../../hooks/hooks";
 import { onClearFile, onClearImages } from "../../redux/features/upload-slice";
+import { useSelector } from "react-redux";
 
 const API_BASE_URL = "http://localhost:1337";
 
@@ -55,21 +56,12 @@ const ItemCard = styled.div`
   grid-template-columns: 50px auto;
   gap: 15px;
 `;
-// Utility function to check if the attachment is a file
-const isFile = (attachment) => {
-  const fileTypes = [
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
-  return fileTypes.includes(attachment.mime);
-};
 
 const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   const [searchQuery] = useSearchParams();
-  const [newMessage, setNewMessage] = useState("");
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const [uploadedImages] = useState([]);
+  const [showEmojiPicker] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const messageEndRef = useRef(null);
@@ -79,42 +71,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [id, showEmojiPicker, uploadedImages]); // Use optional chaining to safely access messages
-
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (newMessage.trim() || uploadedImages.length > 0) {
-      const messageToSend = {
-        content: newMessage,
-        images: uploadedImages.map((image) => ({ src: image })),
-        senderId: currentUserId,
-      };
-      onSendMessage(friend.id, messageToSend);
-      setNewMessage("");
-      setUploadedImages([]);
-      setShowEmojiPicker(false);
-    }
-  };
-
-  const handleEmojiSelect = (emoji) => {
-    setNewMessage((prevMessage) => prevMessage + emoji.native);
-  };
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedImages((prevImages) => [...prevImages, reader.result]);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = (index) => {
-    setUploadedImages((prevImages) =>
-      prevImages.filter((_, idx) => idx !== index)
-    );
-  };
 
   const toggleImageModal = (image) => {
     setSelectedImage(image);
@@ -127,13 +83,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     () => fetchConversation({ id: searchQuery.get("id") })
   );
   const handleSubmit = async (body) => {
-    // Handle form submission here
-    // console.log(body);
-    // const config = {
-    //   headers: {
-    //     Authorization: `Bearer ${localStorage.getItem("jwt")}`, // Attach the token as a Bearer token
-    //   },
-    // };
     if (body.type === "TEXT") {
       const form = {
         message: body.message,
@@ -273,80 +222,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       // const updated = [...data, newMessages];
     }
     messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-    // else if (body.type === "VOICE") {
-    //   const newMessages = {
-    //     id: uuidv4(),
-    //     type: body.type,
-    //     message: null,
-    //     file: body.message,
-    //     member: {
-    //       id: localStorage.getItem("id"),
-    //       fullname: localStorage.getItem("fullname"),
-    //       avatar: localStorage.getItem("avatar"),
-    //     },
-    //     createdAt: new Date(),
-    //     status: "PENDING",
-    //   };
-
-    //   // const updated = [...data, newMessages];
-    //   // setData(updated);
-    // } else if (body.type === "IMAGES" || body.type === "FILES") {
-    //   // dispatch(onClearImages());
-    //   // dispatch(onClearFile());
-    //   const newMessages = body.message.map((file) => ({
-    //     id: uuidv4(),
-    //     type: body.type,
-    //     message: null,
-    //     file: file.file,
-    //     blobURL: body.type === "IMAGES" ? file.blobURL : null,
-    //     member: {
-    //       id: localStorage.getItem("id"),
-    //       fullname: localStorage.getItem("fullname"),
-    //       avatar: localStorage.getItem("avatar"),
-    //     },
-    //     createdAt: new Date(),
-    //     status: "PENDING",
-    //   }));
-
-    //   // setData((prev) => [...prev, ...newMessages]);
-
-    //   // const result = await uploadBlobUrlToStrapi(body.message);
-    //   // axios
-    //   //   .post(
-    //   //     `${API_BASE_URL}/course-hub/message?course_hubId=${conversationId}`,
-    //   //     {
-    //   //       files: result.data,
-    //   //       type: body.type,
-    //   //     },
-    //   //     config
-    //   //   )
-    //   //   .then((response) => {
-    //   //     setTimeout(() => {
-    //   //       setData((currentData) =>
-    //   //         currentData.map((item) => {
-    //   //           if (item.id === uuid) {
-    //   //             item.status = "success";
-    //   //             item.files = result.data;
-    //   //             item.type = body.type;
-    //   //           }
-    //   //           return item;
-    //   //         })
-    //   //       );
-    //   //     }, 1000);
-    //   //   })
-    //   //   .catch((error) => {
-    //   //     console.log(error);
-    //   //     const update = data.map((item) => {
-    //   //       if (item.id === uuid) {
-    //   //         item.status = "error";
-    //   //       }
-    //   //       return item;
-    //   //     });
-    //   //     setData(update);
-    //   //   });
-    // } else {
-    //   alert("something wrong");
-    // }
   };
   const setUploaded = React.useCallback(async (targetItem) => {
     console.log(targetItem);
@@ -371,6 +246,42 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     });
   }, []);
 
+  const { socket } = useSelector((state) => state.socket);
+
+  React.useEffect(() => {
+    if (socket) {
+      // Create a socket connection
+      socket?.on("newMessage", async ({ message }) => {
+        let data = await queryClient.getQueryData([
+          "conversation",
+          searchQuery.get("id"),
+        ]);
+        console.log(data);
+        data = {
+          ...data,
+          messages: [...data.messages, message],
+        };
+
+        queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+          ...data,
+        });
+        // formik.setFieldTouched("message", false); // Disable field touched status
+        // formik.setFieldValue("message", ""); // Reset field value
+        // const newMessage = {
+        //   createdAt: new Date(),
+        //   message: message,
+        //   member: {
+        //     fullname: localStorage.getItem("fullname"),
+        //   },
+        // };
+        //setData((prev) => [...prev, newMessage]);
+      });
+      return () => {
+        socket?.off("newMessage");
+      };
+    }
+  }, [socket]);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>error...</div>;
 
@@ -379,38 +290,25 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       <Card>
         <Card.Header>
           {AvatarWithName(data?.participants, data?.type, data?.currentUserId)}
-          {/* <Button
-            variant="outline-secondary"
-            onClick={onBackToList}
-            style={{
-              float: "right",
-              display: "inline-block",
-              marginTop: "-5px",
-            }}
-          >
-            Back to List
-          </Button> */}
         </Card.Header>
         <Card.Body style={{ height: "70vh", overflowY: "auto" }}>
           {data?.messages?.map((message, index) => (
-            <div
-              key={index}
-              // className={`message ${
-              //   message.senderId === currentUserId
-              //     ? "my-message"
-              //     : "frie nd-message"
-              // }`}
-            >
+            <div key={index}>
               <ItemMessage>
                 <img
-                  src={"https://avatars.hsoubcdn.com/default?s=128"}
+                  src={
+                    message?.expediteur?.profil?.photoProfil?.url
+                      ? API_BASE_URL +
+                        message?.expediteur?.profil?.photoProfil?.url
+                      : "https://avatars.hsoubcdn.com/default?s=128"
+                  }
                   alt=""
                   style={{ width: "100%" }}
                 />
                 <div>
                   <p color="text.muted" style={{ padding: "0px 0px 10px 0" }}>
                     <h5 color="gray.700" mb="10px" lineHeight="1.3">
-                      SImail
+                      {message?.expediteur?.username}
                     </h5>
                   </p>
                   <PreUploadItem
@@ -430,37 +328,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
                 {message.status === "PENDING" ? <CiClock1 /> : <FiCheck />}{" "}
                 <Moment format="hh:mm">{new Date(message.createdAt)}</Moment>
               </div>
-
-              {/* <div style={{ float: "right" }}>
-                {message?.status === "PENDING" ? (
-                  <FiClock />
-                ) : (
-                  <IoMdCheckmark />
-                )}
-              </div> */}
-
-              {/* {message.attachement?.map((item, idx) => (
-                <div key={idx} style={{ marginBottom: "10px" }}>
-                  {item.mime.startsWith("image/") ? (
-                    <Image
-                      src={API_BASE_URL + item.url}
-                      alt="Message content"
-                      style={{ maxWidth: "100%", cursor: "pointer" }}
-                      onClick={() => toggleImageModal(API_BASE_URL + item.url)}
-                    />
-                  ) : (
-                    isFile(item) && (
-                      <a
-                        href={item.url}
-                        download
-                        style={{ display: "inline-block", marginTop: "10px" }}
-                      >
-                        <button>Download File</button>
-                      </a>
-                    )
-                  )}
-                </div>
-              ))} */}
             </div>
           ))}
           <div ref={messageEndRef} />
@@ -471,70 +338,6 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
               <WriterMessage createMessage={handleSubmit} />
             </TextAreaStylled>
           </ActionSection>
-          {/* <Form onSubmit={handleSendMessage}>
-            {showEmojiPicker && <EmojiPicker onSelect={handleEmojiSelect} />}
-            <Button
-              variant="secondary"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            >
-              😊
-            </Button>
-            <Form.Control
-              type="text"
-              placeholder="Type your message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-            />
-            <input
-              type="file"
-              onChange={handleImageUpload}
-              accept="image/*"
-              style={{ display: "none" }}
-              id="fileInput"
-            />
-            <label
-              htmlFor="fileInput"
-              style={{ cursor: "pointer", marginRight: 10 }}
-            >
-              <BiImageAdd />
-            </label>
-            {uploadedImages.map((image, index) => (
-              <Badge
-                key={index}
-                style={{
-                  cursor: "pointer",
-                  position: "relative",
-                  display: "inline-block",
-                  marginRight: "5px",
-                }}
-              >
-                <Image
-                  src={image}
-                  alt="Preview"
-                  thumbnail
-                  style={{ width: "100px" }}
-                  onClick={() => toggleImageModal(image)}
-                />
-                <BiXCircle
-                  color="red"
-                  style={{
-                    position: "absolute",
-                    top: "0",
-                    right: "0",
-                    fontSize: "20px",
-                    margin: "5px",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveImage(index);
-                  }}
-                />
-              </Badge>
-            ))}
-            <Button type="submit">
-              <IoMdSend />
-            </Button>
-          </Form> */}
         </Card.Footer>
       </Card>
       <Modal
