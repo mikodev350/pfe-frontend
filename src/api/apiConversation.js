@@ -50,3 +50,51 @@ export const addMessage = async ({ data }) => {
     throw error;
   }
 };
+
+// /---------------------------------------------/
+// /tp create groupe /
+
+export const fetchFriends = async () => {
+  try {
+    const response = await apiService.get("/friends-search");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    throw error;
+  }
+};
+
+export const createGroup = async (groupData) => {
+  try {
+    const response = await apiService.post(
+      "/create-conversation-groupe",
+      groupData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating group:", error);
+    throw error;
+  }
+};
+
+// /---------------------------------/
+
+export const fetchPrivateConversations = async () => {
+  try {
+    const response = await apiService.get("/conversations/private");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching private conversations:", error);
+    throw error;
+  }
+};
+
+export const fetchGroupConversations = async () => {
+  try {
+    const response = await apiService.get("/conversations/group");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching group conversations:", error);
+    throw error;
+  }
+};
