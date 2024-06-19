@@ -4,12 +4,19 @@ import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 
 import { initSocket, cleanup } from "../../redux/features/socket-slice";
-
+import { toast, ToastContainer } from "react-toastify";
 // import sound from "../sounds/beep.mp3";
-import { newNotification } from "../../redux/features/notification-slice";
-import { toast } from "react-toastify";
+import {
+  newNotification,
+  newMessage,
+} from "../../redux/features/notification-slice";
+import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "react-query";
 
 export default function Socket() {
+  const queryClient = useQueryClient();
+  const [searchQuery] = useSearchParams();
+  const id = searchQuery.get("id");
   // const dispatch = useSelector(state => state.socket);
   const dispatch = useDispatch();
   const initSock = async () => {
@@ -34,16 +41,43 @@ export default function Socket() {
       //const audio = new Audio(sound);
 
       // Add event listener for 'newNotification' event
-      newSocket.on("newNotification", (data) => {
+      newSocket.on("notification", (data) => {
         // alert("nofitication recevied");
         // Play the audio file when a new notification is received
         // audio.play();
-        dispatch(newNotification(data));
-        toast.info(data.notify_text, {
+        const { notification } = data;
+        dispatch(newNotification(notification));
+        toast.info(notification.username + " " + notification.notifText, {
           position: "top-left",
         });
       });
 
+      // Add event listener for 'newNotification' event
+      newSocket.on("newMessage", async ({ message, conversationId }) => {
+        // alert("nofitication recevied");
+        // Play the audio file when a new notification is received
+        // audio.play();
+        if (!id) {
+          dispatch(newMessage());
+          toast.info("jak message bitch", {
+            position: "top-left",
+          });
+        } else if (id === conversationId) {
+          let data = await queryClient.getQueryData([
+            "conversation",
+            conversationId,
+          ]);
+          console.log(data);
+          data = {
+            ...data,
+            messages: [...data.messages, message],
+          };
+
+          queryClient.setQueryData(["conversation", conversationId], {
+            ...data,
+          });
+        }
+      });
       return () => {
         newSocket.close();
         dispatch(
@@ -58,5 +92,5 @@ export default function Socket() {
     initSock();
   }, []);
 
-  return <>n</>;
+  return <ToastContainer />;
 }

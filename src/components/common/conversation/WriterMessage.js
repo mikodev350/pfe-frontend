@@ -54,19 +54,19 @@ export default function WriterMessage({
     dispatch(onClearRecorder());
   };
 
-  //   useEffect(() => {
-  //     if (conversationId) {
-  //       socket?.on("createMessage", (message) => {
-  //         console.log(message);
-  //         if (message.user.id === localStorage.getItem("userId")) {
-  //           setSending(false);
-  //         }
-  //       });
-  //       return () => {
-  //         socket?.off("createMessage");
-  //       };
-  //     }
-  //   }, [conversationId, socket]);
+  // useEffect(() => {
+  //   if (conversationId) {
+  //     socket?.on("createMessage", (message) => {
+  //       console.log(message);
+  //       if (message.user.id === localStorage.getItem("userId")) {
+  //         setSending(false);
+  //       }
+  //     });
+  //     return () => {
+  //       socket?.off("createMessage");
+  //     };
+  //   }
+  // }, [conversationId, socket]);
 
   return (
     <div className="writer-message-section">

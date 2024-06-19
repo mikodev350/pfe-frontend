@@ -64,7 +64,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   const [showEmojiPicker] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const messageEndRef = useRef(null);
+
   // Create a ref for the scrollable container
   const scrollableContainerRef = React.useRef(null);
 
@@ -76,6 +76,12 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       });
     }
   }, []);
+  const id = searchQuery.get("id");
+  React.useEffect(() => {
+    if (id) {
+    }
+  }, [id]);
+
   const toggleImageModal = (image) => {
     setSelectedImage(image);
     setShowImageModal(true);
@@ -118,7 +124,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       ]);
       data = {
         ...data,
-        messages: [...data.messages, newMessages],
+        messages: [...data?.messages, newMessages],
       };
       queryClient.setQueryData(["conversation", searchQuery.get("id")], {
         ...data,
@@ -296,7 +302,11 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       };
     }
   }, [socket]);
-
+  React.useEffect(() => {
+    if (id && socket) {
+      socket?.emit("seen_conversation", { conversationId: id });
+    }
+  }, [id, socket]);
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>error...</div>;
 

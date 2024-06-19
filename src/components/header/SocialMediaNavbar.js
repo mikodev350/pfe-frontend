@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import useOnClickOutside from "../../util/useOnClickOutside";
 import ButtonSearchFormDetail from "../searchForm/ButtonSearchFormDetail";
+import { useAppSelector } from "../../hooks/hooks";
 
 const styles = {
   navIcon: {
@@ -32,6 +33,7 @@ const styles = {
     borderRadius: "50%",
     color: "#fff",
     backgroundColor: "#6c757d",
+    cursor: "pointer",
   },
   badge: {
     position: "absolute",
@@ -53,6 +55,7 @@ const styles = {
     flex: "1 1 auto",
   },
   customDropdown: {
+    cursor: "pointer",
     position: "absolute",
     backgroundColor: "#fff",
     boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
@@ -82,6 +85,9 @@ const messages = [
 ];
 
 function SocialMediaNavbar({ onFilterChange }) {
+  const { notifications, total_count, total_new_messages } = useAppSelector(
+    (state) => state.notification
+  );
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
@@ -124,7 +130,7 @@ function SocialMediaNavbar({ onFilterChange }) {
             >
               <FaEnvelope />
               <Badge pill style={styles.badge}>
-                {messages.length}
+                {total_new_messages}
               </Badge>
             </div>
             {isMessagesOpen && (
@@ -144,16 +150,27 @@ function SocialMediaNavbar({ onFilterChange }) {
             >
               <FaBell />
               <Badge pill style={styles.badge}>
-                {notifications.length}
+                {total_count}
               </Badge>
             </div>
             {isNotificationsOpen && (
               <div style={styles.customDropdown}>
                 {notifications.map((notification) => (
-                  <div key={notification.id} style={styles.dropdownItem}>
-                    {notification.text}
+                  <Link
+                    to={
+                      "/" +
+                      localStorage.getItem("role").toLowerCase() +
+                      notification.redirect_url +
+                      `?notif_id=${notification.id}`
+                    }
+                    key={notification.id}
+                    style={styles.dropdownItem}
+                  >
+                    {notification?.expediteur?.username +
+                      " " +
+                      notification?.notifText}
                     <small className="text-muted">{notification.time}</small>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

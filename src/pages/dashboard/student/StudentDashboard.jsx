@@ -18,8 +18,6 @@ import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 import Profile from "../../Profile/Profile";
 import Communaute from "../../communauté/Communaute";
 
-
-
 export default function StudentDashboard() {
   return (
     <Layout>
@@ -28,15 +26,15 @@ export default function StudentDashboard() {
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
 
-
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
         <Route path="resource-preview/:id" element={<ResourcePreviewPage />} />
-        <Route path="update-parcour/:pathwayId" element={<UpdatePathwayForm />} />
+        <Route
+          path="update-parcour/:pathwayId"
+          element={<UpdatePathwayForm />}
+        />
 
-
-        
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
@@ -44,19 +42,21 @@ export default function StudentDashboard() {
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
         <Route path="custom-profile" element={<CreateProfile />} />
 
-
         <Route path="edit-profile" element={<DashboardProfile />} />
 
-                {/* thisss parttt iss for the teachherrrrrr  */}
-     <Route path="add-education" element={<AddEducation />} />
-    <Route path="update-education/:educationId" element={<AddEducation />} />
-   <Route path="add-experience" element={<AddExperience />} />
-   <Route path="update-experience/:experienceId" element={<AddExperience />} />
-   
-   <Route path="communaute" element={<Communaute />} />
+        {/* thisss parttt iss for the teachherrrrrr  */}
+        <Route path="add-education" element={<AddEducation />} />
+        <Route
+          path="update-education/:educationId"
+          element={<AddEducation />}
+        />
+        <Route path="add-experience" element={<AddExperience />} />
+        <Route
+          path="update-experience/:experienceId"
+          element={<AddExperience />}
+        />
 
-
-
+        <Route path="communaute" element={<Communaute />} />
       </Routes>
     </Layout>
   );

@@ -6,6 +6,7 @@ const initialState = {
   notifications: [],
   totalPages: 0,
   currentPage: 0,
+  total_new_messages: 0,
   isLoading: true,
   error: null,
 };
@@ -17,7 +18,7 @@ export const notificationSlice = createSlice({
     setNotifications: (state, { payload }) => {
       state.notifications = [...state.notifications, ...payload.notifications];
       state.total_count = payload.total_count;
-      state.totalPages = payload.totalPages;
+      state.total_new_messages = payload.total_new_messages;
       state.currentPage = payload.currentPage;
       state.isLoading = false;
     },
@@ -25,6 +26,9 @@ export const notificationSlice = createSlice({
       state.notifications = [payload, ...state.notifications];
 
       state.total_count = state.total_count + 1;
+    },
+    newMessage: (state, { payload }) => {
+      state.total_new_messages = state.total_new_messages + 1;
     },
     setSeenStatusNotification: (state, { payload }) => {
       state.notifications = state.notifications.map((item) => {
@@ -51,6 +55,7 @@ export const {
   newNotification,
   setSeenStatusNotification,
   cleanup,
+  newMessage,
 } = notificationSlice.actions;
 
 export const notification = (state) => state.notification;

@@ -15,12 +15,14 @@ import Socket from "./components/Socket/Socket";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./custom-bootstrap.css";
+import Notification from "./components/Notifications";
 
 function App() {
   return (
     <>
-      <Socket />
       <Router>
+        <Socket />
+        <Notification />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

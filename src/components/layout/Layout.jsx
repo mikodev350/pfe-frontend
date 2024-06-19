@@ -96,8 +96,8 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
   return (
     <>
-      {/* <SocialMediaNavbar onFilterChange={handleSearchResults} /> */}
-      <CustomNavbar />
+      <SocialMediaNavbar onFilterChange={handleSearchResults} />
+
       <aside>
         <SideBarMobile />
       </aside>
