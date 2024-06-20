@@ -7,7 +7,7 @@ import { fetchDataAndStore, getParcoursFromLocalStorage, getModulesFromLocalStor
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
-import { getToken } from "../../util/authUtils"; 
+import { getToken } from "../../util/authUtils";
 import { uploadFile } from "../../api/apiUpload";
 import { saveResource } from "../../api/apiResource";
 
@@ -134,7 +134,7 @@ export default function AddResource() {
     const selectedParcoursIds = selectedParcours.map(p => p.value);
     const filteredModules = getModulesFromLocalStorage().filter(m => selectedParcoursIds.includes(m.idparcour));
     setModuleOptions(filteredModules.map(m => ({ value: m.id, label: m.name })));
-    setLessonOptions([]); 
+    setLessonOptions([]);
   };
 
   const handleModulesChange = (selectedModules) => {
@@ -507,4 +507,3 @@ export default function AddResource() {
     </Container>
   );
 }
-
