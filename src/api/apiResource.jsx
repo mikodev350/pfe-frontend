@@ -39,11 +39,15 @@ export const fetchResources = async (currentPage, pageSize, sectionid, searchVal
 };
 
 export const getResourceById = async (id, token) => {
+
   const response = await axios.get(`${API_BASE_URL}/resources/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
   });
+  console.log('====================================');
+  console.log(response);
+  console.log('====================================');
   return response.data;
 };
 
@@ -69,4 +73,44 @@ export const deleteResource = async (id, token) => {
     console.error('Error deleting resource:', error);
     throw error;
   }
+};
+
+// geenrate thee linkkk 
+
+export const generateResourceLink = async (id, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/resources-link/${id}/generate-link`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error generating resource link:", error);
+    throw error;
+  }
+};
+
+export const getResourceByToken = async (token,tokenUser) => {
+  try {
+     const response = await axios.get(`${API_BASE_URL}/resources-link/access/${token}`, {
+      headers: {
+        Authorization: `Bearer ${tokenUser}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching resource by token:", error);
+    throw error;
+  }
+};
+// Clonneee my resource 
+export const cloneResource = async (id,token) => {
+  const response = await axios.post(`${API_BASE_URL}/resources-copy/clone/${id}`, {}, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
 };

@@ -1,17 +1,16 @@
 import React from "react";
 import { Container, Image, Button, Badge } from "react-bootstrap";
 import { MdPersonAddAlt } from "react-icons/md";
+import { IoClose } from "react-icons/io5";
+import Swal from "sweetalert2";
+import { useQueryClient } from "react-query";
 import {
   acceptFriendRequest,
   cancelFriendRequest,
   sendFriendRequest,
 } from "../../api/apiFriendRequest";
-import { IoClose } from "react-icons/io5";
-import Swal from "sweetalert2";
-import { useQueryClient } from "react-query";
 
-
- const userRole = localStorage.getItem("role")?.toUpperCase();
+const userRole = localStorage.getItem("role")?.toUpperCase();
 
 export const ProfileHeader = ({
   id,
@@ -19,24 +18,31 @@ export const ProfileHeader = ({
   profile,
   nomComplet,
   isRequestSender,
+  isRequestReceiver,
+  isMyProfile,
   relationIsExist,
   isFriends,
 }) => {
   const [message, setMessage] = React.useState("");
+  const [status, setStatus] = React.useState({
+    isRequestSender,
+    isRequestReceiver,
+    relationIsExist,
+    isFriends,
+    isMyProfile,
+  });
 
   const queryClient = useQueryClient();
 
   const handleSendRequest = async () => {
     try {
-      const result = await sendFriendRequest(id, token);
-      console.log(result);
-      queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
-        return {
-          ...oldData,
-          isRequestSender: true,
-          relationIsExist: true,
-          isFriends: false,
-        };
+      await sendFriendRequest(id, token);
+      queryClient.invalidateQueries(["profile", id ? id : "me"]);
+      setStatus({
+        ...status,
+        isRequestSender: true,
+        relationIsExist: true,
+        isFriends: false,
       });
       setMessage("Invitation sent!");
     } catch (error) {
@@ -47,41 +53,40 @@ export const ProfileHeader = ({
   const handleCancelRequest = async () => {
     try {
       Swal.fire({
-        title: "Do you want to save the changes?",
+        title: "Do you want to remove the relation?",
         showCancelButton: true,
         confirmButtonText: "Remove Relation",
       }).then(async (result) => {
         if (result.isConfirmed) {
           await cancelFriendRequest(id, token);
-          Swal.fire("Saved!", "", "success");
-
-          queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
-            return {
-              ...oldData,
-              isRequestSender: false,
-              relationIsExist: false,
-              isFriends: false,
-            };
+          Swal.fire("Removed!", "", "success");
+          queryClient.invalidateQueries(["profile", id ? id : "me"]);
+          setStatus({
+            ...status,
+            isRequestSender: false,
+            isRequestReceiver: false,
+            relationIsExist: false,
+            isFriends: false,
           });
         } else if (result.isDenied) {
           Swal.fire("Changes are not saved", "", "info");
         }
       });
     } catch (error) {
-      setMessage("Error sending invitation: " + error.message);
+      setMessage("Error removing relation: " + error.message);
     }
   };
 
   const handleAcceptRequest = async () => {
     try {
       await acceptFriendRequest(id, token);
-      queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
-        return {
-          ...oldData,
-          isRequestSender: false,
-          relationIsExist: true,
-          isFriends: true,
-        };
+      queryClient.invalidateQueries(["profile", id ? id : "me"]);
+      setStatus({
+        ...status,
+        isRequestSender: false,
+        isRequestReceiver: false,
+        relationIsExist: true,
+        isFriends: true,
       });
     } catch (error) {
       setMessage("Error accepting invitation: " + error.message);
@@ -117,18 +122,18 @@ export const ProfileHeader = ({
       {profile?.niveauSpecifique && (
         <p className="text-light">Niveaux: {profile?.niveauSpecifique}</p>
       )}
-  <div>
-  {profile?.matieresEnseignees?.length > 0 && userRole === "TEACHER"&& (
-    <>
-      <p className="text-light">Les matières:</p>
-      {profile.matieresEnseignees.map((matiere, index) => (
-        <Badge key={index} pill bg="light" text="dark" className="mx-1">
-          {matiere}
-        </Badge>
-      ))}
-    </>
-  )}
-</div>
+      <div>
+        {profile?.matieresEnseignees?.length > 0 && userRole === "TEACHER" && (
+          <>
+            <p className="text-light">Les matières:</p>
+            {profile.matieresEnseignees.map((matiere, index) => (
+              <Badge key={index} pill bg="light" text="dark" className="mx-1">
+                {matiere}
+              </Badge>
+            ))}
+          </>
+        )}
+      </div>
       <div>
         {profile?.additionalAttribute && (
           <p className="text-light">
@@ -136,47 +141,44 @@ export const ProfileHeader = ({
           </p>
         )}
         <br />
-        {id && (
+        {!status.isMyProfile && (
           <>
             {message && <p className="text-light">{message}</p>}
-
-            {relationIsExist ? (
-              <>
-                {isFriends ? (
+            {status.relationIsExist ? (
+              status.isFriends || status.isRequestSender ? (
+                <Button
+                  variant="danger"
+                  onClick={handleCancelRequest}
+                  className="custom-light-button"
+                >
+                  <IoClose size={19} /> Remove Relation
+                </Button>
+              ) : status.isRequestReceiver ? (
+                <>
+                  <Button
+                    variant="outline-light"
+                    onClick={handleAcceptRequest}
+                    className="custom-light-button"
+                  >
+                    <MdPersonAddAlt size={19} /> Accept
+                  </Button>
                   <Button
                     variant="danger"
                     onClick={handleCancelRequest}
                     className="custom-light-button"
                   >
-                    <IoClose size={19} /> Remove Relation
+                    <IoClose size={19} /> Decline
                   </Button>
-                ) : !isRequestSender ? (
-                  <Button
-                    variant="danger"
-                    onClick={handleCancelRequest}
-                    className="custom-light-button"
-                  >
-                    <IoClose size={19} /> Cancel
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      variant="outline-light"
-                      onClick={handleAcceptRequest}
-                      className="custom-light-button"
-                    >
-                      <MdPersonAddAlt size={19} /> Accept
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={handleCancelRequest}
-                      className="custom-light-button"
-                    >
-                      <IoClose size={19} /> Decline
-                    </Button>
-                  </>
-                )}
-              </>
+                </>
+              ) : (
+                <Button
+                  variant="danger"
+                  onClick={handleCancelRequest}
+                  className="custom-light-button"
+                >
+                  <IoClose size={19} /> Cancel
+                </Button>
+              )
             ) : (
               <Button
                 variant="outline-light"

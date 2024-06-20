@@ -98,3 +98,31 @@ export const fetchGroupConversations = async () => {
     throw error;
   }
 };
+
+/********************************************************************************/
+/*ADD AND REMOVE  WHEN YOU'RE ADMIN OF THE GROUPE */
+export const addParticipant = async ({ conversationId, userIds }) => {
+  try {
+    const response = await apiService.post("/add-participant", {
+      conversationId,
+      userIds,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding participant:", error);
+    throw error;
+  }
+};
+
+export const removeParticipant = async ({ conversationId, userId }) => {
+  try {
+    const response = await apiService.post("/remove-participant", {
+      conversationId,
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error removing participant:", error);
+    throw error;
+  }
+};
