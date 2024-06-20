@@ -302,6 +302,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       };
     }
   }, [socket]);
+
   React.useEffect(() => {
     if (id && socket) {
       socket?.emit("seen_conversation", { conversationId: id });

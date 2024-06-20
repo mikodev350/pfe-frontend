@@ -17,6 +17,8 @@ import AddExperience from "../../add-experience/AddExperience";
 import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 import Profile from "../../Profile/Profile";
 import Communaute from "../../communauté/Communaute";
+import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPageWithToken";
+import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
 
 export default function StudentDashboard() {
   return (
@@ -29,7 +31,7 @@ export default function StudentDashboard() {
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
-        <Route path="resource-preview/:id" element={<ResourcePreviewPage />} />
+        {/* <Route path="resource-preview/:id" element={<ResourcePreviewPage />} /> */}
         <Route
           path="update-parcour/:pathwayId"
           element={<UpdatePathwayForm />}
@@ -57,6 +59,15 @@ export default function StudentDashboard() {
         />
 
         <Route path="communaute" element={<Communaute />} />
+
+        <Route
+          path="/resources/access/:token"
+          element={<ResourcePreviewPageWithToken />}
+        />
+        <Route
+          path="/resource-preview/:id"
+          element={<ResourcePreviewPageWithId />}
+        />
       </Routes>
     </Layout>
   );

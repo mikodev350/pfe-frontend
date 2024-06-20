@@ -136,8 +136,8 @@ export const getExperience = async (id, token) => {
 };
 
 /*************************************************************************/
-export const fetchUserProfile = async (idUser, token) => {
-  const response = await axios.get(`${API_BASE_URL}/find-profile/${idUser}`, {
+export const fetchUserProfile = async (id, token) => {
+  const response = await axios.get(`${API_BASE_URL}/user-profile/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

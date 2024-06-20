@@ -1,9 +1,58 @@
 import React, { useState } from "react";
-import { Card, Col, Row, Button, Modal, Carousel } from "react-bootstrap";
+import { Card, Col, Row, Button, Modal, Carousel, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
+import GenerateLinkButton from "../../components/GenerateLinkButton/GenerateLinkButton";
+import { cloneResource } from "../../api/apiResource";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import styled from 'styled-components';
+import { FaSave } from "react-icons/fa";
 
-const ResourceDetails = ({ resource }) => {
+const StyledCard = styled(Card)`
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+`;
+
+const StyledHeader = styled(Card.Header)`
+  background-color: #007bff;
+  color: white;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+      height: 66px;
+
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const SaveButton = styled(Button)`
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+`;
+
+const InnerCard = styled(Card)`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+`;
+
+const Image = styled.img`
+  border-radius: 4px;
+`;
+
+const ResourceDetails = ({ resource, isFromLink, token }) => {
   const [show, setShow] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -14,11 +63,36 @@ const ResourceDetails = ({ resource }) => {
 
   const handleClose = () => setShow(false);
 
+  const handleSaveResource = async () => {
+    try {
+      const newResource = await cloneResource(resource.id, token);
+      toast.success("Resource saved successfully!");
+      console.log("New Resource:", newResource); // For debugging purposes
+    } catch (error) {
+      console.error("Error saving resource:", error);
+      toast.error("Error saving resource");
+    }
+  };
+
   return (
-    <Card className="mt-4">
-      <Card.Header>
+    <StyledCard className="mt-4">
+      <ToastContainer />
+      <StyledHeader>
         <h2>{resource.nom}</h2>
-      </Card.Header>
+        <ButtonsContainer>
+          {isFromLink && (
+            <OverlayTrigger
+              placement="top"
+              overlay={<Tooltip id="button-tooltip">Save Resource</Tooltip>}
+            >
+              <SaveButton onClick={handleSaveResource}>
+                <FaSave />
+              </SaveButton>
+            </OverlayTrigger>
+          )}
+          {!isFromLink && <GenerateLinkButton resourceId={resource.id} />}
+        </ButtonsContainer>
+      </StyledHeader>
       <Card.Body>
         <Row>
           <Col md={6}>
@@ -39,37 +113,34 @@ const ResourceDetails = ({ resource }) => {
         <Row className="mt-4">
           <Col md={6}>
             <h3>Parcours</h3>
-            {resource.parcours.map((parcours) => (
-              <Card key={parcours.id} className="mb-2">
+            {resource.parcours && resource.parcours.map((parcours) => (
+              <InnerCard key={parcours.id} className="mb-2">
                 <Card.Body>
                   <p>Nom du parcours: {parcours.nom}</p>
-                  {/* Affichez d'autres propriétés du parcours ici */}
                 </Card.Body>
-              </Card>
+              </InnerCard>
             ))}
           </Col>
           <Col md={6}>
             <h3>Modules</h3>
-            {resource.modules.map((module) => (
-              <Card key={module.id} className="mb-2">
+            {resource.modules && resource.modules.map((module) => (
+              <InnerCard key={module.id} className="mb-2">
                 <Card.Body>
                   <p>Nom du module: {module.nom}</p>
-                  {/* Affichez d'autres propriétés du module ici */}
                 </Card.Body>
-              </Card>
+              </InnerCard>
             ))}
           </Col>
         </Row>
         <Row className="mt-4">
           <Col md={6}>
             <h3>Leçons</h3>
-            {resource.lessons.map((lesson) => (
-              <Card key={lesson.id} className="mb-2">
+            {resource.lessons && resource.lessons.map((lesson) => (
+              <InnerCard key={lesson.id} className="mb-2">
                 <Card.Body>
                   <p>Nom de la leçon: {lesson.nom}</p>
-                  {/* Affichez d'autres propriétés de la leçon ici */}
                 </Card.Body>
-              </Card>
+              </InnerCard>
             ))}
           </Col>
           <Col md={6}>
@@ -94,10 +165,10 @@ const ResourceDetails = ({ resource }) => {
                   {resource.images.map((image, index) => (
                     <Col md={4} key={index}>
                       <Zoom>
-                        <img 
-                          src={`http://localhost:1337${image.url}`} 
-                          alt={`Image ${index + 1}`} 
-                          className="img-fluid" 
+                        <Image
+                          src={`http://localhost:1337${image.url}`}
+                          alt={`Image ${index + 1}`}
+                          className="img-fluid"
                           style={{ cursor: 'pointer' }}
                         />
                       </Zoom>
@@ -136,7 +207,7 @@ const ResourceDetails = ({ resource }) => {
           </Col>
         </Row>
       </Card.Body>
-    </Card>
+    </StyledCard>
   );
 };
 

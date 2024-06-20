@@ -15,7 +15,7 @@ export const Skills = ({ competencesSkills }) => {
         {competencesSkills.map((competencesSkill, index) => (
           <li key={index}>
             <span className="checkmark">✔</span>
-            {competencesSkills}
+            {competencesSkill.toUpperCase()}
           </li>
           
         ))}
