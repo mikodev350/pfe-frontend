@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Container, Card, Image, Modal, Button, Form } from "react-bootstrap";
 import { CiClock1 } from "react-icons/ci";
 import { FiCheck } from "react-icons/fi";
@@ -45,6 +45,7 @@ const AvatarWithName = (participants, type, id, title, imageUrl) => {
     </ItemCard>
   );
 };
+
 const ItemCard = styled.div`
   display: grid;
   grid-template-columns: 50px auto;
@@ -52,7 +53,7 @@ const ItemCard = styled.div`
 `;
 
 const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
-  const [searchQuery] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showAddParticipantModal, setShowAddParticipantModal] = useState(false);
@@ -96,14 +97,14 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   }, []);
 
   const { isLoading, data, error } = useQuery(
-    ["conversation", searchQuery.get("id")],
-    () => fetchConversation({ id: searchQuery.get("id") })
+    ["conversation", searchParams.get("id")],
+    () => fetchConversation({ id: searchParams.get("id") })
   );
 
   const handleAddParticipant = async () => {
     try {
-      await addParticipant({ conversationId: searchQuery.get("id"), userId: selectedUser.value });
-      queryClient.invalidateQueries(["conversation", searchQuery.get("id")]);
+      await addParticipant({ conversationId: searchParams.get("id"), userId: selectedUser.value });
+      queryClient.invalidateQueries(["conversation", searchParams.get("id")]);
       setShowAddParticipantModal(false);
       setSelectedUser(null);
     } catch (error) {
@@ -113,8 +114,8 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
 
   const handleRemoveParticipant = async () => {
     try {
-      await removeParticipant({ conversationId: searchQuery.get("id"), userId: selectedUser.value });
-      queryClient.invalidateQueries(["conversation", searchQuery.get("id")]);
+      await removeParticipant({ conversationId: searchParams.get("id"), userId: selectedUser.value });
+      queryClient.invalidateQueries(["conversation", searchParams.get("id")]);
       setShowRemoveParticipantModal(false);
       setSelectedUser(null);
     } catch (error) {
@@ -150,20 +151,20 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
 
       let data = await queryClient.getQueryData([
         "conversation",
-        searchQuery.get("id"),
+        searchParams.get("id"),
       ]);
       data = {
         ...data,
         messages: [...data.messages, newMessages],
       };
-      queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+      queryClient.setQueryData(["conversation", searchParams.get("id")], {
         ...data,
       });
 
       const result = await addMessage({
         data: {
           ...form,
-          id: searchQuery.get("id"),
+          id: searchParams.get("id"),
           fakeId: newMessages.id,
         },
       });
@@ -174,7 +175,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         return item;
       });
 
-      queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+      queryClient.setQueryData(["conversation", searchParams.get("id")], {
         ...data,
       });
     } else if (body.type === "IMAGES" || body.type === "FILES") {
@@ -198,13 +199,13 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
 
       let data = await queryClient.getQueryData([
         "conversation",
-        searchQuery.get("id"),
+        searchParams.get("id"),
       ]);
       data = {
         ...data,
         messages: [...data.messages, ...newMessages],
       };
-      queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+      queryClient.setQueryData(["conversation", searchParams.get("id")], {
         ...data,
       });
     } else if (body.type === "VOICE") {
@@ -223,23 +224,27 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       };
       let data = await queryClient.getQueryData([
         "conversation",
-        searchQuery.get("id"),
+        searchParams.get("id"),
       ]);
       data = {
         ...data,
         messages: [...data.messages, newMessages],
       };
-      queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+      queryClient.setQueryData(["conversation", searchParams.get("id")], {
         ...data,
       });
     }
   };
 
-  const setUploaded = React.useCallback(async (targetItem) => {
+  const setUploaded = useCallback(async (targetItem) => {
     let data = await queryClient.getQueryData([
       "conversation",
-      searchQuery.get("id"),
+      searchParams.get("id"),
     ]);
+    if (!data) {
+      console.error("No data found for conversation");
+      return;
+    }
     data = {
       ...data,
       messages: data.messages.map((item) => {
@@ -250,10 +255,10 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         return item;
       }),
     };
-    queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+    queryClient.setQueryData(["conversation", searchParams.get("id")], {
       ...data,
     });
-  }, []);
+  }, [queryClient, searchParams]);
 
   const { socket } = useSelector((state) => state.socket);
 
@@ -262,14 +267,18 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       socket?.on("newMessage", async ({ message }) => {
         let data = await queryClient.getQueryData([
           "conversation",
-          searchQuery.get("id"),
+          searchParams.get("id"),
         ]);
+        if (!data) {
+          console.error("No data found for conversation");
+          return;
+        }
         data = {
           ...data,
           messages: [...data.messages, message],
         };
 
-        queryClient.setQueryData(["conversation", searchQuery.get("id")], {
+        queryClient.setQueryData(["conversation", searchParams.get("id")], {
           ...data,
         });
         if (scrollableContainerRef.current) {
@@ -283,7 +292,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         socket?.off("newMessage");
       };
     }
-  }, [socket]);
+  }, [socket, queryClient, searchParams]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error...</div>;
@@ -338,7 +347,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
                           ? message.type
                           : getFileType(message.attachement?.url),
                       }}
-                      conversationId={searchQuery.get("id")}
+                      conversationId={searchParams.get("id")}
                       setUploaded={setUploaded}
                       onClick={toggleImageModal}
                     />
@@ -375,7 +384,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
       <AddParticipantModal
         show={showAddParticipantModal}
         handleClose={() => setShowAddParticipantModal(false)}
-        conversationId={searchQuery.get("id")}
+        conversationId={searchParams.get("id")}
         currentParticipants={data?.participants}
       />
       <Modal show={showRemoveParticipantModal} onHide={() => setShowRemoveParticipantModal(false)} centered>
