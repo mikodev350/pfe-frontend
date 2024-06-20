@@ -14,5 +14,7 @@ export const getUserType = () => {
 
 // Function to get the stored token
 export const getToken = () => {
-  return localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  console.log("Token récupéré dans getToken:", token); // Journal de débogage
+  return token;
 };

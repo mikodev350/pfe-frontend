@@ -17,6 +17,8 @@ import AddExperience from "../../add-experience/AddExperience";
 import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 import Profile from "../../Profile/Profile";
 import Communaute from "../../communauté/Communaute";
+import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPageWithToken";
+import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
 
 
 
@@ -32,7 +34,7 @@ export default function StudentDashboard() {
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
-        <Route path="resource-preview/:id" element={<ResourcePreviewPage />} />
+        {/* <Route path="resource-preview/:id" element={<ResourcePreviewPage />} /> */}
         <Route path="update-parcour/:pathwayId" element={<UpdatePathwayForm />} />
 
 
@@ -41,19 +43,31 @@ export default function StudentDashboard() {
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
 
+
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
         <Route path="custom-profile" element={<CreateProfile />} />
 
 
         <Route path="edit-profile" element={<DashboardProfile />} />
 
-                {/* thisss parttt iss for the teachherrrrrr  */}
-     <Route path="add-education" element={<AddEducation />} />
+      {/* thisss parttt iss for the teachherrrrrr  */}
+    <Route path="add-education" element={<AddEducation />} />
     <Route path="update-education/:educationId" element={<AddEducation />} />
    <Route path="add-experience" element={<AddExperience />} />
    <Route path="update-experience/:experienceId" element={<AddExperience />} />
    
    <Route path="communaute" element={<Communaute />} />
+
+
+
+    <Route
+            path="/resources/access/:token"
+            element={<ResourcePreviewPageWithToken />}
+          />
+          <Route
+            path="/resource-preview/:id"
+            element={<ResourcePreviewPageWithId />}
+          />
 
 
 

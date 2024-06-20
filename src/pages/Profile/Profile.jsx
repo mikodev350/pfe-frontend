@@ -12,25 +12,29 @@ import { useParams, Link } from "react-router-dom";
 export default function Profile() {
   const { id } = useParams();
   const token = React.useMemo(() => getToken(), []);
+  const localUserId = localStorage.getItem('userId'); // Retrieve the user ID from localStorage
 
   const { data: profile, isLoading } = useQuery(
     ["profile", id ? id : "me"],
     () => (id ? fetchUserProfile(id, token) : fetchMyProfile(token)),
     {
       enabled: !!token,
-
-    })
-
+    }
+  );
 
   if (isLoading) return <div>Loading...</div>;
+
+  console.log(profile);
 
   return (
     <>
       <Row>
         <Col className="mt-3 d-flex justify-content-end">
-          <Link to={"/student/edit-profile"}>
-            <Button variant="primary">Edit Profile</Button>
-          </Link>
+          {profile.isMyProfile && (
+            <Link to={"/student/edit-profile"}>
+              <Button variant="primary">Edit Profile</Button>
+            </Link>
+          )}
         </Col>
       </Row>
       <ProfileHeader
@@ -39,6 +43,8 @@ export default function Profile() {
         profile={profile?.profil}
         nomComplet={profile?.username}
         isRequestSender={profile?.isRequestSender}
+        isRequestReceiver={profile?.isRequestReceiver}
+        isMyProfile={profile?.isMyProfile}
         relationIsExist={profile?.relationIsExist}
         isFriends={profile?.isFriends}
       />
