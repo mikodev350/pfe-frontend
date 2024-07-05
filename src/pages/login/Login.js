@@ -5,7 +5,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import { loginAPI } from "../../api/authApi";
-// import "./login.css";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 
@@ -15,34 +14,37 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-  const [values] = useState({
-    identifier: "",
-    password: "",
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
-  function witchPage(token) {
-    const role = localStorage.getItem("role");
+  // function witchPage(token) {
+  //   const role = localStorage.getItem("role");
 
-    if (role === "STUDENT") {
-      if (token) {
-        window.location.href = `/invite-section/${token}`;
-      }
-      navigate("/student/section");
-    } else if (role === "TEACHER") {
-      navigate("/teacher/section");
-    }
-  }
+  //   if (role === "STUDENT") {
+  //     if (token) {
+  //       window.location.href = `/invite-section/${token}`;
+  //     }
+  //     navigate("/student/section");
+  //   } else if (role === "TEACHER") {
+  //     navigate("/teacher/section");
+  //   }
+  // }
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsSubmitting(true);
     try {
       const response = await loginAPI(values);
+      console.log("====================================");
+      console.log(response);
+      console.log("====================================");
       if (response && response.token) {
         localStorage.setItem("token", response.token);
-        witchPage(response.token);
+        localStorage.setItem("userId", response.user.id);
+        localStorage.setItem("username", response.user.username);
+        localStorage.setItem("role", response.type);
+
+        window.location.href = `/dashboard/`;
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {
@@ -59,7 +61,6 @@ const Login = () => {
 
   return (
     <>
-      {" "}
       <Helmet>
         <link rel="stylesheet" type="text/css" href="/css/login.css" />
       </Helmet>
@@ -72,7 +73,7 @@ const Login = () => {
             </Col>
             <Col md={6} id="login-box">
               <Formik
-                initialValues={values}
+                initialValues={{ identifier: "", password: "" }}
                 validationSchema={LoginSchema}
                 onSubmit={handleSubmit}
               >

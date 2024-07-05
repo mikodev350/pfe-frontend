@@ -11,24 +11,43 @@ import ProudSection from "./ProudSection";
 import TestimonialSection from "./TestimonialSection";
 import CTASection from "./CTASection";
 import Footer from "../../components/footer/Footer";
-import CustomNavbar from "./other-header";
+import SideBarMobile from "../../components/sideBar/sideBarMobile/SideBarMobile";
+import CustomHeader from "./other-header";
 
 export default function Home() {
   return (
     <>
-      <Helmet>
+       <Helmet>
         <link rel="stylesheet" type="text/css" href="/css/customHome.css" />
       </Helmet>
-      <CustomNavbar />
-      <HeroSection />
-      <ServicesSection />
-      <AboutSection />
-      <WhatSection />
-      <WhySection />
-      <ProudSection />
-      <TestimonialSection />
+      <CustomHeader /> {/* CustomHeader doit être rendu en premier */}
+      <SideBarMobile /> {/* SideBarMobile peut suivre CustomHeader */}
+      <section id="hero">
+        <HeroSection />
+      </section>
+      <section id="services">
+        <ServicesSection />
+      </section>
+      <section id="about">
+        <AboutSection />
+      </section>
+      <section id="what">
+        <WhatSection />
+      </section>
+      <section id="why">
+        <WhySection />
+      </section>
+      <section id="proud">
+        <ProudSection />
+      </section>
+      <section id="testimonial">
+        <TestimonialSection />
+      </section>
       <br />
-      <CTASection />
+      <section id="cta">
+        <CTASection />
+      </section>
+      <br />
       <br />
       <Footer />
     </>

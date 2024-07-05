@@ -1,4 +1,4 @@
-#login {
+#signup {
     width: 100%;
     height: 100vh;
     display: flex;
@@ -7,7 +7,7 @@
     position: relative;
 }
 
-#login-box {
+#signup-box {
     background-color: white;
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
@@ -15,8 +15,8 @@
     align-items: center;
 }
 
-#login .container #login-row #login-column #login-box,
-#login .container #login-row form {
+#signup .container #signup-row #signup-column #signup-box,
+#signup .container #signup-row form {
     max-width: 400px;
     /* Reduced max-width */
     height: auto;
@@ -32,13 +32,13 @@
     background-color: white;
 }
 
-#login-form,
-#login .container #login-row #login-column form {
+#signUp-form,
+#signup .container #signup-row #signup-column form {
     padding: 20px;
 }
 
 #signUp-column,
-#login-box {
+#signup-box {
     padding-right: 20px;
     padding-left: 20px;
     /* Reduced padding */
@@ -199,7 +199,7 @@ button:hover,
 }
 
 /* Add background image */
-.main-login-container {
+.main-signup-container {
     left: 0px;
     right: 0px;
     position: absolute;
@@ -209,7 +209,7 @@ button:hover,
 }
 
 .background-image {
-    background-image: url('./Learning-pana.svg');
+    background-image: url('./../assets/college project-amico(2).svg');
     background-size: auto;
     background-repeat: no-repeat;
     width: 100%;
@@ -217,7 +217,7 @@ button:hover,
     background-position: center;
 }
 
-/* login title */
+/* signup title */
 .custom-heading {
     font-size: 35px;
     /* Reduced font size */
@@ -230,7 +230,7 @@ button:hover,
 }
 
 @media (max-width: 768px) {
-    .main-login-container {
+    .main-signup-container {
         width: 100%;
         background-color: white;
         top: 0px;
@@ -249,13 +249,13 @@ button:hover,
         display: none;
     }
 
-    .image-login {
+    .image-signup {
         display: flex;
         justify-content: center;
         margin: 0px;
     }
 
-    #login-box {
+    #signup-box {
         padding: 0px 6cqmax;
     }
 }

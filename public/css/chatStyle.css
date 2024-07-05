@@ -460,3 +460,58 @@ audio {
   background-color: #f1f1f1;
   color: #9ca2ac;
 }
+
+
+.friend-list-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.friend-list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header,
+.chat-footer {
+  padding: 10px;
+  background-color: #f8f8f8;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.message img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.message-content {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #e0e0e0;
+}
+
+.message-content p {
+  margin: 0;
+}

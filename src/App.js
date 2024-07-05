@@ -38,24 +38,6 @@ function App() {
           <Route path="/student/*" element={<StudentDashboard />} />
           <Route path="/chat" element={<ChatApp />} />
           <Route path="/settings/*" element={<Settings />} />
-          {/*  */}
-          {/* <Route
-            path="/resources/access/:token"
-            component={ResourcePreviewPage}
-          />
-          <Route
-            path="/resources-link/access/:token"
-            component={ResourceAccessPage}
-          /> */}
-          {/* Ajoutez d'autres routes ici... */}
-          {/* <Route
-            path="/resources-link/access/edit/:token"
-            component={ResourceEditPage}
-          />
-          <Route
-            path="/resources/access/:token"
-            component={ResourceAccessPage}
-          /> */}
         </Routes>
       </Router>
     </>
