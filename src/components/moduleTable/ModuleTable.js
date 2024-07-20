@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
-import { fetchModules, updateModule } from "../../api/apiModule";
+import {
+  fetchModules,
+  updateModule,
+  deleteModule,
+  syncOfflineChangesModule,
+} from "../../api/apiModule";
 import Loader from "../loader/Loader";
 import { Table } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
@@ -19,7 +24,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   const [totalPages, setTotalPages] = useState(1);
   const queryClient = useQueryClient();
 
-  const fetchModulesMemoized = React.useCallback(
+  const fetchModulesMemoized = useCallback(
     async (page, search) => {
       const response = await fetchModules(page, token, search, idParcours);
       return response;
@@ -27,21 +32,35 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
     [token, idParcours]
   );
 
-  const { data, isLoading, isError, error } = useQuery(
-    ["modules", searchValue, idParcours],
+  const { data, isLoading, isError, error, refetch } = useQuery(
+    ["modules", searchValue, idParcours, currentPage],
     async () => {
-      if (searchValue) {
-        return fetchModulesMemoized(currentPage, searchValue);
-      } else {
-        return fetchModulesMemoized(currentPage, "");
-      }
+      return fetchModulesMemoized(currentPage, searchValue);
     },
     {
+      keepPreviousData: true,
       onSuccess: (response) => {
         setTotalPages(response.totalPages);
       },
     }
   );
+
+  useEffect(() => {
+    refetch();
+  }, [currentPage, searchValue, token, refetch]);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      await syncOfflineChangesModule(token, queryClient);
+      await refetch();
+    };
+
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+    };
+  }, [token, queryClient, refetch]);
 
   const updateModuleMutation = useMutation(
     (data) => updateModule(data.id, { nom: data.name }, token),

@@ -7,6 +7,8 @@ import { toast, ToastContainer } from "react-toastify";
 import { loginAPI } from "../../api/authApi";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
+import initializeCriticalData from "../../hooks/initializeCriticalData";
+// import initializeCriticalData from "../../initializeCriticalData"; // Importer la fonction d'initialisation
 
 const LoginSchema = Yup.object().shape({
   identifier: Yup.string().email("Invalid email").required("Email Required"),
@@ -15,36 +17,25 @@ const LoginSchema = Yup.object().shape({
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const navigate = useNavigate();
-
-  // function witchPage(token) {
-  //   const role = localStorage.getItem("role");
-
-  //   if (role === "STUDENT") {
-  //     if (token) {
-  //       window.location.href = `/invite-section/${token}`;
-  //     }
-  //     navigate("/student/section");
-  //   } else if (role === "TEACHER") {
-  //     navigate("/teacher/section");
-  //   }
-  // }
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setIsSubmitting(true);
     try {
       const response = await loginAPI(values);
-      console.log("====================================");
       console.log(response);
-      console.log("====================================");
-      if (response && response.token) {
-        localStorage.setItem("token", response.token);
+
+      if (response && response.jwt) {
+        localStorage.setItem("token", response.jwt);
         localStorage.setItem("userId", response.user.id);
         localStorage.setItem("username", response.user.username);
         localStorage.setItem("role", response.type);
 
-        window.location.href = `/dashboard/`;
+        // Initialiser les données critiques après la connexion
+        await initializeCriticalData(response.jwt);
+
+        // Rediriger vers le tableau de bord
+        // window.location.href = `/dashboard/`;
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {

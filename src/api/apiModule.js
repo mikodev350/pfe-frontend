@@ -1,7 +1,36 @@
 import axios from "axios";
-import { API_BASE_URL } from "../constants/constante"; // Make sure to define your API base URL in constants
+import { API_BASE_URL } from "../constants/constante";
+import db from "../database/database";
 
-// Fetch modules with pagination, search, and parcoursId
+const handleConflict = (localData, remoteData) => {
+  console.log("localData" + localData);
+  console.log(localData);
+
+  console.log("remoteData" + remoteData);
+  console.log(remoteData);
+
+  if (new Date(localData.updatedAt) > new Date(remoteData.updatedAt)) {
+    return localData;
+  } else {
+    return remoteData;
+  }
+};
+
+const addOrUpdateModuleInIndexedDB = async (module) => {
+  const existingModule = await db.modules.get(module.id);
+  if (!existingModule) {
+    await db.modules.put({
+      id: module.id,
+      nom: module.nom,
+      parcour: module.parcour.id,
+      lessons: module.lessons,
+      updatedAt: module.updatedAt,
+      createdAt: module.createdAt,
+      version: module.version || 1,
+    });
+  }
+};
+
 export const fetchModules = async (page, token, search = "", parcoursId) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/modules`, {
@@ -17,24 +46,87 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
       },
     });
 
+    // Insert modules into IndexedDB only if they do not already exist
+    await db.transaction("rw", db.modules, async () => {
+      for (const module of response.data.data) {
+        await addOrUpdateModuleInIndexedDB(module);
+      }
+    });
+
     return {
       data: response.data.data,
       totalPages: Math.ceil(response.data.meta.pagination.total / 5),
     };
   } catch (error) {
     console.error("Error fetching modules:", error);
-    throw error;
+
+    // Fetch local data from IndexedDB in case of error
+    const localData = await db.modules
+      .where("parcour")
+      .equals(Number(parcoursId))
+      .filter((module) => module.nom.includes(search))
+      .offset((page - 1) * 5)
+      .limit(5)
+      .toArray();
+
+    // Count the total number of local modules
+    const totalLocalDataCount = await db.modules
+      .where("parcour")
+      .equals(Number(parcoursId))
+      .filter((module) => module.nom.includes(search))
+      .count();
+
+    return {
+      data: localData,
+      totalPages: Math.ceil(totalLocalDataCount / 5),
+    };
   }
 };
 
 export const createModule = async (moduleData, token) => {
+  if (!navigator.onLine) {
+    const newData = {
+      ...moduleData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    try {
+      const id = await db.modules.add(newData);
+      await db.offlineChanges.add({
+        type: "add",
+        data: { id, ...newData },
+        timestamp: Date.now(),
+      });
+      return { status: "offline" };
+    } catch (error) {
+      console.error("Error adding data to IndexedDB:", error);
+      throw error;
+    }
+  }
+
   try {
-    const response = await axios.post(`${API_BASE_URL}/modules`, moduleData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const newData = {
+      ...moduleData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    const response = await axios.post(
+      `${API_BASE_URL}/modules`,
+      { data: newData },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    try {
+      await db.modules.add({ id: response.data.data.id, ...newData });
+    } catch (error) {
+      console.error("Error adding data to IndexedDB:", error);
+      throw error;
+    }
+
     return response.data;
   } catch (error) {
     console.error("Error creating module:", error);
@@ -42,39 +134,164 @@ export const createModule = async (moduleData, token) => {
   }
 };
 
-// Update an existing module
-export const updateModule = async (moduleId, module, token) => {
-  try {
-    const response = await axios.put(
-      `${API_BASE_URL}/modules/${moduleId}`,
-      { data: module },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+export const updateModule = async (id, moduleData, token) => {
+  const updatedData = {
+    ...moduleData,
+    updatedAt: new Date().toISOString(),
+  };
 
-    return response.data;
-  } catch (error) {
-    console.error("Error updating module:", error);
-    throw error;
+  if (!navigator.onLine) {
+    try {
+      await db.modules.update(Number(id), updatedData);
+      await db.offlineChanges.add({
+        type: "update",
+        data: { id, ...updatedData },
+        timestamp: Date.now(),
+      });
+      return { status: "offline", data: updatedData };
+    } catch (error) {
+      console.error("Error updating data in IndexedDB:", error);
+      throw error;
+    }
+  } else {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/modules/${id}`,
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      try {
+        await db.modules.update(Number(id), updatedData);
+      } catch (error) {
+        console.error("Error updating data in IndexedDB:", error);
+        throw error;
+      }
+
+      return { status: "success", data: response.data.data };
+    } catch (error) {
+      console.error("Error updating module:", error);
+      throw error;
+    }
   }
 };
 
-//ici delete the module
-export const deleteModule = async (moduleId, token) => {
+export const deleteModule = async (id, token) => {
+  if (!navigator.onLine) {
+    try {
+      await db.modules.delete(id);
+      await db.offlineChanges.add({
+        type: "delete",
+        data: { id },
+        timestamp: Date.now(),
+      });
+      return { status: "offline" };
+    } catch (error) {
+      console.error("Error deleting data in IndexedDB:", error);
+      throw error;
+    }
+  }
+
   try {
-    const response = await axios.delete(`${API_BASE_URL}/modules/${moduleId}`, {
+    const response = await axios.delete(`${API_BASE_URL}/modules/${id}`, {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+
+    try {
+      await db.modules.delete(id);
+    } catch (error) {
+      console.error("Error deleting data in IndexedDB:", error);
+      throw error;
+    }
+
+    return { status: "success", data: response.data };
   } catch (error) {
     console.error("Error deleting module:", error);
     throw error;
   }
+};
+
+export const syncOfflineChangesModule = async (token, queryClient) => {
+  const offlineChanges = await db.offlineChanges.toArray();
+
+  for (const change of offlineChanges) {
+    try {
+      if (change.type === "add") {
+        const response = await axios.post(
+          `${API_BASE_URL}/modules`,
+          { data: change.data },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        await db.modules.put(response.data.data);
+        queryClient.setQueryData(["modules"], (oldData) => {
+          return {
+            ...oldData,
+            data: [...oldData.data, response.data.data],
+          };
+        });
+      } else if (change.type === "update") {
+        const remoteData = await axios
+          .get(`${API_BASE_URL}/modules/${change.data.id}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => response.data);
+
+        const resolvedData = handleConflict(change.data, remoteData.data);
+
+        // Use resolvedData directly instead of resolvedData.data
+        const response = await axios.put(
+          `${API_BASE_URL}/modules/${resolvedData.id}`,
+          resolvedData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("this is response");
+        console.log(response);
+        await db.modules.update(resolvedData.id, resolvedData);
+        queryClient.setQueryData(["modules"], (oldData) => {
+          return {
+            ...oldData,
+            data: oldData.data.map((item) =>
+              item.id === resolvedData.id ? resolvedData : item
+            ),
+          };
+        });
+      } else if (change.type === "delete") {
+        await axios.delete(`${API_BASE_URL}/modules/${change.data.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        await db.modules.delete(change.data.id);
+        queryClient.setQueryData(["modules"], (oldData) => {
+          return {
+            ...oldData,
+            data: oldData.data.filter((item) => item.id !== change.data.id),
+          };
+        });
+      }
+    } catch (error) {
+      console.error("Error syncing change:", change, error);
+    }
+  }
+  await db.offlineChanges.clear();
 };

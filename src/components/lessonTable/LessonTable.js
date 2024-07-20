@@ -1,8 +1,13 @@
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "react-query";
-import { fetchLessons, updateLesson, deleteLesson } from "../../api/apiLesson";
+import React, { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient, useMutation } from "react-query";
+import {
+  fetchLessons,
+  updateLesson,
+  deleteLesson,
+  syncOfflineChangesLesson,
+} from "../../api/apiLesson";
 import Loader from "../loader/Loader";
-import { Table, Button, Modal, Form } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
 import TableBody from "../table/TableBody";
 import TableCell from "../table/TableCell";
@@ -15,41 +20,79 @@ import { toast } from "react-toastify";
 
 const header = ["#", "Leçon", "Date", "Options"];
 
-const LessonTable = ({ searchValue, token, moduleId }) => {
+const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error } = useQuery(
-    ["lessons", currentPage, searchValue, moduleId],
-    () => fetchLessons(currentPage, token, searchValue, moduleId),
+  const fetchLessonsMemoized = useCallback(
+    async (page, search) => {
+      const response = await fetchLessons(page, token, search, moduleId);
+      console.log("Fetched Lessons: ", response.data);
+      return response;
+    },
+    [token, moduleId]
+  );
+
+  const { data, isLoading, isError, error, refetch } = useQuery(
+    ["lessons", { searchValue, moduleId, currentPage }],
+    () => fetchLessonsMemoized(currentPage, searchValue),
     {
+      keepPreviousData: true,
       onSuccess: (response) => {
+        console.log("Query onSuccess: ", response);
         setTotalPages(response.totalPages);
       },
     }
   );
 
+  useEffect(() => {
+    console.log("Refetching query");
+    refetch();
+  }, [currentPage, searchValue, token, refetch]);
+
   const updateLessonMutation = useMutation(
-    (updatedLesson) =>
-      updateLesson(updatedLesson.id, { nom: updatedLesson.nom }, token),
+    async (data) => {
+      await updateLesson(data.id, { nom: data.name }, token);
+      await queryClient.invalidateQueries([
+        "lessons",
+        { searchValue, moduleId, currentPage },
+      ]);
+    },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("lessons");
+        queryClient.invalidateQueries([
+          "lessons",
+          { searchValue, moduleId, currentPage },
+        ]);
       },
       onError: (error) => {
-        console.error("Erreur lors de la mise à jour de la leçon:", error);
+        toast.error(
+          `Erreur lors de la mise à jour de la leçon : ${error.message}`
+        );
       },
     }
   );
 
   const deleteLessonMutation = useMutation(
-    (lessonId) => deleteLesson(lessonId, token),
+    async (lessonId) => {
+      await deleteLesson(lessonId, token);
+      await queryClient.invalidateQueries([
+        "lessons",
+        { searchValue, moduleId, currentPage },
+      ]);
+    },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries("lessons");
+      onSuccess: async () => {
+        queryClient.invalidateQueries([
+          "lessons",
+          { searchValue, moduleId, currentPage },
+        ]);
         toast.success("Leçon supprimée avec succès !");
+        if (navigator.onLine) {
+          await syncOfflineChangesLesson(token, queryClient);
+        }
       },
       onError: (error) => {
         toast.error(
@@ -59,25 +102,13 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
     }
   );
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [currentLesson, setCurrentLesson] = useState({});
-
-  const handleEdit = (lesson) => {
-    setCurrentLesson(lesson);
-    setShowEditModal(true);
-  };
-
-  const handleSave = async () => {
-    await updateLessonMutation.mutateAsync(currentLesson);
-    setShowEditModal(false);
-  };
-
-  const handleInputChange = (e) => {
-    setCurrentLesson({ ...currentLesson, nom: e.target.value });
+  const handleUpdateLesson = async (lessonId, newName) => {
+    try {
+      console.log("Updating lesson:", lessonId, newName);
+      await updateLessonMutation.mutateAsync({ id: lessonId, name: newName });
+    } catch (error) {
+      console.error("Error updating lesson:", error);
+    }
   };
 
   const handleDelete = (lessonId) => {
@@ -96,6 +127,10 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
     });
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -105,6 +140,8 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
       <div>Erreur lors de la récupération des données : {error.message}</div>
     );
   }
+
+  console.log("Data fetched: ", data?.data);
 
   return (
     <>
@@ -128,7 +165,7 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
                 dataLabel={header[2]}
               />
               <TableCell dataLabel={header[3]}>
-                <BiEdit size={24} onClick={() => handleEdit(item)} />
+                <BiEdit size={24} onClick={() => onEditLesson(item)} />
                 <BiTrash size={24} onClick={() => handleDelete(item.id)} />
               </TableCell>
             </TableRow>
@@ -142,32 +179,6 @@ const LessonTable = ({ searchValue, token, moduleId }) => {
           onPageChange={handlePageChange}
         />
       </div>
-
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modifier la leçon</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="lessonName">
-              <Form.Label>Nom de la leçon</Form.Label>
-              <Form.Control
-                type="text"
-                value={currentLesson.nom || ""}
-                onChange={handleInputChange}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Fermer
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Enregistrer les modifications
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };

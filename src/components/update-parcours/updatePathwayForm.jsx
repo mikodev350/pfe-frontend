@@ -4,34 +4,33 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { getToken } from "../../util/authUtils";
 import { updatePathway, getPathwayById } from "../../api/ApiParcour";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object({
   nom: Yup.string().required("Nom du parcours est requis"),
   type: Yup.string().required("Type du parcours est requis"),
-  etablissement: Yup.string(),
-  autoApprentissage: Yup.boolean(),
+  etablissement: Yup.string().nullable(),
+  autoApprentissage: Yup.boolean().nullable(),
 });
 
 const UpdatePathwayForm = () => {
   const navigate = useNavigate();
-
-      const { pathwayId } = useParams();
-
+  const { pathwayId } = useParams();
   const [initialValues, setInitialValues] = useState(null);
-
   const token = React.useMemo(() => getToken(), []);
 
   useEffect(() => {
     const fetchPathway = async () => {
       try {
         const response = await getPathwayById(pathwayId, token);
-        setInitialValues(response.data);
+        if (response.data) {
+          setInitialValues(response.data);
+          console.log("Initial values set:", response.data);
+        }
       } catch (error) {
-        console.error('Error fetching pathway:', error);
+        console.error("Error fetching pathway:", error);
       }
     };
-
     fetchPathway();
   }, [pathwayId, token]);
 
@@ -45,19 +44,23 @@ const UpdatePathwayForm = () => {
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-
+      console.log("Form submitted with values:", values);
       try {
         const response = await updatePathway(pathwayId, values, token);
-        console.log('Pathway updated successfully:', response);
-                      navigate("/student/parcours");
-
+        if (response.status === 'offline') {
+          console.log('Pathway updated offline');
+        } else {
+          console.log('Pathway updated successfully:', response);
+        }
+        navigate('/student/parcours');
       } catch (error) {
         console.error('Error updating pathway:', error);
       }
     },
   });
 
-
+  // Ajoutez cette ligne pour voir si les valeurs initiales sont correctement définies
+  console.log("formik errors:", formik.errors);
 
   return (
     <Container>

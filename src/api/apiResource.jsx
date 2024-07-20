@@ -18,7 +18,7 @@ export const saveResource = async (resourceData, token) => {
   }
 };
 
-export const fetchResources = async (currentPage, pageSize, sectionid, searchValue, token) => {
+export const fetchResources = async (currentPage, pageSize, sectionId, searchValue, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/resources`, {
       headers: {
@@ -27,11 +27,20 @@ export const fetchResources = async (currentPage, pageSize, sectionid, searchVal
       params: {
         page: currentPage,
         pageSize: pageSize,
-        section: sectionid,
-        search: searchValue,
+        _q: searchValue,
+        section: sectionId,
       },
     });
-    return response.data;
+
+    console.log('====================================');
+    console.log("fetchResources");
+        console.log(Math.ceil(response.data.total / pageSize));
+
+    console.log('====================================');
+    return {
+      data: response.data.data,
+      totalPages: Math.ceil(response.data.total / pageSize),
+    };
   } catch (error) {
     console.error("Error fetching resources:", error);
     throw error;

@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const ModelLesson = ({
   show,
@@ -8,27 +10,24 @@ const ModelLesson = ({
   initialData,
   moduleId,
 }) => {
-  const [lessonData, setLessonData] = useState({
-    name: "",
+  const formik = useFormik({
+    initialValues: {
+      nom: initialData ? initialData.nom : "",
+    },
+    validationSchema: Yup.object({
+      nom: Yup.string().required("Nom de leçon est requis"),
+    }),
+    onSubmit: (values) => {
+      onSaveLesson({ ...values, module: moduleId });
+      handleClose();
+    },
   });
 
   useEffect(() => {
     if (initialData) {
-      setLessonData(initialData);
+      formik.setValues({ nom: initialData.nom });
     }
   }, [initialData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLessonData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    onSaveLesson({ ...lessonData, module: moduleId });
-  };
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -38,26 +37,29 @@ const ModelLesson = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form>
+        <Form onSubmit={formik.handleSubmit}>
           <Form.Group controlId="formLessonName">
             <Form.Label>Nom de leçon</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={lessonData.name}
-              onChange={handleChange}
+              name="nom"
+              value={formik.values.nom}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              isInvalid={!!formik.errors.nom && formik.touched.nom}
             />
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.nom}
+            </Form.Control.Feedback>
           </Form.Group>
+          <Button variant="secondary" onClick={handleClose}>
+            Annuler
+          </Button>
+          <Button variant="primary" type="submit">
+            Enregistrer
+          </Button>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Annuler
-        </Button>
-        <Button variant="primary" onClick={handleSave}>
-          Enregistrer
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 };

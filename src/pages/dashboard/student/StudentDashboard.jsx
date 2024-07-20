@@ -24,25 +24,31 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <Routes>
+        {/* ***************************************************************************************************** */}
+
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
+{/* ***************************************************************************************************** */}
 
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
-        {/* <Route path="resource-preview/:id" element={<ResourcePreviewPage />} /> */}
+        {/* ***************************************************************************************************** */}
+
         <Route
           path="update-parcour/:pathwayId"
           element={<UpdatePathwayForm />}
         />
-
+{/* ***************************************************************************************************** */}
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
+{/* ***************************************************************************************************** */}
 
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
         <Route path="custom-profile" element={<CreateProfile />} />
+{/* ***************************************************************************************************** */}
 
         <Route path="edit-profile" element={<DashboardProfile />} />
 
@@ -57,6 +63,7 @@ export default function StudentDashboard() {
           path="update-experience/:experienceId"
           element={<AddExperience />}
         />
+{/* ***************************************************************************************************** */}
 
         <Route path="communaute" element={<Communaute />} />
 
@@ -68,6 +75,8 @@ export default function StudentDashboard() {
           path="/resource-preview/:id"
           element={<ResourcePreviewPageWithId />}
         />
+{/* ***************************************************************************************************** */}
+
       </Routes>
     </Layout>
   );

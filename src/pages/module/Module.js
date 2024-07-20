@@ -3,11 +3,10 @@ import { useQueryClient } from "react-query";
 import { Container, Col, Row, Button } from "react-bootstrap";
 import SearchForm from "../../components/searchForm/SearchForm";
 import ModuleTable from "../../components/moduleTable/ModuleTable";
-// import AddModuleModal from "../../components/addModuleModal/AddModuleModal";
+import AddModuleModal from "../../components/modelModule/AddModuleModal";
 import { useParams } from "react-router-dom";
 import { getToken } from "../../util/authUtils";
 import { createModule } from "../../api/apiModule";
-import AddModuleModal from "../../components/modelModule/AddModuleModal";
 
 const Module = () => {
   const [searchValue, setSearchValue] = useState("");
