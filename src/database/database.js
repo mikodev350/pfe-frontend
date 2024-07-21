@@ -49,7 +49,6 @@ class Resource {
     pdf,
     video,
     link,
-    users_permissions_user,
     referenceLivre
   ) {
     this.id = id;
@@ -64,7 +63,6 @@ class Resource {
     this.pdf = pdf;
     this.video = video;
     this.link = link;
-    this.users_permissions_user = users_permissions_user;
     this.referenceLivre = referenceLivre;
   }
 }
@@ -78,8 +76,7 @@ db.version(1).stores({
   modules: "++id, nom, parcour, lessons,lessonLength ",
   lessons: "++id, nom, module, createdAt,updatedAt",
   resources:
-    "++id, nom, format, parcours, modules, lessons, note, images, audio, pdf, video, link, users_permissions_user, referenceLivre",
-  offlineChanges: "++id, type, data, timestamp",
+    "++id, nom, format, parcours, modules, lessons, note, images, audio, pdf, video, link, referenceLivre",
 });
 
 // Map the classes to the tables
