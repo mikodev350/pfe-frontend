@@ -56,6 +56,7 @@ const SignUp = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      alert("i am herreeee");
       const response = await register(values);
       if (response) {
         const token = localStorage.getItem("token");

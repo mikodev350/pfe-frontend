@@ -7,9 +7,10 @@ import { fetchDataAndStore, getParcoursFromLocalStorage, getModulesFromLocalStor
 import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
-import { getToken } from "../../util/authUtils";
+import { getToken } from "../../util/authUtils"; 
+import { saveResource, syncOfflineChangesResource, saveFileToIndexedDB } from "../../api/apiResource";
+import { useQueryClient } from "react-query";
 import { uploadFile } from "../../api/apiUpload";
-import { saveResource } from "../../api/apiResource";
 
 const formatOptions = [
   { value: 'cours', label: 'Cours' },
@@ -28,7 +29,6 @@ export default function AddResource() {
   const [parcoursOptions, setParcoursOptions] = useState([]);
   const [moduleOptions, setModuleOptions] = useState([]);
   const [lessonOptions, setLessonOptions] = useState([]);
-
   const [resources, setResources] = useState([]);
   const [images, setImages] = useState([]); // Multiple images
   const [audioFile, setAudioFile] = useState(null);
@@ -37,7 +37,7 @@ export default function AddResource() {
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState("");
   const [link, setLink] = useState("");
-  const [referenceLivre, setreferenceLivre] = useState("");
+  const [referenceLivre, setReferenceLivre] = useState("");
   const [displayLinkInput, setDisplayLinkInput] = useState(false);
   const [displayBookInput, setDisplayBookInput] = useState(false);
 
@@ -47,6 +47,7 @@ export default function AddResource() {
   const hiddenFileInputVideo = useRef(null);
 
   const token = React.useMemo(() => getToken(), []);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +60,20 @@ export default function AddResource() {
     };
     fetchData();
   }, [token]);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      try {
+        await syncOfflineChangesResource(token, queryClient);
+        console.log("Synced offline changes successfully.");
+      } catch (error) {
+        console.error("Error syncing offline changes:", error);
+      }
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [token, queryClient]);
 
   const formik = useFormik({
     initialValues: {
@@ -79,49 +94,84 @@ export default function AddResource() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
+        const formData = new FormData();
+
         // Upload images
         const uploadedImages = [];
         for (let image of images) {
-          const uploadedImage = await uploadFile(image.raw, token);
-          uploadedImages.push(uploadedImage[0]);
+          if (!navigator.onLine) {
+            const id = await saveFileToIndexedDB(image);
+            uploadedImages.push({ id, offline: true });
+          } else {
+                        console.log("image.raw")
+
+            console.log(image.raw)
+                        console.log("image")
+
+            console.log(image)
+
+            const uploadedImage = await uploadFile(image.raw, token);
+            uploadedImages.push(uploadedImage[0]);
+          }
         }
         values.images = uploadedImages;
 
         // Upload audio
         if (audioFile) {
-          const uploadedAudio = await uploadFile(audioFile.raw, token);
-          values.audio = uploadedAudio[0];
+          if (!navigator.onLine) {
+            const id = await saveFileToIndexedDB(audioFile.raw);
+            values.audio = { id, offline: true };
+          } else {
+            const uploadedAudio = await uploadFile(audioFile.raw, token);
+            values.audio = uploadedAudio[0];
+          }
         }
 
         // Upload PDF
         if (pdfFile) {
-          const uploadedPdf = await uploadFile(pdfFile.raw, token);
-          values.pdf = uploadedPdf[0];
+          if (!navigator.onLine) {
+            const id = await saveFileToIndexedDB(pdfFile.raw);
+            values.pdf = { id, offline: true };
+          } else {
+            const uploadedPdf = await uploadFile(pdfFile.raw, token);
+            values.pdf = uploadedPdf[0];
+          }
         }
 
         // Upload video
         if (videoFile) {
-          const uploadedVideo = await uploadFile(videoFile.raw, token);
-          values.video = uploadedVideo[0];
+          if (!navigator.onLine) {
+            const id = await saveFileToIndexedDB(videoFile.raw);
+            values.video = { id, offline: true };
+          } else {
+            const uploadedVideo = await uploadFile(videoFile.raw, token);
+            values.video = uploadedVideo[0];
+          }
         }
 
-        const response = await saveResource(values, token);
-        if (response && response.data) {
-          console.log('Resource created successfully:', response);
-          setResources([...resources, response.data]);
-          formik.resetForm();
-          setImages([]); // Reset images
-          setAudioFile(null);
-          setPdfFile(null);
-          setPdfPreview("");
-          setVideoFile(null);
-          setVideoPreview("");
-          setLink("");
-          setreferenceLivre("");
-          setDisplayLinkInput(false);
-          setDisplayBookInput(false);
+        if (!navigator.onLine) {
+          // Save resource offline
+          await saveResource(values, token);
         } else {
-          throw new Error("Failed to save resource");
+          // Save resource online
+          const response = await saveResource(values, token);
+          if (response && response.data) {
+            console.log('Resource created successfully:', response);
+            setResources([...resources, response.data]);
+            formik.resetForm();
+            setImages([]); // Reset images
+            setAudioFile(null);
+            setPdfFile(null);
+            setPdfPreview("");
+            setVideoFile(null);
+            setVideoPreview("");
+            setLink("");
+            setReferenceLivre("");
+            setDisplayLinkInput(false);
+            setDisplayBookInput(false);
+          } else {
+            throw new Error("Failed to save resource");
+          }
         }
       } catch (error) {
         console.error("Error saving resource:", error);
@@ -134,7 +184,7 @@ export default function AddResource() {
     const selectedParcoursIds = selectedParcours.map(p => p.value);
     const filteredModules = getModulesFromLocalStorage().filter(m => selectedParcoursIds.includes(m.idparcour));
     setModuleOptions(filteredModules.map(m => ({ value: m.id, label: m.name })));
-    setLessonOptions([]);
+    setLessonOptions([]); 
   };
 
   const handleModulesChange = (selectedModules) => {
@@ -224,9 +274,9 @@ export default function AddResource() {
     }
   };
 
-  const handlereferenceLivreChange = (event) => {
+  const handleReferenceLivreChange = (event) => {
     const value = event.target.value;
-    setreferenceLivre(value);
+    setReferenceLivre(value);
     formik.setFieldValue("referenceLivre", value);
     if (value) {
       setDisplayLinkInput(false);
@@ -453,7 +503,7 @@ export default function AddResource() {
                   type="text"
                   name="referenceLivre"
                   value={formik.values.referenceLivre}
-                  onChange={handlereferenceLivreChange}
+                  onChange={handleReferenceLivreChange}
                   isInvalid={!!formik.errors.referenceLivre}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -484,7 +534,7 @@ export default function AddResource() {
 
             {pdfPreview && (
               <div className="pdf-preview">
-                <iframe src={pdfPreview} width="100%" height="500px" />
+                <iframe src={pdfPreview} width="100%" height="500px" title="PDF Preview" />
                 <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
                   <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>

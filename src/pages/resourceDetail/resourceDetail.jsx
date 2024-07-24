@@ -100,15 +100,18 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
             <p><strong>Note:</strong></p>
             <div dangerouslySetInnerHTML={{ __html: resource.note }} />
           </Col>
-          {resource.video && (
-            <Col md={6}>
-              <h3>Vidéo</h3>
-              <video controls width="100%">
-                <source src={`https://localhost:1337${resource.video.url}`} type={resource.video.mime} />
-                Your browser does not support the video tag.
-              </video>
-            </Col>
-          )}
+{resource.video && (
+  <Col md={6}>
+    <h3>Vidéo</h3>
+    {console.log("Video URL:", `http://localhost:1337${resource.video.url}`)}
+    {console.log("Video MIME type:", resource.video.mime)}
+    <video controls width="100%">
+      <source src={`http://localhost:1337${resource.video.url}`} type={resource.video.mime} />
+      Your browser does not support the video tag.
+    </video>
+  </Col>
+)}
+
         </Row>
         <Row className="mt-4">
           <Col md={6}>
@@ -153,11 +156,16 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
               </div>
             )}
             {resource.pdf && (
-              <div className="mt-4">
-                <h3>PDF</h3>
-                <iframe title="PDF Viewer" src={`http://localhost:1337${resource.pdf.url}`} width="100%" height="500px"></iframe>
-              </div>
-            )}
+  <div className="mt-4">
+    <h3>PDF</h3>
+    <embed
+      src={`http://localhost:1337${resource.pdf.url}`}
+      width="100%"
+      height="500px"
+      type="application/pdf"
+    />
+  </div>
+)}
             {resource.images && resource.images.length > 0 && (
               <div className="mt-4">
                 <h3>Images</h3>

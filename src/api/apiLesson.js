@@ -268,7 +268,8 @@ export const deleteLesson = async (id, token) => {
     }
   }
 };
-/// Fonction pour synchroniser les changements hors ligne
+
+// Function to sync offline changes for lessons
 export const syncOfflineChangesLesson = async (token, queryClient) => {
   const offlineChanges = await db.offlineChanges.toArray();
   console.log("Syncing offline changes:", offlineChanges);

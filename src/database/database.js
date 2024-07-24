@@ -1,6 +1,5 @@
 import Dexie from "dexie";
 
-// Define the classes before using them
 class Parcour {
   constructor(
     nom,
@@ -67,22 +66,33 @@ class Resource {
   }
 }
 
-// Create an instance of the database
+class File {
+  constructor(id, name, type, content, createdAt) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.content = content;
+    this.createdAt = createdAt;
+  }
+}
+
 const db = new Dexie("POADatabase");
 
-// Define the schema for your database
 db.version(1).stores({
   parcours: "++id, nom, type, etablissement, autoApprentissage",
-  modules: "++id, nom, parcour, lessons,lessonLength ",
-  lessons: "++id, nom, module, createdAt,updatedAt",
+  modules: "++id, nom, parcour, lessons, lessonLength",
+  lessons: "++id, nom, module, createdAt, updatedAt",
   resources:
     "++id, nom, format, parcours, modules, lessons, note, images, audio, pdf, video, link, referenceLivre",
+  offlineChanges: "++id, type, data, timestamp, endpoint, method, headers",
+  files: "++id, name,preview, type, content, lastModified, createdAt", // Updated schema
+  // files: "++id, name, type, content, createdAt",
 });
 
-// Map the classes to the tables
 db.parcours.mapToClass(Parcour);
 db.modules.mapToClass(Module);
 db.lessons.mapToClass(Lesson);
 db.resources.mapToClass(Resource);
+db.files.mapToClass(File);
 
 export default db;

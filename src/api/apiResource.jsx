@@ -1,41 +1,138 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants/constante";
 import db from "../database/database";
+import { uploadFile } from "./apiUpload";
 
-// Gestion des conflits de données entre IndexedDB et le serveur
-const handleConflict = (localData, remoteData) => {
-  return new Date(localData.updatedAt) > new Date(remoteData.updatedAt)
-    ? localData
-    : remoteData;
+
+
+// Convert a file to base64 format
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 };
 
-// Ajout ou mise à jour des ressources dans IndexedDB
+// Add or update a file in IndexedDB
+const addOrUpdateFileInIndexedDB = async (file) => {
+  const existingFile = await db.files.get(file.id);
+
+  if (!existingFile) {
+    await db.files.put({
+      id: file.id,
+      name: file.file.name,
+      type: file.file.type,
+      content: await fileToBase64(file.file),
+      createdAt: file.createdAt
+    });
+  } else {
+    await db.files.update(file.id, {
+      name: file.file.name,
+      type: file.file.type,
+      content: await fileToBase64(file.file),
+      createdAt: file.createdAt
+    });
+  }
+};
+
+// Function to save a file to IndexedDB
+export const saveFileToIndexedDB = async (file) => {
+  
+  try {
+    const id = await db.files.add({
+      name: file.raw.name,
+      type: file.raw.type,
+      preview:file.preview,
+      content: file,
+      createdAt: new Date().toISOString(),
+    });
+
+    return id;
+  } catch (error) {
+    console.error("Error saving file to IndexedDB:", error);
+    throw error;
+  }
+};
+// // Convert a file to base64 format
+// const fileToBase64 = (file) => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.readAsDataURL(file);
+//     reader.onload = () => resolve(reader.result);
+//     reader.onerror = (error) => reject(error);
+//   });
+// };
+
+// // Add or update a file in IndexedDB
+// const addOrUpdateFileInIndexedDB = async (file) => {
+//   const existingFile = await db.files.get(file.id);
+
+//   if (!existingFile) {
+//     await db.files.put({
+//       id: file.id,
+//       name: file.file.name,
+//       type: file.file.type,
+//       content: await fileToBase64(file.file),
+//       createdAt: file.createdAt
+//     });
+//   } else {
+//     await db.files.update(file.id, {
+//       name: file.file.name,
+//       type: file.file.type,
+//       content: await fileToBase64(file.file),
+//       createdAt: file.createdAt
+//     });
+//   }
+// };
+
+// // Function to save a file to IndexedDB
+// export const saveFileToIndexedDB = async (file) => {
+//   try {
+//     console.log('====================================');
+//     console.log('====================================');
+//     console.log("file");
+//     console.log('====================================');
+//     console.log(file.raw.name);
+//     console.log(file.preview);
+//     console.log(file.raw.type);
+//     console.log("this is all the file");
+//     console.log(file);
+
+    
+//     console.log('====================================');
+//     const id = await db.files.add({
+//      name : file.raw.name,
+//       preview: file.preview,
+//       type:file.raw.type,
+//       content:file,
+//       createdAt: new Date().toISOString(),
+//     });
+
+//     return id;
+//   } catch (error) {
+//     console.error("Error saving file to IndexedDB:", error);
+//     throw error;
+//   }
+// };
+
+// Handle data conflicts between IndexedDB and the server
+const handleConflict = (localData, remoteData) => {
+  return new Date(localData.updatedAt) > new Date(remoteData.updatedAt) ? localData : remoteData;
+};
+
+// Add or update a resource in IndexedDB
 const addOrUpdateResourceInIndexedDB = async (resource) => {
   const existingResource = await db.resources.get(resource.id);
   if (!existingResource) {
-    await db.resources.put({
-      id: resource.id,
-      nom: resource.nom,
-      format: resource.format,
-      parcours: resource.parcours ? resource.parcours : null,
-      modules: resource.modules ? resource.modules : null,
-      lessons: resource.lessons ? resource.lessons : null,
-      note: resource.note,
-      images: resource.images,
-      audio: resource.audio,
-      pdf: resource.pdf,
-      video: resource.video,
-      link: resource.link,
-      referenceLivre: resource.referenceLivre,
-      updatedAt: resource.updatedAt,
-      createdAt: resource.createdAt,
-    });
+    await db.resources.put(resource);
   } else {
     await db.resources.update(resource.id, resource);
   }
 };
 
-// Fonction pour récupérer les ressources
+// Function to fetch resources
 export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/resources`, {
@@ -81,40 +178,56 @@ export const fetchResources = async (page, pageSize, sectionId, searchValue, tok
   }
 };
 
-// Fonction pour créer une ressource
+// Function to save a resource
 export const saveResource = async (resourceData, token) => {
-  const newData = {
+  let newData = {
     ...resourceData,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
+  alert(JSON.stringify(resourceData))
   console.log("Creating resource:", newData);
 
   if (!navigator.onLine) {
+    // Handle offline case
     try {
-      const id = await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
+      const userId = localStorage.getItem("userId");
+
+      await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const id = await db.resources.add(newData);
         await db.offlineChanges.add({
           type: "add",
-          data: { id, ...newData },
+          data: {         
+            userId: userId,
+            ...newData,
+          },
           timestamp: Date.now(),
         });
         console.log("Offline create added to offlineChanges:", newData);
-        return id;
       });
-      return { status: "offline", data: { id, ...newData } };
+      return { status: "offline", data: newData };
     } catch (error) {
       console.error("Error adding data to IndexedDB:", error);
       throw error;
     }
   } else {
+    // Handle online case
     try {
+      const userId = localStorage.getItem("userId");
+
+      newData = {
+        userId: userId,
+        ...newData,
+      };
       const response = await axios.post(`${API_BASE_URL}/resources`, newData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
+
+      console.log("Server response:", response.data);
 
       await db.transaction("rw", [db.resources], async () => {
         await db.resources.add({ id: response.data.data.id, ...newData });
@@ -123,13 +236,17 @@ export const saveResource = async (resourceData, token) => {
       console.log("Resource created online and added to IndexedDB:", response.data.data);
       return { status: "success", data: response.data.data };
     } catch (error) {
-      console.error("Error creating resource:", error);
+      if (error.response) {
+        console.error("Server responded with error:", error.response.data);
+      } else {
+        console.error("Error creating resource:", error.message);
+      }
       throw error;
     }
   }
 };
 
-// Fonction pour mettre à jour une ressource
+// Function to update a resource
 export const updateResource = async (id, data, token) => {
   const updatedData = {
     ...data,
@@ -154,6 +271,12 @@ export const updateResource = async (id, data, token) => {
             type: "update",
             data: { id, ...updatedData },
             timestamp: Date.now(),
+            endpoint: `${API_BASE_URL}/resources/${id}`,
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
           });
           console.log("Offline update added to offlineChanges:", updatedData);
         } else {
@@ -168,7 +291,13 @@ export const updateResource = async (id, data, token) => {
     }
   } else {
     try {
-      const response = await axios.put(`${API_BASE_URL}/resources/${id}`, updatedData, {
+      const userId = localStorage.getItem("userId");
+      const newData = {
+        userId: userId,
+        ...updatedData,
+      };
+
+      const response = await axios.put(`${API_BASE_URL}/resources/${id}`, newData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -179,8 +308,8 @@ export const updateResource = async (id, data, token) => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
           console.log("Existing resource found in IndexedDB for online update:", existingResource);
-          await db.resources.update(Number(id), updatedData);
-          console.log("Resource updated in IndexedDB after online update:", updatedData);
+          await db.resources.update(Number(id), newData);
+          console.log("Resource updated in IndexedDB after online update:", newData);
         } else {
           console.error("Resource not found in IndexedDB for update:", id);
         }
@@ -195,7 +324,7 @@ export const updateResource = async (id, data, token) => {
   }
 };
 
-// Fonction pour supprimer une ressource
+// Function to delete a resource
 export const deleteResource = async (id, token) => {
   if (!navigator.onLine) {
     try {
@@ -210,6 +339,12 @@ export const deleteResource = async (id, token) => {
             type: "delete",
             data: { id },
             timestamp: Date.now(),
+            endpoint: `${API_BASE_URL}/resources/${id}`,
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
           });
           console.log("Offline delete added to offlineChanges:", id);
         } else {
@@ -250,7 +385,7 @@ export const deleteResource = async (id, token) => {
   }
 };
 
-// Fonction pour générer un lien de ressource
+// Function to generate a resource link
 export const generateResourceLink = async (id, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/resources-link/${id}/generate-link`, {
@@ -265,7 +400,7 @@ export const generateResourceLink = async (id, token) => {
   }
 };
 
-// Fonction pour récupérer une ressource par ID
+// Function to get a resource by ID
 export const getResourceById = async (id, token) => {
   try {
     if (!navigator.onLine) {
@@ -292,7 +427,7 @@ export const getResourceById = async (id, token) => {
   }
 };
 
-// Fonction pour récupérer une ressource par token
+// Function to get a resource by token
 export const getResourceByToken = async (resourceToken, tokenUser) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/resources-link/access/${resourceToken}`, {
@@ -307,7 +442,7 @@ export const getResourceByToken = async (resourceToken, tokenUser) => {
   }
 };
 
-// Fonction pour cloner une ressource
+// Function to clone a resource
 export const cloneResource = async (id, token) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/resources-copy/clone/${id}`, {}, {
@@ -322,15 +457,70 @@ export const cloneResource = async (id, token) => {
   }
 };
 
-// Fonction pour synchroniser les changements hors ligne
+
+// Function to sync offline changes
 export const syncOfflineChangesResource = async (token, queryClient) => {
   const offlineChanges = await db.offlineChanges.toArray();
-  console.log("Syncing offline changes:", offlineChanges);
-
+let  dataResource;
   for (const change of offlineChanges) {
     try {
       if (change.type === "add") {
-        const response = await axios.post(`${API_BASE_URL}/resources`, change.data, {
+        const { images, audio, pdf, video, ...resourceData } = change.data;
+
+
+        // Upload files
+        const uploadedImages = [];
+        for (let image of images) {
+          console.log('Image before upload:', image);
+          const fileFromDB = await db.files.get(image.id);
+                    console.log('Image after upload:', fileFromDB);
+
+          if (fileFromDB) {
+            const uploadedImage = await uploadFile(fileFromDB.content.raw, token);
+            uploadedImages.push(uploadedImage[0]);
+          }
+        }
+
+dataResource={
+          ... resourceData
+          ,images: uploadedImages
+        }
+
+
+        if (audio) {
+          const fileFromDB = await db.files.get(audio.id);
+          if (fileFromDB) {
+            const uploadedAudio = await uploadFile(fileFromDB.content.raw, token);
+            resourceData.audio = uploadedAudio[0];
+          }
+        }
+
+        if (pdf) {
+          const fileFromDB = await db.files.get(pdf.id);
+          if (fileFromDB) {
+            const uploadedPdf = await uploadFile(fileFromDB.content.raw, token);
+            // resourceData.pdf = uploadedPdf[0];
+dataResource={
+          ... resourceData,
+          pdf: uploadedPdf
+        }           
+          }
+           
+        }
+
+        if (video) {
+          const fileFromDB = await db.files.get(video.id);
+          if (fileFromDB) {
+            const uploadedVideo = await uploadFile(fileFromDB.content.raw, token);
+            resourceData.video = uploadedVideo[0];
+          }
+                 dataResource={
+          ... resourceData
+          ,pdf: uploadedImages
+        }
+        }
+
+        const response = await axios.post(`${API_BASE_URL}/resources`, dataResource, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -350,8 +540,10 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
 
         console.log("Resource added and synced online:", response.data.data);
       } else if (change.type === "update") {
+        const { images, audio, pdf, video, ...resourceData } = change.data;
+
         const remoteData = await axios
-          .get(`${API_BASE_URL}/resources/${change.data.id}`, {
+          .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -359,7 +551,42 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
           })
           .then((response) => response.data);
 
-        const resolvedData = handleConflict(change.data, remoteData);
+        const resolvedData = handleConflict(resourceData, remoteData);
+
+        // Upload files
+        const uploadedImages = [];
+        for (let image of images) {
+          const fileFromDB = await db.files.get(image.id);
+          if (fileFromDB) {
+            const uploadedImage = await uploadFile(fileFromDB, token);
+            uploadedImages.push(uploadedImage[0]);
+          }
+        }
+        resolvedData.images = uploadedImages;
+
+        if (audio) {
+          const fileFromDB = await db.files.get(audio.id);
+          if (fileFromDB) {
+            const uploadedAudio = await uploadFile(fileFromDB.content.raw, token);
+            resolvedData.audio = uploadedAudio[0];
+          }
+        }
+
+        if (pdf) {
+          const fileFromDB = await db.files.get(pdf.id);
+          if (fileFromDB) {
+            const uploadedPdf = await uploadFile(fileFromDB.content.raw, token);
+            resolvedData.pdf = uploadedPdf[0];
+          }
+        }
+
+        if (video) {
+          const fileFromDB = await db.files.get(video.id);
+          if (fileFromDB) {
+            const uploadedVideo = await uploadFile(fileFromDB.content.raw, token);
+            resolvedData.video = uploadedVideo[0];
+          }
+        }
 
         const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, resolvedData, {
           headers: {

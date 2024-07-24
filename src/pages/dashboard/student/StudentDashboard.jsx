@@ -25,12 +25,10 @@ export default function StudentDashboard() {
     <Layout>
       <Routes>
         {/* ***************************************************************************************************** */}
-
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
 {/* ***************************************************************************************************** */}
-
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />

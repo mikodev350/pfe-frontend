@@ -56,6 +56,9 @@ export async function register(userData) {
       `${API_BASE_URL}/auth/local/register`,
       userData
     );
+    console.log("====================================");
+    console.log(response);
+    console.log("====================================");
     localStorage.setItem("token", response.data.jwt);
     localStorage.setItem("role", response.data.user.type.toUpperCase());
     return { ...response.data };
