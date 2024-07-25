@@ -15,7 +15,7 @@ const useSyncOnConnectionRestore = () => {
       // await syncOfflineChanges(token);
       // await syncOfflineChangesModule(token);
       // await syncOfflineChangesLesson(token);
-      await syncOfflineChangesResource(token);
+      // await syncOfflineChangesResource(token);
     };
 
     if (navigator.onLine) {

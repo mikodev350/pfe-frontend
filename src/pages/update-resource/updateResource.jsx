@@ -32,9 +32,9 @@ export default function UpdateResource() {
   const [lessonOptions, setLessonOptions] = useState([]);
 
   const [images, setImages] = useState([]); // Multiple images
-  const [audioFile, setAudioFile] = useState({ preview: "", raw: null });
-  const [pdfFile, setPdfFile] = useState({ preview: "", raw: null });
-  const [videoFile, setVideoFile] = useState({ preview: "", raw: null });
+  const [audioFile, setAudioFile] = useState({ preview: "", id: null, raw: null });
+  const [pdfFile, setPdfFile] = useState({ preview: "", id: null, raw: null });
+  const [videoFile, setVideoFile] = useState({ preview: "", id: null, raw: null });
   const [link, setLink] = useState("");
   const [bookReference, setBookReference] = useState("");
   const [displayLinkInput, setDisplayLinkInput] = useState(false);
@@ -63,19 +63,19 @@ export default function UpdateResource() {
           lesson: resource.lessons.map((l) => l.id),
           note: resource.note,
           youtubeLink: resource.youtubeLink,
-          images: resource.images ? resource.images.map(image => ({ preview: image.url, raw: null })) : [],
-          audio: resource.audio ? resource.audio.url : "",
-          pdf: resource.pdf ? resource.pdf.url : "",
-          video: resource.video ? resource.video.url : "",
+          images: resource.images ? resource.images.map(image => ({ preview: image.url, id: image.id, raw: null })) : [],
+          audio: resource.audio ? { preview: resource.audio.url, id: resource.audio.id, raw: null } : { preview: "", id: null, raw: null },
+          pdf: resource.pdf ? { preview: resource.pdf.url, id: resource.pdf.id, raw: null } : { preview: "", id: null, raw: null },
+          video: resource.video ? { preview: resource.video.url, id: resource.video.id, raw: null } : { preview: "", id: null, raw: null },
           link: resource.link || "",
           bookReference: resource.bookReference || "",
         });
 
         // Set states with the fetched data
-        if (resource.images) setImages(resource.images.map(image => ({ preview: image.url, raw: null })));
-        if (resource.audio) setAudioFile({ preview: resource.audio.url, raw: null });
-        if (resource.pdf) setPdfFile({ preview: resource.pdf.url, raw: null });
-        if (resource.video) setVideoFile({ preview: resource.video.url, raw: null });
+        if (resource.images) setImages(resource.images.map(image => ({ preview: image.url, id: image.id, raw: null })));
+        if (resource.audio) setAudioFile({ preview: resource.audio.url, id: resource.audio.id, raw: null });
+        if (resource.pdf) setPdfFile({ preview: resource.pdf.url, id: resource.pdf.id, raw: null });
+        if (resource.video) setVideoFile({ preview: resource.video.url, id: resource.video.id, raw: null });
         if (resource.link) setLink(resource.link);
         if (resource.bookReference) setBookReference(resource.bookReference);
 
@@ -116,37 +116,50 @@ export default function UpdateResource() {
       try {
         // Upload new images
         const newImages = await Promise.all(images.filter(image => image.raw).map(image => uploadFile(image.raw, token)));
-        values.images = [...values.images, ...newImages.map(uploadedImage => uploadedImage[0])];
+        const existingImages = images.filter(image => !image.raw).map(image => ({ id: image.id })); // Images already existing in the backend
+        values.images = [...existingImages, ...newImages.map(uploadedImage => ({ id: uploadedImage[0].id }))];
 
+        // Set audio file
         if (audioFile.raw) {
           const uploadedAudio = await uploadFile(audioFile.raw, token);
-          values.audio = uploadedAudio[0];
+          values.audio = { preview: uploadedAudio[0].url, id: uploadedAudio[0].id };
+        } else if (audioFile.id) {
+          values.audio = { preview: audioFile.preview, id: audioFile.id };
         } else {
-          values.audio = audioFile.preview;
+          values.audio = null; // Keep as null if no existing or new file
         }
 
+        // Set pdf file
         if (pdfFile.raw) {
           const uploadedPdf = await uploadFile(pdfFile.raw, token);
-          values.pdf = uploadedPdf[0];
+          values.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
+        } else if (pdfFile.id) {
+          values.pdf = { preview: pdfFile.preview, id: pdfFile.id };
         } else {
-          values.pdf = pdfFile.preview;
+          values.pdf = null; // Keep as null if no existing or new file
         }
 
+        // Set video file
         if (videoFile.raw) {
           const uploadedVideo = await uploadFile(videoFile.raw, token);
-          values.video = uploadedVideo[0];
+          values.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
+        } else if (videoFile.id) {
+          values.video = { preview: videoFile.preview, id: videoFile.id };
         } else {
-          values.video = videoFile.preview;
+          values.video = null; // Keep as null if no existing or new file
         }
+
+        // Filter out undefined images
+        values.images = values.images.filter(image => image !== undefined);
 
         const response = await updateResource(id, values, token);
         if (response && response.data) {
           console.log("Resource updated successfully:", response);
           formik.resetForm();
           setImages([]);
-          setAudioFile({ preview: "", raw: null });
-          setPdfFile({ preview: "", raw: null });
-          setVideoFile({ preview: "", raw: null });
+          setAudioFile({ preview: "", id: null, raw: null });
+          setPdfFile({ preview: "", id: null, raw: null });
+          setVideoFile({ preview: "", id: null, raw: null });
           setLink("");
           setBookReference("");
           setDisplayLinkInput(false);
@@ -161,22 +174,22 @@ export default function UpdateResource() {
   });
 
   const handleParcoursChange = (selectedParcours) => {
-    formik.setFieldValue("parcours", selectedParcours.map((p) => p.value));
-    const selectedParcoursIds = selectedParcours.map((p) => p.value);
+    formik.setFieldValue("parcours", selectedParcours.map((p) => p.value).filter(Boolean));
+    const selectedParcoursIds = selectedParcours.map((p) => p.value).filter(Boolean);
     const filteredModules = getModulesFromLocalStorage().filter((m) => selectedParcoursIds.includes(m.idparcour));
     setModuleOptions(filteredModules.map((m) => ({ value: m.id, label: m.name })));
     setLessonOptions([]);
   };
 
   const handleModulesChange = (selectedModules) => {
-    formik.setFieldValue("module", selectedModules.map((m) => m.value));
-    const selectedModulesIds = selectedModules.map((m) => m.value);
+    formik.setFieldValue("module", selectedModules.map((m) => m.value).filter(Boolean));
+    const selectedModulesIds = selectedModules.map((m) => m.value).filter(Boolean);
     const filteredLessons = getLessonsFromLocalStorage().filter((l) => selectedModulesIds.includes(l.idmodule));
     setLessonOptions(filteredLessons.map((l) => ({ value: l.id, label: l.name })));
   };
 
   const handleLessonsChange = (selectedLessons) => {
-    formik.setFieldValue("lesson", selectedLessons.map((l) => l.value));
+    formik.setFieldValue("lesson", selectedLessons.map((l) => l.value).filter(Boolean));
   };
 
   const handleDescriptionChange = (content) => {
@@ -194,7 +207,7 @@ export default function UpdateResource() {
           raw: file
         }));
         setImages([...images, ...newImages]);
-        formik.setFieldValue("images", [...images, ...newImages].map(image => image.raw));
+        formik.setFieldValue("images", [...images, ...newImages]);
       } else {
         const file = files[0];
         const url = URL.createObjectURL(file);
@@ -232,13 +245,13 @@ export default function UpdateResource() {
       formik.setFieldValue("images", newImages.map(image => image.raw));
     } else if (type === "audio") {
       setAudioFile({ preview: "", raw: null });
-      formik.setFieldValue("audio", "");
+      formik.setFieldValue("audio", null); // Set to null when removed
     } else if (type === "pdf") {
       setPdfFile({ preview: "", raw: null });
-      formik.setFieldValue("pdf", "");
+      formik.setFieldValue("pdf", null); // Set to null when removed
     } else if (type === "video") {
       setVideoFile({ preview: "", raw: null });
-      formik.setFieldValue("video", "");
+      formik.setFieldValue("video", null); // Set to null when removed
     }
   };
 

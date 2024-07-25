@@ -246,52 +246,51 @@ export const saveResource = async (resourceData, token) => {
   }
 };
 
-// Function to update a resource
+
+
 export const updateResource = async (id, data, token) => {
   const updatedData = {
     ...data,
     updatedAt: new Date().toISOString(),
   };
 
-  console.log("Updating resource:", updatedData);
-
   if (!navigator.onLine) {
     try {
-      await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
+      await db.transaction('rw', [db.resources, db.offlineChanges], async () => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
-          console.log("Existing resource found in IndexedDB:", existingResource);
+          console.log('Existing resource found in IndexedDB:', existingResource);
           await db.resources.update(Number(existingResource.id), {
             ...existingResource,
             ...updatedData,
           });
-          console.log("Resource updated in IndexedDB:", updatedData);
+          console.log('Resource updated in IndexedDB:', updatedData);
 
           await db.offlineChanges.add({
-            type: "update",
+            type: 'update',
             data: { id, ...updatedData },
             timestamp: Date.now(),
             endpoint: `${API_BASE_URL}/resources/${id}`,
-            method: "PUT",
+            method: 'PUT',
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           });
-          console.log("Offline update added to offlineChanges:", updatedData);
+          console.log('Offline update added to offlineChanges:', updatedData);
         } else {
-          console.error("Resource not found in IndexedDB for update:", id);
+          console.error('Resource not found in IndexedDB for update:', id);
         }
       });
 
-      return { status: "offline", data: updatedData };
+      return { status: 'offline', data: updatedData };
     } catch (error) {
-      console.error("Error updating data in IndexedDB:", error);
+      console.error('Error updating data in IndexedDB:', error);
       throw error;
     }
   } else {
     try {
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem('userId');
       const newData = {
         userId: userId,
         ...updatedData,
@@ -300,29 +299,134 @@ export const updateResource = async (id, data, token) => {
       const response = await axios.put(`${API_BASE_URL}/resources/${id}`, newData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
-      await db.transaction("rw", [db.resources], async () => {
+      await db.transaction('rw', [db.resources], async () => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
-          console.log("Existing resource found in IndexedDB for online update:", existingResource);
+          console.log('Existing resource found in IndexedDB for online update:', existingResource);
           await db.resources.update(Number(id), newData);
-          console.log("Resource updated in IndexedDB after online update:", newData);
+          console.log('Resource updated in IndexedDB after online update:', newData);
         } else {
-          console.error("Resource not found in IndexedDB for update:", id);
+          console.error('Resource not found in IndexedDB for update:', id);
         }
       });
 
-      console.log("Resource updated online:", response.data);
-      return { status: "success", data: response.data };
+      console.log('Resource updated online:', response.data);
+      return { status: 'success', data: response.data };
     } catch (error) {
-      console.error("Error updating resource:", error);
+      console.error('Error updating resource:', error);
       throw error;
     }
   }
 };
+// // Function to update a resource
+// export const updateResource = async (id, data, token) => {
+//   const updatedData = {
+//     ...data,
+//     updatedAt: new Date().toISOString(),
+//   };
+
+//   if (!navigator.onLine) {
+//     try {
+//       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
+//         const existingResource = await db.resources.get(Number(id));
+//         if (existingResource) {
+//           console.log("Existing resource found in IndexedDB:", existingResource);
+//           await db.resources.update(Number(existingResource.id), {
+//             ...existingResource,
+//             ...updatedData,
+//           });
+//           console.log("Resource updated in IndexedDB:", updatedData);
+
+//           await db.offlineChanges.add({
+//             type: "update",
+//             data: { id, ...updatedData },
+//             timestamp: Date.now(),
+//             endpoint: `${API_BASE_URL}/resources/${id}`,
+//             method: "PUT",
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               'Content-Type': 'application/json',
+//             },
+//           });
+//           console.log("Offline update added to offlineChanges:", updatedData);
+//         } else {
+//           console.error("Resource not found in IndexedDB for update:", id);
+//         }
+//       });
+
+//       return { status: "offline", data: updatedData };
+//     } catch (error) {
+//       console.error("Error updating data in IndexedDB:", error);
+//       throw error;
+//     }
+//   } else {
+//     try {
+//       const userId = localStorage.getItem("userId");
+//       const newData = {
+//         userId: userId,
+//         ...updatedData,
+//       };
+
+//       // Upload files
+//       const { images, audio, pdf, video, ...resourceData } = newData;
+
+//       // Upload new images
+//       const uploadedImages = [];
+//       for (let image of images) {
+//         if (image.raw) {
+//           const uploadedImage = await uploadFile(image.raw, token);
+//           uploadedImages.push(uploadedImage[0]);
+//         } else {
+//           uploadedImages.push(image);
+//         }
+//       }
+//       resourceData.images = uploadedImages;
+
+//       if (audio && audio.raw) {
+//         const uploadedAudio = await uploadFile(audio.raw, token);
+//         resourceData.audio = uploadedAudio[0];
+//       }
+
+//       if (pdf && pdf.raw) {
+//         const uploadedPdf = await uploadFile(pdf.raw, token);
+//         resourceData.pdf = uploadedPdf[0];
+//       }
+
+//       if (video && video.raw) {
+//         const uploadedVideo = await uploadFile(video.raw, token);
+//         resourceData.video = uploadedVideo[0];
+//       }
+
+//       const response = await axios.put(`${API_BASE_URL}/resources/${id}`, resourceData, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//       });
+
+//       await db.transaction("rw", [db.resources], async () => {
+//         const existingResource = await db.resources.get(Number(id));
+//         if (existingResource) {
+//           console.log("Existing resource found in IndexedDB for online update:", existingResource);
+//           await db.resources.update(Number(id), resourceData);
+//           console.log("Resource updated in IndexedDB after online update:", resourceData);
+//         } else {
+//           console.error("Resource not found in IndexedDB for update:", id);
+//         }
+//       });
+
+//       console.log("Resource updated online:", response.data);
+//       return { status: "success", data: response.data };
+//     } catch (error) {
+//       console.error("Error updating resource:", error);
+//       throw error;
+//     }
+//   }
+// };
 
 // Function to delete a resource
 export const deleteResource = async (id, token) => {
@@ -512,11 +616,11 @@ dataResource={
           const fileFromDB = await db.files.get(video.id);
           if (fileFromDB) {
             const uploadedVideo = await uploadFile(fileFromDB.content.raw, token);
-            resourceData.video = uploadedVideo[0];
-          }
-                 dataResource={
+            // resourceData.video = uploadedVideo[0];
+             dataResource={
           ... resourceData
-          ,pdf: uploadedImages
+          ,video: uploadedVideo
+          }      
         }
         }
 
