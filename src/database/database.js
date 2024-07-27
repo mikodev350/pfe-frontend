@@ -85,7 +85,9 @@ db.version(1).stores({
   resources:
     "++id, nom, format, parcours, modules, lessons, note, images, audio, pdf, video, link, referenceLivre",
   offlineChanges: "++id, type, data, timestamp, endpoint, method, headers",
-  files: "++id, name,preview, type, content, lastModified, createdAt", // Updated schema
+  files: "++id, name, type, url, createdAt", // Simplified schema
+
+  // files: "++id, name,preview, type, content, lastModified, createdAt", // Updated schema
   // files: "++id, name, type, content, createdAt",
 });
 

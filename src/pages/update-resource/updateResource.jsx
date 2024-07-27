@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import Select, { components } from "react-select";
 import { useFormik } from "formik";
@@ -10,7 +10,8 @@ import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "r
 import { getToken } from "../../util/authUtils";
 import { uploadFile } from "../../api/apiUpload";
 import { useParams } from "react-router-dom";
-import { getResourceById, updateResource } from "../../api/apiResource";
+import { getResourceById, updateResource, addFileInToIndexedDB, syncOfflineChangesResource } from "../../api/apiResource";
+import { useQueryClient } from "react-query";
 
 const formatOptions = [
   { value: 'cours', label: 'Cours' },
@@ -26,12 +27,15 @@ const CheckboxOption = (props) => (
 );
 
 export default function UpdateResource() {
+
+    const queryClient = useQueryClient();
+
   const { id } = useParams();
   const [parcoursOptions, setParcoursOptions] = useState([]);
   const [moduleOptions, setModuleOptions] = useState([]);
   const [lessonOptions, setLessonOptions] = useState([]);
 
-  const [images, setImages] = useState([]); // Multiple images
+  const [images, setImages] = useState([]);
   const [audioFile, setAudioFile] = useState({ preview: "", id: null, raw: null });
   const [pdfFile, setPdfFile] = useState({ preview: "", id: null, raw: null });
   const [videoFile, setVideoFile] = useState({ preview: "", id: null, raw: null });
@@ -45,7 +49,125 @@ export default function UpdateResource() {
   const hiddenFileInputPdf = useRef(null);
   const hiddenFileInputVideo = useRef(null);
 
-  const token = React.useMemo(() => getToken(), []);
+  const token = useMemo(() => getToken(), []);
+
+
+   useEffect(() => {
+    const handleOnline = async () => {
+      try {
+        await syncOfflineChangesResource(token, queryClient);
+        console.log("Synced offline changes successfully.");
+      } catch (error) {
+        console.error("Error syncing offline changes:", error);
+      }
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [token, queryClient]);
+
+
+
+  const formik = useFormik({
+    initialValues: {
+      resourceName: "",
+      format: "",
+      parcours: [],
+      module: [],
+      lesson: [],
+      note: "",
+      youtubeLink: "",
+      images: [],
+      audio: "",
+      pdf: "",
+      video: "",
+      link: "",
+      bookReference: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        // Upload new images
+        const newImages = await Promise.all(images.filter(image => image.raw).map(async (image) => {
+          if (!navigator.onLine) {
+            const id = await addFileInToIndexedDB(image.preview, image.raw);
+            return { id, offline: true };
+          } else {
+            const uploadedImage = await uploadFile(image.raw, token);
+            return { id: uploadedImage[0].id };
+          }
+        }));
+        const existingImages = images.filter(image => !image.raw).map(image => ({ id: image.id }));
+        values.images = [...existingImages, ...newImages];
+
+        // Set audio file
+        if (audioFile.raw) {
+          if (!navigator.onLine) {
+            const id = await addFileInToIndexedDB(audioFile.preview, audioFile.raw);
+            values.audio = { id, offline: true };
+          } else {
+            const uploadedAudio = await uploadFile(audioFile.raw, token);
+            values.audio = { preview: uploadedAudio[0].url, id: uploadedAudio[0].id };
+          }
+        } else if (audioFile.id) {
+          values.audio = { preview: audioFile.preview, id: audioFile.id };
+        } else {
+          values.audio = null;
+        }
+
+        // Set pdf file
+        if (pdfFile.raw) {
+          if (!navigator.onLine) {
+            const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
+            values.pdf = { id, offline: true };
+          } else {
+            const uploadedPdf = await uploadFile(pdfFile.raw, token);
+            values.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
+          }
+        } else if (pdfFile.id) {
+          values.pdf = { preview: pdfFile.preview, id: pdfFile.id };
+        } else {
+          values.pdf = null;
+        }
+
+        // Set video file
+        if (videoFile.raw) {
+          if (!navigator.onLine) {
+            const id = await addFileInToIndexedDB(videoFile.preview, videoFile.raw);
+            values.video = { id, offline: true };
+          } else {
+            const uploadedVideo = await uploadFile(videoFile.raw, token);
+            values.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
+          }
+        } else if (videoFile.id) {
+          values.video = { preview: videoFile.preview, id: videoFile.id };
+        } else {
+          values.video = null;
+        }
+
+        // Filter out undefined images
+        values.images = values.images.filter(image => image !== undefined);
+
+        const response = await updateResource(id, values, token);
+        if (response && response.data) {
+          console.log("Resource updated successfully:", response);
+          formik.resetForm();
+          setImages([]);
+          setAudioFile({ preview: "", id: null, raw: null });
+          setPdfFile({ preview: "", id: null, raw: null });
+          setVideoFile({ preview: "", id: null, raw: null });
+          setLink("");
+          setBookReference("");
+          setDisplayLinkInput(false);
+          setDisplayBookInput(false);
+        } else {
+          throw new Error("Failed to update resource");
+        }
+      } catch (error) {
+        console.error("Error updating resource:", error);
+      }
+    },
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +177,8 @@ export default function UpdateResource() {
         setParcoursOptions(parcours.map((p) => ({ value: p.id, label: p.name })));
 
         const resource = await getResourceById(id, token);
+
+        console.log(resource.images);
         formik.setValues({
           resourceName: resource.nom,
           format: resource.format,
@@ -94,84 +218,6 @@ export default function UpdateResource() {
     };
     fetchData();
   }, [id, token]);
-
-  const formik = useFormik({
-    initialValues: {
-      resourceName: "",
-      format: "",
-      parcours: [],
-      module: [],
-      lesson: [],
-      note: "",
-      youtubeLink: "",
-      images: [],
-      audio: "",
-      pdf: "",
-      video: "",
-      link: "",
-      bookReference: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      try {
-        // Upload new images
-        const newImages = await Promise.all(images.filter(image => image.raw).map(image => uploadFile(image.raw, token)));
-        const existingImages = images.filter(image => !image.raw).map(image => ({ id: image.id })); // Images already existing in the backend
-        values.images = [...existingImages, ...newImages.map(uploadedImage => ({ id: uploadedImage[0].id }))];
-
-        // Set audio file
-        if (audioFile.raw) {
-          const uploadedAudio = await uploadFile(audioFile.raw, token);
-          values.audio = { preview: uploadedAudio[0].url, id: uploadedAudio[0].id };
-        } else if (audioFile.id) {
-          values.audio = { preview: audioFile.preview, id: audioFile.id };
-        } else {
-          values.audio = null; // Keep as null if no existing or new file
-        }
-
-        // Set pdf file
-        if (pdfFile.raw) {
-          const uploadedPdf = await uploadFile(pdfFile.raw, token);
-          values.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
-        } else if (pdfFile.id) {
-          values.pdf = { preview: pdfFile.preview, id: pdfFile.id };
-        } else {
-          values.pdf = null; // Keep as null if no existing or new file
-        }
-
-        // Set video file
-        if (videoFile.raw) {
-          const uploadedVideo = await uploadFile(videoFile.raw, token);
-          values.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
-        } else if (videoFile.id) {
-          values.video = { preview: videoFile.preview, id: videoFile.id };
-        } else {
-          values.video = null; // Keep as null if no existing or new file
-        }
-
-        // Filter out undefined images
-        values.images = values.images.filter(image => image !== undefined);
-
-        const response = await updateResource(id, values, token);
-        if (response && response.data) {
-          console.log("Resource updated successfully:", response);
-          formik.resetForm();
-          setImages([]);
-          setAudioFile({ preview: "", id: null, raw: null });
-          setPdfFile({ preview: "", id: null, raw: null });
-          setVideoFile({ preview: "", id: null, raw: null });
-          setLink("");
-          setBookReference("");
-          setDisplayLinkInput(false);
-          setDisplayBookInput(false);
-        } else {
-          throw new Error("Failed to update resource");
-        }
-      } catch (error) {
-        console.error("Error updating resource:", error);
-      }
-    },
-  });
 
   const handleParcoursChange = (selectedParcours) => {
     formik.setFieldValue("parcours", selectedParcours.map((p) => p.value).filter(Boolean));
@@ -504,7 +550,7 @@ export default function UpdateResource() {
             <div className="image-preview-container">
               {images.length > 0 && images.map((image, index) => (
                 <div className="image-preview" key={index}>
-                  <img src={image.preview.startsWith('blob') ? image.preview : `http://localhost:1337${image.preview}`} alt={`Preview ${index}`} className="thumbnail-image" />
+                  <img src={image.preview?.startsWith('blob') ? image.preview : `http://localhost:1337${image.preview}`} alt={`Preview ${index}`} className="thumbnail-image" />
                   <Button variant="outline-danger" onClick={() => removeFile("image", index)}>
                     <FiTrash2 size={24} /> Supprimer
                   </Button>
@@ -514,7 +560,7 @@ export default function UpdateResource() {
 
             {audioFile.preview && (
               <div className="audio-preview">
-                <AudioPlayer audioFile={audioFile.preview.startsWith('blob') ? audioFile.preview : `http://localhost:1337${audioFile.preview}`} />
+                <AudioPlayer audioFile={audioFile.preview?.startsWith('blob') ? audioFile.preview : `http://localhost:1337${audioFile.preview}`} />
                 <Button variant="outline-danger" onClick={() => removeFile("audio")}>
                   <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
@@ -523,7 +569,7 @@ export default function UpdateResource() {
 
             {pdfFile.preview && (
               <div className="pdf-preview">
-                <iframe title="PDF Preview" src={pdfFile.preview.startsWith('blob') ? pdfFile.preview : `http://localhost:1337${pdfFile.preview}`} width="100%" height="500px" />
+                <iframe title="PDF Preview" src={pdfFile.preview?.startsWith('blob') ? pdfFile.preview : `http://localhost:1337${pdfFile.preview}`} width="100%" height="500px" />
                 <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
                   <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>
@@ -532,7 +578,7 @@ export default function UpdateResource() {
 
             {videoFile.preview && (
               <div className="video-preview">
-                <video src={videoFile.preview.startsWith('blob') ? videoFile.preview : `http://localhost:1337${videoFile.preview}`} controls width="100%" />
+                <video src={videoFile.preview?.startsWith('blob') ? videoFile.preview : `http://localhost:1337${videoFile.preview}`} controls width="100%" />
                 <Button variant="outline-danger" onClick={() => removeFile("video")}>
                   <FiTrash2 size={24} /> Supprimer la vidéo
                 </Button>
