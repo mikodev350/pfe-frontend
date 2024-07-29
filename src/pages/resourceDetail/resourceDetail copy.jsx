@@ -1,5 +1,3 @@
-// ResourceDetails Component
-
 import React, { useState } from "react";
 import { Card, Col, Row, Button, Modal, Carousel, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Zoom from 'react-medium-image-zoom';
@@ -27,7 +25,8 @@ const StyledHeader = styled(Card.Header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 66px;
+      height: 66px;
+
 `;
 
 const ButtonsContainer = styled.div`
@@ -68,94 +67,11 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
     try {
       const newResource = await cloneResource(resource.id, token);
       toast.success("Resource saved successfully!");
+      console.log("New Resource:", newResource); // For debugging purposes
     } catch (error) {
+      console.error("Error saving resource:", error);
       toast.error("Error saving resource");
     }
-  };
-
-  const renderMedia = (media) => {
-  if (!media.url) return null;
-
-  let src;
-  if (media.url.startsWith("blob:")) {
-    src = media.url;
-  } else if (media.url.startsWith("http://") || media.url.startsWith("https://")) {
-    src = media.url;
-  } else {
-    src = `http://localhost:1337${media.url}`;
-  }
-
-  return (
-    <Image
-      src={src}
-      alt={media.name}
-      className="img-fluid"
-      style={{ cursor: 'pointer' }}
-    />
-  );
-};
-
-
-  const renderVideo = (video) => {
-    if (!video.url) return null;
-
-    let src;
-    if (video.url.startsWith("blob:")) {
-      src = video.url;
-    } else if (video.url.startsWith("http://") || video.url.startsWith("https://")) {
-      src = video.url;
-    } else {
-      src = `http://localhost:1337${video.url}`;
-    }
-
-    return (
-      <video controls width="100%">
-        <source src={src} type={video.mime} />
-        Your browser does not support the video tag.
-      </video>
-    );
-  };
-
-  const renderAudio = (audio) => {
-    if (!audio.url) return null;
-
-    let src;
-    if (audio.url.startsWith("blob:")) {
-      src = audio.url;
-    } else if (audio.url.startsWith("http://") || audio.url.startsWith("https://")) {
-      src = audio.url;
-    } else {
-      src = `http://localhost:1337${audio.url}`;
-    }
-
-    return (
-      <audio controls className="w-100">
-        <source src={src} type={audio.type} />
-        Your browser does not support the audio element.
-      </audio>
-    );
-  };
-
-  const renderPDF = (pdf) => {
-    if (!pdf.url) return null;
-
-    let src;
-    if (pdf.url.startsWith("blob:")) {
-      src = pdf.url;
-    } else if (pdf.url.startsWith("http://") || pdf.url.startsWith("https://")) {
-      src = pdf.url;
-    } else {
-      src = `http://localhost:1337${pdf.url}`;
-    }
-
-    return (
-      <embed
-        src={src}
-        width="100%"
-        height="500px"
-        type="application/pdf"
-      />
-    );
   };
 
   return (
@@ -184,12 +100,18 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
             <p><strong>Note:</strong></p>
             <div dangerouslySetInnerHTML={{ __html: resource.note }} />
           </Col>
-          {resource.video && (
-            <Col md={6}>
-              <h3>Vidéo</h3>
-              {renderVideo(resource.video)}
-            </Col>
-          )}
+{resource.video && (
+  <Col md={6}>
+    <h3>Vidéo</h3>
+    {console.log("Video URL:", `http://localhost:1337${resource.video.url}`)}
+    {console.log("Video MIME type:", resource.video.mime)}
+    <video controls width="100%">
+      <source src={`http://localhost:1337${resource.video.url}`} type={resource.video.mime} />
+      Your browser does not support the video tag.
+    </video>
+  </Col>
+)}
+
         </Row>
         <Row className="mt-4">
           <Col md={6}>
@@ -228,15 +150,22 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
             {resource.audio && (
               <div>
                 <h3>Audio</h3>
-                {renderAudio(resource.audio)}
+                <audio controls src={`http://localhost:1337${resource.audio.url}`} className="w-100">
+                  Your browser does not support the audio element.
+                </audio>
               </div>
             )}
             {resource.pdf && (
-              <div className="mt-4">
-                <h3>PDF</h3>
-                {renderPDF(resource.pdf)}
-              </div>
-            )}
+  <div className="mt-4">
+    <h3>PDF</h3>
+    <embed
+      src={`http://localhost:1337${resource.pdf.url}`}
+      width="100%"
+      height="500px"
+      type="application/pdf"
+    />
+  </div>
+)}
             {resource.images && resource.images.length > 0 && (
               <div className="mt-4">
                 <h3>Images</h3>
@@ -244,7 +173,12 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
                   {resource.images.map((image, index) => (
                     <Col md={4} key={index}>
                       <Zoom>
-                        {renderMedia(image)}
+                        <Image
+                          src={`http://localhost:1337${image.url}`}
+                          alt={`Image ${index + 1}`}
+                          className="img-fluid"
+                          style={{ cursor: 'pointer' }}
+                        />
                       </Zoom>
                       <Button variant="link" onClick={() => handleShow(index)}>
                         Voir en plein écran
@@ -262,7 +196,7 @@ const ResourceDetails = ({ resource, isFromLink, token }) => {
                         <Carousel.Item key={index}>
                           <img
                             className="d-block w-100"
-                            src={image.url.startsWith("blob:") || image.url.startsWith("http://") || image.url.startsWith("https://") ? image.url : `http://localhost:1337${image.url}`}
+                            src={`http://localhost:1337${image.url}`}
                             alt={`Image ${index + 1}`}
                           />
                         </Carousel.Item>

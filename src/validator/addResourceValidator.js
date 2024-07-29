@@ -6,7 +6,7 @@ const options = {
 };
 
 export const validationSchema = Yup.object().shape({
-  resourceName: Yup.string().trim().required("Resource name is required"),
+  nom: Yup.string().trim().required("Resource name is required"),
   format: Yup.string()
     .oneOf(["cours", "devoir", "ressource numérique"], "Invalid format")
     .required("Format is required"),
@@ -69,7 +69,7 @@ export const validationSchema = Yup.object().shape({
 //       "Please enter a valid YouTube video link."
 //     )
 //     .notRequired(),
-//   resourceName: Yup.string().trim().required("Resource name is required"),
+//   nom: Yup.string().trim().required("Resource name is required"),
 //   format: Yup.string()
 //     .oneOf(["cours", "devoir", "ressource numérique"], "Invalid format")
 //     .required("Format is required"),

@@ -77,7 +77,7 @@ export default function AddResource() {
 
   const formik = useFormik({
     initialValues: {
-      resourceName: "",
+      nom: "",
       format: "",
       parcours: [],
       module: [],
@@ -292,17 +292,17 @@ export default function AddResource() {
       <Row className="justify-content-md-center">
         <Col md={8}>
           <Form onSubmit={formik.handleSubmit}>
-            <Form.Group controlId="resourceName">
+            <Form.Group controlId="nom">
               <Form.Label>Nom de la ressource</Form.Label>
               <Form.Control
                 type="text"
-                name="resourceName"
-                value={formik.values.resourceName}
+                name="nom"
+                value={formik.values.nom}
                 onChange={formik.handleChange}
-                isInvalid={!!formik.errors.resourceName}
+                isInvalid={!!formik.errors.nom}
               />
               <Form.Control.Feedback type="invalid">
-                {formik.errors.resourceName}
+                {formik.errors.nom}
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -639,7 +639,7 @@ export default function AddResource() {
 
 //   const formik = useFormik({
 //     initialValues: {
-//       resourceName: "",
+//       nom: "",
 //       format: "",
 //       parcours: [],
 //       module: [],
@@ -854,17 +854,17 @@ export default function AddResource() {
 //       <Row className="justify-content-md-center">
 //         <Col md={8}>
 //           <Form onSubmit={formik.handleSubmit}>
-//             <Form.Group controlId="resourceName">
+//             <Form.Group controlId="nom">
 //               <Form.Label>Nom de la ressource</Form.Label>
 //               <Form.Control
 //                 type="text"
-//                 name="resourceName"
-//                 value={formik.values.resourceName}
+//                 name="nom"
+//                 value={formik.values.nom}
 //                 onChange={formik.handleChange}
-//                 isInvalid={!!formik.errors.resourceName}
+//                 isInvalid={!!formik.errors.nom}
 //               />
 //               <Form.Control.Feedback type="invalid">
-//                 {formik.errors.resourceName}
+//                 {formik.errors.nom}
 //               </Form.Control.Feedback>
 //             </Form.Group>
 

@@ -13,6 +13,24 @@ const fileToBase64 = (file) => {
   });
 };
 
+// Function to convert a URL to a Blob
+const urlToBlob = async (url) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const blob = await response.blob();
+
+    console.log(blob.type);
+    const blobUrl = URL.createObjectURL(blob);
+
+    return { urlBlob: blobUrl, typeBlob: blob.type };
+  } catch (error) {
+    console.error('Error converting URL to Blob:', error);
+    throw error;
+  }
+};
 // Add or update a file in IndexedDB
 export const addOrUpdateFileInIndexedDB = async (file) => {
   console.log("file-----------------------------------------------------");
@@ -38,6 +56,9 @@ export const addOrUpdateFileInIndexedDB = async (file) => {
     });
   }
 };
+
+
+
 /************************************************************************************************/
 // Add or update a file in IndexedDB
 export const addFileInToIndexedDB = async (url,file) => {
@@ -49,7 +70,9 @@ export const addFileInToIndexedDB = async (url,file) => {
       createdAt: new Date(), 
     });
      
-    return data;
+    return data; 
+/************************************************************************************************/
+
   // //  const fileUrl = file.url ? file.url : file.preview; 
   // const existingFile = await db.files.get(file.id);
   // if (!existingFile) {
@@ -94,10 +117,25 @@ export const addFileInToIndexedDB = async (url,file) => {
 };
 /************************************************************************************************/  
 
+
+// Fonction pour vérifier si un fichier existe déjà dans IndexedDB
+const fileExistsInIndexedDB = async (name) => {
+  const existingFile = await db.files.where({ name: name }).first();
+  return existingFile ? existingFile.id : null;
+};
+
+/**************************************************************************************************/ 
 // Function to save a file to IndexedDB
+// Fonction pour sauvegarder un fichier dans IndexedDB
 export const saveFileToIndexedDB = async (file) => {
-    console.log("saveFileToIndexedDB-----------------------------------------------------");
-  console.log(file)
+  console.log("saveFileToIndexedDB-----------------------------------------------------");
+  console.log(file);
+
+  const existingFileId = await fileExistsInIndexedDB(file.raw.name);
+  if (existingFileId) {
+    console.log(`File ${file.raw.name} already exists in IndexedDB, skipping save.`);
+    return existingFileId;
+  }
 
   try {
     const id = await db.files.add({
@@ -115,22 +153,239 @@ export const saveFileToIndexedDB = async (file) => {
   }
 };
 
+// export const saveFileToIndexedDB = async (file) => {
+//     console.log("saveFileToIndexedDB-----------------------------------------------------");
+//   console.log(file)
+
+//   try {
+//     const id = await db.files.add({
+//       name: file.raw.name,
+//       type: file.raw.type,
+//       preview: file.preview,
+//       content: file,
+//       createdAt: new Date().toISOString(),
+//     });
+
+//     return id;
+//   } catch (error) {
+//     console.error("Error saving file to IndexedDB:", error);
+//     throw error;
+//   }
+// };
+
+// Fonction pour sauvegarder un fichier dans IndexedDB à partir d'une URL
+export const saveFileToIndexedDBResource = async (url, name) => {
+  const existingFileId = await fileExistsInIndexedDB(name);
+  if (existingFileId) {
+    console.log(`File ${name} already exists in IndexedDB, skipping save.`);
+    return existingFileId;
+  }
+
+  console.log(url);
+  const { urlBlob, typeBlob } = await urlToBlob(`http://localhost:1337${url}`);
+  try {
+    const id = await db.files.add({
+      name: name,
+      type: typeBlob,
+      url: urlBlob,
+
+      createdAt: new Date().toISOString(),
+    });
+
+    return id;
+  } catch (error) {
+    console.error("Error saving file to IndexedDB:", error);
+    throw error;
+  }
+};
+
+
+
 // Handle data conflicts between IndexedDB and the server
 const handleConflict = (localData, remoteData) => {
   return new Date(localData.updatedAt) > new Date(remoteData.updatedAt) ? localData : remoteData;
 };
 
-// Add or update a resource in IndexedDB
+
+
+
+
+// // Add or update a resource in IndexedDB
+// const addOrUpdateResourceInIndexedDB = async (resource) => {
+//   console.log(resource);
+//   const existingResource = await db.resources.get(resource.id);
+
+//   // Handle different types of files and update the resource with file IDs
+//   if (resource.images && resource.images.length > 0) {
+//     resource.imageIds = [];
+//     for (const image of resource.images) {
+//       const fileId = await saveFileToIndexedDBResource(image.url, image.name);
+//       console.log(fileId);
+//       resource.imageIds.push(fileId);
+//     }
+//   } else if (resource.audio) {
+//     const fileId = await saveFileToIndexedDBResource(resource.audio.url, resource.audio.name);
+//     resource.audioId = fileId;
+//   } else if (resource.pdf) {
+//     const fileId = await saveFileToIndexedDBResource(resource.pdf.url, resource.pdf.name);
+//     resource.pdfId = fileId;
+//   } else if (resource.video) {
+//     const fileId = await saveFileToIndexedDBResource(resource.video.url, resource.video.name);
+//     resource.videoId = fileId;
+//   }
+
+//     const resourceData = {
+//     id: resource.id,
+//     format: resource.format ? resource.format : null,
+//     nom: resource.nom ? resource.nom : null,
+//     parcours: resource.parcours ? resource.parcours : null,
+//     modules: resource.modules ? resource.modules : null,
+//     lessons: resource.lessons ? resource.lessons : null,
+//     note: resource.note ? resource.note : null,
+//     pdf: resource.pdfId ? resource.pdfId : null,
+//      video: resource.videoId ? resource.videoId : null,
+//     images: resource.imageIds ? resource.imageIds : null,
+//     link: resource.link ? resource.link : null,
+//     audio: resource.audioId ? resource.audioId : null,
+//     referenceLivre: resource.referenceLivre ? resource.referenceLivre : null,
+//     createdAt: resource.createdAt ? resource.createdAt : new Date().toISOString(),
+//   };
+
+//     console.log("------------------------------------------------------------------------------------");
+//       console.log("resourceData");
+//       console.log(resourceData);
+//       console.log("------------------------------------------------------------------------------------");
+
+//   if (!existingResource) {
+//     await db.resources.put(resourceData);
+//   } else {
+//     await db.resources.update(resourceData.id, resourceData);
+//   }
+// };
+
+
+
+
+// Fonction pour ajouter ou mettre à jour une ressource dans IndexedDB
 const addOrUpdateResourceInIndexedDB = async (resource) => {
+  console.log(resource);
   const existingResource = await db.resources.get(resource.id);
+
+  // Traiter différents types de fichiers et mettre à jour la ressource avec les IDs des fichiers
+  if (resource.images && resource.images.length > 0) {
+    resource.imageIds = [];
+    for (const image of resource.images) {
+      const fileId = await saveFileToIndexedDBResource(image.url, image.name);
+      console.log(fileId);
+      resource.imageIds.push(fileId);
+    }
+  } else if (resource.audio) {
+    const fileId = await saveFileToIndexedDBResource(resource.audio.url, resource.audio.name);
+    resource.audioId = fileId;
+  } else if (resource.pdf) {
+    const fileId = await saveFileToIndexedDBResource(resource.pdf.url, resource.pdf.name);
+    resource.pdfId = fileId;
+  } else if (resource.video) {
+    const fileId = await saveFileToIndexedDBResource(resource.video.url, resource.video.name);
+    resource.videoId = fileId;
+  }
+
+  const resourceData = {
+    id: resource.id,
+    format: resource.format ? resource.format : null,
+    nom: resource.nom ? resource.nom : null,
+    parcours: resource.parcours ? resource.parcours : null,
+    modules: resource.modules ? resource.modules : null,
+    lessons: resource.lessons ? resource.lessons : null,
+    note: resource.note ? resource.note : null,
+    pdf: resource.pdfId ? resource.pdfId : null,
+    video: resource.videoId ? resource.videoId : null,
+    images: resource.imageIds ? resource.imageIds : null,
+    link: resource.link ? resource.link : null,
+    audio: resource.audioId ? resource.audioId : null,
+    referenceLivre: resource.referenceLivre ? resource.referenceLivre : null,
+    createdAt: resource.createdAt ? resource.createdAt : new Date().toISOString(),
+  };
+
+  console.log("------------------------------------------------------------------------------------");
+  console.log("resourceData");
+  console.log(resourceData);
+  console.log("------------------------------------------------------------------------------------");
+
   if (!existingResource) {
-    await db.resources.put(resource);
+    await db.resources.put(resourceData);
   } else {
-    await db.resources.update(resource.id, resource);
+    await db.resources.update(resourceData.id, resourceData);
   }
 };
 
-// Function to fetch resources
+// // Fonction pour ajouter ou mettre à jour une ressource dans IndexedDB
+// const addOrUpdateResourceInIndexedDB = async (resource) => {
+//   console.log(resource);
+//   const existingResource = await db.resources.get(resource.id);
+
+//   // Traiter différents types de fichiers et mettre à jour la ressource avec les IDs des fichiers
+//   if (resource.images && resource.images.length > 0) {
+//     resource.imageIds = [];
+//     for (const image of resource.images) {
+//       const fileId = await saveFileToIndexedDBResource(image.url, image.name);
+//       console.log(fileId);
+//       resource.imageIds.push(fileId);
+//     }
+//   } else if (resource.audio) {
+//     const fileId = await saveFileToIndexedDBResource(resource.audio.url, resource.audio.name);
+//     resource.audioId = fileId;
+//   } else if (resource.pdf) {
+//     const fileId = await saveFileToIndexedDBResource(resource.pdf.url, resource.pdf.name);
+//     resource.pdfId = fileId;
+//   } else if (resource.video) {
+//     const fileId = await saveFileToIndexedDBResource(resource.video.url, resource.video.name);
+//     resource.videoId = fileId;
+//   }
+
+//   const resourceData = {
+//     id: resource.id,
+//     format: resource.format ? resource.format : null,
+//     nom: resource.nom ? resource.nom : null,
+//     parcours: resource.parcours ? resource.parcours : null,
+//     modules: resource.modules ? resource.modules : null,
+//     lessons: resource.lessons ? resource.lessons : null,
+//     note: resource.note ? resource.note : null,
+//     pdf: resource.pdfId ? resource.pdfId : null,
+//     video: resource.videoId ? resource.videoId : null,
+//     images: resource.imageIds ? resource.imageIds : null,
+//     link: resource.link ? resource.link : null,
+//     audio: resource.audioId ? resource.audioId : null,
+//     referenceLivre: resource.referenceLivre ? resource.referenceLivre : null,
+//     createdAt: resource.createdAt ? resource.createdAt : new Date().toISOString(),
+//   };
+
+//   console.log("------------------------------------------------------------------------------------");
+//   console.log("resourceData");
+//   console.log(resourceData);
+//   console.log("------------------------------------------------------------------------------------");
+
+//   if (!existingResource) {
+//     await db.resources.put(resourceData);
+//   } else {
+//     await db.resources.update(resourceData.id, resourceData);
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Fonction pour récupérer des ressources
 export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/resources`, {
@@ -145,6 +400,10 @@ export const fetchResources = async (page, pageSize, sectionId, searchValue, tok
         Authorization: `Bearer ${token}`,
       },
     });
+
+    console.log("--------------------response ---------------------------------------------");
+    console.log(response.data.data);
+    console.log("----------------------------------------------------------------------------");
 
     await db.transaction("rw", db.resources, async () => {
       for (const resource of response.data.data) {
@@ -176,10 +435,108 @@ export const fetchResources = async (page, pageSize, sectionId, searchValue, tok
   }
 };
 
+
+// // Function to fetch resources
+// export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
+//   try {
+//     const response = await axios.get(`${API_BASE_URL}/resources`, {
+//       params: {
+//         page,
+//         pageSize,
+//         _q: searchValue,
+//         section: sectionId,
+//       },
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     console.log("--------------------response ---------------------------------------------");
+//     console.log(response.data.data);
+//     console.log("----------------------------------------------------------------------------");
+
+//     await db.transaction("rw", db.resources, async () => {
+//       for (const resource of response.data.data) {
+//         await addOrUpdateResourceInIndexedDB(resource);
+//       }
+//     });
+
+//     return {
+//       data: response.data.data,
+//       totalPages: Math.ceil(response.data.total / pageSize),
+//     };
+//   } catch (error) {
+//     console.error("Error fetching resources:", error);
+
+//     const localData = await db.resources
+//       .filter((resource) => resource.nom.includes(searchValue))
+//       .offset((page - 1) * pageSize)
+//       .limit(pageSize)
+//       .toArray();
+
+//     const totalLocalDataCount = await db.resources
+//       .filter((resource) => resource.nom.includes(searchValue))
+//       .count();
+
+//     return {
+//       data: localData,
+//       totalPages: Math.ceil(totalLocalDataCount / pageSize),
+//     };
+//   }
+// };
+
+// // Function to fetch resources
+// export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
+//   try {
+//     const response = await axios.get(`${API_BASE_URL}/resources`, {
+//       params: {
+//         page,
+//         pageSize,
+//         _q: searchValue,
+//         section: sectionId,
+//       },
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     await db.transaction("rw", db.resources, async () => {
+//       for (const resource of response.data.data) {
+//         await addOrUpdateResourceInIndexedDB(resource);
+//       }
+//     });
+
+//     return {
+//       data: response.data.data,
+//       totalPages: Math.ceil(response.data.total / pageSize),
+//     };
+//   } catch (error) {
+//     console.error("Error fetching resources:", error);
+
+//     const localData = await db.resources
+//       .filter((resource) => resource.nom.includes(searchValue))
+//       .offset((page - 1) * pageSize)
+//       .limit(pageSize)
+//       .toArray();
+
+//     const totalLocalDataCount = await db.resources
+//       .filter((resource) => resource.nom.includes(searchValue))
+//       .count();
+
+//     return {
+//       data: localData,
+//       totalPages: Math.ceil(totalLocalDataCount / pageSize),
+//     };
+//   }
+// };
+
 // Function to save a resource
 export const saveResource = async (resourceData, token) => {
   let newData = {
     ...resourceData,
+    isLocal:true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -244,6 +601,7 @@ export const saveResource = async (resourceData, token) => {
 export const updateResource = async (id, data, token) => {
   const updatedData = {
     ...data,
+        isLocal:true,
     updatedAt: new Date().toISOString(),
   };
 
@@ -416,13 +774,35 @@ export const generateResourceLink = async (id, token) => {
   }
 };
 
-// Function to get a resource by ID
 export const getResourceById = async (id, token) => {
   try {
     if (!navigator.onLine) {
+      console.log("Offline: Fetching resource from IndexedDB");
       const resource = await db.resources.get(Number(id));
       if (resource) {
-        return resource;
+        const { images, audio, pdf, video, ...resourceData } = resource;
+        let resolvedData = { ...resourceData };
+
+        if (images && images.length > 0) {
+          const uploadImages = await Promise.all(images.map(async (imageId) => {
+            const fileFromDB = await db.files.get(imageId);
+            if (fileFromDB) {
+              const blob = new Blob([fileFromDB.content], { type: fileFromDB.type });
+              return {
+                id: fileFromDB.id,
+                name: fileFromDB.name,
+                type: fileFromDB.type,
+                url: URL.createObjectURL(blob)
+              };
+            } else {
+              throw new Error("File not found in IndexedDB");
+            }
+          }));
+          resolvedData.images = uploadImages;
+        }
+
+        // Similary handle audio, pdf, and video
+        return resolvedData;
       } else {
         throw new Error("Resource not found in IndexedDB");
       }
@@ -441,6 +821,92 @@ export const getResourceById = async (id, token) => {
   }
 };
 
+
+// export const getResourceById = async (id, token) => {
+//   try {
+//     if (!navigator.onLine) {
+//       console.log("Offline: Fetching resource from IndexedDB");
+//       const resource = await db.resources.get(Number(id));
+//       console.log("Resource fetched from IndexedDB:", resource);
+
+//       if (resource) {
+//         const { images, audio, pdf, video, ...resourceData } = resource;
+//         let resolvedData = { ...resourceData };
+
+//         if (images && images.length > 0) {
+//           const uploadImages = await Promise.all(images.map(async (imageId) => {
+//             const fileFromDB = await db.files.get(imageId);
+//             if (fileFromDB) {
+//               return {
+//                 id: fileFromDB.id,
+//                 name: fileFromDB.name,
+//                 type: fileFromDB.type,
+//                 url: URL.createObjectURL(new Blob([fileFromDB.url], { type: fileFromDB.type }))
+//               };
+//             } else {
+//               throw new Error("File not found in IndexedDB");
+//             }
+//           }));
+//           console.log("Resolved images from IndexedDB:", uploadImages);
+//           resolvedData.images = uploadImages;
+//         }
+
+//         if (audio) {
+//           const audioFromDB = await db.files.get(audio);
+//           if (audioFromDB) {
+//             resolvedData.audio = {
+//               ...audioFromDB,
+//               url: URL.createObjectURL(new Blob([audioFromDB.url], { type: audioFromDB.type }))
+//             };
+//           } else {
+//             throw new Error("Audio file not found in IndexedDB");
+//           }
+//         }
+
+//         if (pdf) {
+//           const pdfFromDB = await db.files.get(pdf);
+//           if (pdfFromDB) {
+//             resolvedData.pdf = {
+//               ...pdfFromDB,
+//               url: URL.createObjectURL(new Blob([pdfFromDB.url], { type: pdfFromDB.type }))
+//             };
+//           } else {
+//             throw new Error("PDF file not found in IndexedDB");
+//           }
+//         }
+
+//         if (video) {
+//           const videoFromDB = await db.files.get(video);
+//           if (videoFromDB) {
+//             resolvedData.video = {
+//               ...videoFromDB,
+//               url: URL.createObjectURL(new Blob([videoFromDB.url], { type: videoFromDB.type }))
+//             };
+//           } else {
+//             throw new Error("Video file not found in IndexedDB");
+//           }
+//         }
+
+//         return resolvedData;
+//       } else {
+//         throw new Error("Resource not found in IndexedDB");
+//       }
+//     }
+
+//     const response = await axios.get(`${API_BASE_URL}/resources/${id}`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching resource by ID:", error);
+//     throw error;
+//   }
+// };
+
+/***************************************************************************/ 
 // Function to get a resource by token
 export const getResourceByToken = async (resourceToken, tokenUser) => {
   try {
@@ -546,75 +1012,7 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
 
   for (const change of offlineChanges) {
     try {
-      // if (change.type === "add") {
-      //   const { images, audio, pdf, video, ...resourceData } = change.data;
-
-      //   // Upload files
-      //   const uploadedImages = [];
-      //   for (let image of images) {
-      //     const fileFromDB = await db.files.get(image.id);
-
-      //     // if (fileFromDB) {
-      //     //   // const file = blobToFile(blob, name, type);
-      //     //   // const formData = new FormData();
-      //     //   // formData.append('files', file);
-
-            
-      //     //   const uploadedImage = await uploadFile(image.content.raw, token);
-      //     //   uploadedImages.push(uploadedImage[0]);
-      //     // }
-
-      //      if (fileFromDB) {
-      //       const file = await prepareDataForUpload(fileFromDB);
-      //       const uploadedImage = await uploadFileToStrapi(file, token);
-      //       uploadedImages.push(uploadedImage[0]);
-      //     }
-      //   }
-      //   resourceData.images = uploadedImages;
-
-      //   if (audio) {
-      //     const fileFromDB = await db.files.get(audio.id);
-      //     if (fileFromDB) {
-      //       const uploadedAudio = await uploadFile(fileFromDB.content.raw, token);
-      //       resourceData.audio = uploadedAudio[0];
-      //     }
-      //   }
-
-      //   if (pdf) {
-      //     const fileFromDB = await db.files.get(pdf.id);
-      //     if (fileFromDB) {
-      //       const uploadedPdf = await uploadFile(fileFromDB.content.raw, token);
-      //       resourceData.pdf = uploadedPdf[0];
-      //     }
-      //   }
-
-      //   if (video) {
-      //     const fileFromDB = await db.files.get(video.id);
-      //     if (fileFromDB) {
-      //       const uploadedVideo = await uploadFile(fileFromDB.content.raw, token);
-      //       resourceData.video = uploadedVideo[0];
-      //     }
-      //   }
-
-      //   const response = await axios.post(`${API_BASE_URL}/resources`, resourceData, {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   });
-
-      //   await db.transaction("rw", [db.resources], async () => {
-      //     await db.resources.put(response.data.data);
-      //   });
-
-      //   queryClient.setQueryData(["resources"], (oldData) => {
-      //     return {
-      //       ...oldData,
-      //       data: [...oldData.data, response.data.data],
-      //     };
-      //   });
-
-      // } 
+     
            if (change.type === "add") {
         const { images, audio, pdf, video, ...resourceData } = change.data;
 
@@ -625,40 +1023,70 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
           if (fileFromDB) {
             const file = await prepareDataForUpload(fileFromDB);
             const uploadedImage = await uploadFileToStrapi(file, token);
+             // Mise à jour du fichier dans IndexedDB après l'upload
+    await db.files.update(fileFromDB.id, {
+      name: uploadedImage[0].name,
+      url: uploadedImage[0].url,
+      createdAt: new Date(),
+    });
             uploadedImages.push(uploadedImage[0]);
           }
         }
         resourceData.images = uploadedImages;
 
         // Upload audio
-        if (audio) {
-          const fileFromDB = await db.files.get(audio.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedAudio = await uploadFileToStrapi(file, token);
-            resourceData.audio = uploadedAudio[0];
-          }
-        }
+      if (audio) {
+  const fileFromDB = await db.files.get(audio.id);
+  if (fileFromDB) {
+    const file = await prepareDataForUpload(fileFromDB);
+    const uploadedAudio = await uploadFileToStrapi(file, token);
+    
+    // Mise à jour du fichier dans IndexedDB après l'upload
+    await db.files.update(fileFromDB.id, {
+      name: uploadedAudio[0].name,
+      url: uploadedAudio[0].url,
+      createdAt: new Date(),
+    });
+
+    resourceData.audio = uploadedAudio[0];
+  }
+}
 
         // Upload PDF
-        if (pdf) {
-          const fileFromDB = await db.files.get(pdf.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedPdf = await uploadFileToStrapi(file, token);
-            resourceData.pdf = uploadedPdf[0];
-          }
-        }
+if (pdf) {
+  const fileFromDB = await db.files.get(pdf.id);
+  if (fileFromDB) {
+    const file = await prepareDataForUpload(fileFromDB);
+    const uploadedPdf = await uploadFileToStrapi(file, token);
+    
+    // Mise à jour du fichier dans IndexedDB après l'upload
+    await db.files.update(fileFromDB.id, {
+      name: uploadedPdf[0].name,
+      url: uploadedPdf[0].url,
+      createdAt: new Date(),
+    });
 
-        // Upload video
-        if (video) {
-          const fileFromDB = await db.files.get(video.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedVideo = await uploadFileToStrapi(file, token);
-            resourceData.video = uploadedVideo[0];
-          }
-        }
+    resourceData.pdf = uploadedPdf[0];
+  }
+}
+
+// Upload video
+if (video) {
+  const fileFromDB = await db.files.get(video.id);
+  if (fileFromDB) {
+    const file = await prepareDataForUpload(fileFromDB);
+    const uploadedVideo = await uploadFileToStrapi(file, token);
+    
+    // Mise à jour du fichier dans IndexedDB après l'upload
+    await db.files.update(fileFromDB.id, {
+      name: uploadedVideo[0].name,
+      url: uploadedVideo[0].url,
+      createdAt: new Date(),
+    });
+
+    resourceData.video = uploadedVideo[0];
+  }
+}
 
         const response = await axios.post(`${API_BASE_URL}/resources`, resourceData, {
           headers: {
@@ -679,62 +1107,94 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
         });
 
       } 
-      else if (change.type === "update") {
-        const { images, audio, pdf, video, ...resourceData } = change.data;
+    else if (change.type === "update") {
+  const { images, audio, pdf, video, ...resourceData } = change.data;
 
+  const remoteData = await axios
+    .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data);
 
-        const remoteData = await axios
-          .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => response.data);
+  const resolvedData = handleConflict(resourceData, remoteData);
 
-        const resolvedData = handleConflict(resourceData, remoteData);
+  // Upload images
+  const uploadedImages = [];
+  for (let image of images) {
+    const fileFromDB = await db.files.get(image.id);
+    if (fileFromDB) {
+      const file = await prepareDataForUpload(fileFromDB);
+      const uploadedImage = await uploadFileToStrapi(file, token);
 
-        // Upload images
-        const uploadedImages = [];
-        for (let image of images) {
-          const fileFromDB = await db.files.get(image.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedImage = await uploadFileToStrapi(file, token);
-            uploadedImages.push(uploadedImage[0]);
-          }
-        }
-        resolvedData.images = uploadedImages;
+      // Mise à jour du fichier dans IndexedDB après l'upload
+      await db.files.update(fileFromDB.id, {
+        name: uploadedImage[0].name,
+        url: uploadedImage[0].url,
+        createdAt: new Date(),
+      });
 
-        // Upload audio
-        if (audio) {
-          const fileFromDB = await db.files.get(audio.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedAudio = await uploadFileToStrapi(file, token);
-            resolvedData.audio = uploadedAudio[0];
-          }
-        }
+      uploadedImages.push(uploadedImage[0]);
+    }
+  }
+  resolvedData.images = uploadedImages;
 
-        // Upload PDF
-        if (pdf) {
-          const fileFromDB = await db.files.get(pdf.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedPdf = await uploadFileToStrapi(file, token);
-            resolvedData.pdf = uploadedPdf[0];
-          }
-        }
+  // Upload audio
+  if (audio) {
+    const fileFromDB = await db.files.get(audio.id);
+    if (fileFromDB) {
+      const file = await prepareDataForUpload(fileFromDB);
+      const uploadedAudio = await uploadFileToStrapi(file, token);
 
-        // Upload video
-        if (video) {
-          const fileFromDB = await db.files.get(video.id);
-          if (fileFromDB) {
-            const file = await prepareDataForUpload(fileFromDB);
-            const uploadedVideo = await uploadFileToStrapi(file, token);
-            resolvedData.video = uploadedVideo[0];
-          }
-        }
+      // Mise à jour du fichier dans IndexedDB après l'upload
+      await db.files.update(fileFromDB.id, {
+        name: uploadedAudio[0].name,
+        url: uploadedAudio[0].url,
+        createdAt: new Date(),
+      });
+
+      resolvedData.audio = uploadedAudio[0];
+    }
+  }
+
+  // Upload PDF
+  if (pdf) {
+    const fileFromDB = await db.files.get(pdf.id);
+    if (fileFromDB) {
+      const file = await prepareDataForUpload(fileFromDB);
+      const uploadedPdf = await uploadFileToStrapi(file, token);
+
+      // Mise à jour du fichier dans IndexedDB après l'upload
+      await db.files.update(fileFromDB.id, {
+        name: uploadedPdf[0].name,
+        url: uploadedPdf[0].url,
+        createdAt: new Date(),
+      });
+
+      resolvedData.pdf = uploadedPdf[0];
+    }
+  }
+
+  // Upload video
+  if (video) {
+    const fileFromDB = await db.files.get(video.id);
+    if (fileFromDB) {
+      const file = await prepareDataForUpload(fileFromDB);
+      const uploadedVideo = await uploadFileToStrapi(file, token);
+
+      // Mise à jour du fichier dans IndexedDB après l'upload
+      await db.files.update(fileFromDB.id, {
+        name: uploadedVideo[0].name,
+        url: uploadedVideo[0].url,
+        createdAt: new Date(),
+      });
+
+      resolvedData.video = uploadedVideo[0];
+    }
+  }
+
         console.log("resolvedData");
                 console.log(resolvedData);
 

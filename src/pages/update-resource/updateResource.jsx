@@ -70,7 +70,7 @@ export default function UpdateResource() {
 
   const formik = useFormik({
     initialValues: {
-      resourceName: "",
+      nom: "",
       format: "",
       parcours: [],
       module: [],
@@ -180,7 +180,7 @@ export default function UpdateResource() {
 
         console.log(resource.images);
         formik.setValues({
-          resourceName: resource.nom,
+          nom: resource.nom,
           format: resource.format,
           parcours: resource.parcours.map((p) => p.id),
           module: resource.modules.map((m) => m.id),
@@ -328,17 +328,17 @@ export default function UpdateResource() {
       <Row className="justify-content-md-center">
         <Col md={8}>
           <Form onSubmit={formik.handleSubmit}>
-            <Form.Group controlId="resourceName">
+            <Form.Group controlId="nom">
               <Form.Label>Nom de la ressource</Form.Label>
               <Form.Control
                 type="text"
-                name="resourceName"
-                value={formik.values.resourceName}
+                name="nom"
+                value={formik.values.nom}
                 onChange={formik.handleChange}
-                isInvalid={!!formik.errors.resourceName}
+                isInvalid={!!formik.errors.nom}
               />
               <Form.Control.Feedback type="invalid">
-                {formik.errors.resourceName}
+                {formik.errors.nom}
               </Form.Control.Feedback>
             </Form.Group>
 
