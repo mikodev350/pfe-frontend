@@ -853,7 +853,7 @@ const cacheFile = async (url) => {
 
 const addOrUpdateResourceInIndexedDB = async (resource) => {
   try {
-    console.log("Start handling resource:", resource.id);
+    console.log("Start handling resource:", resource);
 
     // Préparer les données de la ressource
     const resourceData = {

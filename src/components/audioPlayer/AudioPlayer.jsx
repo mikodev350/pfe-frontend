@@ -1,50 +1,31 @@
 import React, { useEffect, useState } from "react";
 
-const AudioPlayer = ({ audioUrl }) => {
+const AudioPlayer = ({ audioFile }) => {
   const [audioSrc, setAudioSrc] = useState(null);
 
   useEffect(() => {
-    const fetchAudio = async () => {
-      if (navigator.onLine) {
-        console.log("Online: Using provided audio URL:", audioUrl);
-        setAudioSrc(audioUrl);
-      } else {
-        try {
-          console.log("Offline: Trying to fetch audio from cache");
-          const cache = await caches.open('resource-files');
-          const cachedResponse = await cache.match(audioUrl);
-
-          if (cachedResponse) {
-            const blob = await cachedResponse.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            console.log("Audio fetched from cache, Blob URL:", blobUrl);
-            setAudioSrc(blobUrl);
-          } else {
-            console.error("Audio not found in cache.");
-          }
-        } catch (error) {
-          console.error("Error fetching audio from cache:", error);
-        }
-      }
-    };
-
-    fetchAudio();
-
+    let objectUrl = null;
+    if (audioFile instanceof Blob || audioFile instanceof File) {
+      objectUrl = URL.createObjectURL(audioFile);
+      setAudioSrc(objectUrl);
+    } else if (typeof audioFile === 'string') {
+      setAudioSrc(audioFile);
+    }
+    
     return () => {
-      if (audioSrc && audioSrc.startsWith('blob:')) {
-        console.log("Revoking blob URL:", audioSrc);
-        URL.revokeObjectURL(audioSrc);
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [audioUrl]);
+  }, [audioFile]);
 
   if (!audioSrc) {
-    return <p>Loading audio...</p>;
+    return null; // Do not display anything if no audio source is available
   }
 
   return (
     <audio controls controlsList="nodownload noplaybackrate">
-      <source src={audioSrc} type="audio/mpeg" />
+      <source src={audioSrc} type={audioFile.type || 'audio/mpeg'} />
       Your browser does not support the audio element.
     </audio>
   );

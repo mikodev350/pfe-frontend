@@ -1,12 +1,11 @@
-// ResourcePreviewPageWithId.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { getResourceById } from "../../api/apiResource";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getToken } from "../../util/authUtils";
 import ResourceDetails from "./resourceDetail";
+import { getToken } from "../../util/authUtils";
 
 const ResourcePreviewPageWithId = () => {
   const { id } = useParams();
