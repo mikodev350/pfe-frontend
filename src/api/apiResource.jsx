@@ -3,15 +3,6 @@ import { API_BASE_URL } from "../constants/constante";
 import db from "../database/database";
 import { uploadFile } from "./apiUpload";
 
-// Convert a file to base64 format
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-};
 
 // Function to convert a URL to a Blob
 const urlToBlob = async (url) => {
@@ -100,25 +91,6 @@ export const saveFileToIndexedDB = async (file) => {
   }
 };
 
-// export const saveFileToIndexedDB = async (file) => {
-//     console.log("saveFileToIndexedDB-----------------------------------------------------");
-//   console.log(file)
-
-//   try {
-//     const id = await db.files.add({
-//       name: file.raw.name,
-//       type: file.raw.type,
-//       preview: file.preview,
-//       content: file,
-//       createdAt: new Date().toISOString(),
-//     });
-
-//     return id;
-//   } catch (error) {
-//     console.error("Error saving file to IndexedDB:", error);
-//     throw error;
-//   }
-// };
 
 // Fonction pour sauvegarder un fichier dans IndexedDB à partir d'une URL
 export const saveFileToIndexedDBResource = async (url, name) => {
@@ -160,82 +132,67 @@ const handleConflict = (localData, remoteData) => {
 
 
 
-
-
-
-
-
-
-
-
-// export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/resources`, {
-//       params: {
-//         page,
-//         pageSize,
-//         _q: searchValue,
-//         section: sectionId,
-//       },
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     console.log("--------------------response ---------------------------------------------");
-//     console.log(response.data.data);
-//     console.log("----------------------------------------------------------------------------");
-
-//     await db.transaction("rw", db.resources, async () => {
-//       for (const resource of response.data.data) {
-//         await addOrUpdateResourceInIndexedDB(resource);
-//       }
-//     });
-
-//     return {
-//       data: response.data.data,
-//       totalPages: Math.ceil(response.data.total / pageSize),
-//     };
-//   } catch (error) {
-//     console.error("Error fetching resources:", error);
-
-//     const localData = await db.resources
-//       .filter((resource) => resource.nom.includes(searchValue))
-//       .offset((page - 1) * pageSize)
-//       .limit(pageSize)
-//       .toArray();
-
-//     const totalLocalDataCount = await db.resources
-//       .filter((resource) => resource.nom.includes(searchValue))
-//       .count();
-
-//     return {
-//       data: localData,
-//       totalPages: Math.ceil(totalLocalDataCount / pageSize),
-//     };
-//   }
-// };
-
-
-
 // Function to save a resource
 export const saveResource = async (resourceData, token) => {
-  let newData = {
-    ...resourceData,
-    isLocal:true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
 
+let parcoursData=[] 
+let modulesData=[] 
+let lessonsData=[] 
+
+        for (let parcour of resourceData.parcours) {
+          const localData = await db.parcours.get(parseInt(parcour.id));
+parcoursData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+     
+
+            for (let module of resourceData.modules) {
+          const localData = await db.modules.get(parseInt(module.id));
+modulesData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+               for (let lesson of resourceData.lessons) {
+          const localData = await db.lessons.get(parseInt(lesson.id));
+lessonsData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+      // Préparer les données de la ressource
+    const newData = {
+      id: resourceData.id,
+      nom: resourceData.nom,
+      format: resourceData.format,
+      parcours: parcoursData,
+      modules: modulesData,
+      lessons: lessonsData,
+      note: resourceData.note,
+      images: [],
+      audio: null,
+      video: null,
+      pdf: null,
+      link: resourceData.link,
+      referenceLivre: resourceData.referenceLivre,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
     console.log("newData");
-
   console.log(newData);
 
 
   if (!navigator.onLine) {
     try {
       const userId = localStorage.getItem("userId");
+      console.log("---------------------------------newData ---------------------------------------------------");
+      console.log(newData);
+      console.log("--------------------------------------------------------------------------------------------------");
 
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const id = await db.resources.add(newData);
@@ -855,6 +812,7 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
   try {
     console.log("Start handling resource:", resource);
 
+    
     // Préparer les données de la ressource
     const resourceData = {
       id: resource.id,
