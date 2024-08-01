@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const AudioPlayer = ({ audioUrl }) => {
+  console.log(audioUrl);
   const [audioSrc, setAudioSrc] = useState(null);
 
   useEffect(() => {
@@ -32,8 +33,10 @@ const AudioPlayer = ({ audioUrl }) => {
 
     return () => {
       if (audioSrc && audioSrc.startsWith('blob:')) {
-        console.log("Revoking blob URL:", audioSrc);
+        console.log("URL.revokeObjectURL(audioSrc)");
+        console.log(URL.revokeObjectURL(audioSrc))
         URL.revokeObjectURL(audioSrc);
+
       }
     };
   }, [audioUrl]);

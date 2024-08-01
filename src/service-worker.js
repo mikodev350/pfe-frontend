@@ -45,8 +45,14 @@ registerRoute(
     request.destination === "video" ||
     request.destination === "audio",
   new CacheFirst({
-    cacheName: "static-resources",
-    plugins: [new ExpirationPlugin({ maxEntries: 50 })],
+    cacheName: "resource-files",
+    // plugins: [new ExpirationPlugin({ maxEntries: 50 })],
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 100, // Limite du nombre de fichiers dans le cache
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
+      }),
+    ],
   })
 );
 

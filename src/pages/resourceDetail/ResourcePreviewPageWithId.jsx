@@ -1,3 +1,4 @@
+// ResourcePreviewPageWithId.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
@@ -44,7 +45,7 @@ const ResourcePreviewPageWithId = () => {
           <p>Chargement...</p>
         </div>
       ) : (
-        resource ? <ResourceDetails resource={resource} isFromLink={false} /> : <p>Ressource introuvable</p>
+        resource ? <ResourceDetails resource={resource} /> : <p>Ressource introuvable</p>
       )}
     </Container>
   );
