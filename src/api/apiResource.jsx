@@ -3,15 +3,23 @@ import { API_BASE_URL } from "../constants/constante";
 import db from "../database/database";
 import { uploadFile } from "./apiUpload";
 
-// Convert a file to base64 format
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-};
+
+function removeCircularReferences(obj, seen = new Set()) {
+  if (obj && typeof obj === 'object') {
+    if (seen.has(obj)) {
+      // Remplacer les objets déjà vus par une chaîne ou un autre indicateur
+      return '[Circular]';
+    }
+    seen.add(obj);
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = removeCircularReferences(obj[key], seen);
+      }
+    }
+    seen.delete(obj);
+  }
+  return obj;
+}
 
 // Function to convert a URL to a Blob
 const urlToBlob = async (url) => {
@@ -38,7 +46,12 @@ const urlToBlob = async (url) => {
 /************************************************************************************************/
 // Add or update a file in IndexedDB
 export const addFileInToIndexedDB = async (url,file) => {
-  console.log("file-----------------------------------------------------");
+  // console.log("file-----------------------------------------------------");
+  //     console.log(file);
+
+  //   console.log("url-----------------------------------------------------");
+  //   console.log(url);
+
   const data = await db.files.add({
       name: file.name,
       type: file.type,
@@ -100,25 +113,6 @@ export const saveFileToIndexedDB = async (file) => {
   }
 };
 
-// export const saveFileToIndexedDB = async (file) => {
-//     console.log("saveFileToIndexedDB-----------------------------------------------------");
-//   console.log(file)
-
-//   try {
-//     const id = await db.files.add({
-//       name: file.raw.name,
-//       type: file.raw.type,
-//       preview: file.preview,
-//       content: file,
-//       createdAt: new Date().toISOString(),
-//     });
-
-//     return id;
-//   } catch (error) {
-//     console.error("Error saving file to IndexedDB:", error);
-//     throw error;
-//   }
-// };
 
 // Fonction pour sauvegarder un fichier dans IndexedDB à partir d'une URL
 export const saveFileToIndexedDBResource = async (url, name) => {
@@ -160,67 +154,11 @@ const handleConflict = (localData, remoteData) => {
 
 
 
-
-
-
-
-
-
-
-
-// export const fetchResources = async (page, pageSize, sectionId, searchValue, token) => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/resources`, {
-//       params: {
-//         page,
-//         pageSize,
-//         _q: searchValue,
-//         section: sectionId,
-//       },
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     console.log("--------------------response ---------------------------------------------");
-//     console.log(response.data.data);
-//     console.log("----------------------------------------------------------------------------");
-
-//     await db.transaction("rw", db.resources, async () => {
-//       for (const resource of response.data.data) {
-//         await addOrUpdateResourceInIndexedDB(resource);
-//       }
-//     });
-
-//     return {
-//       data: response.data.data,
-//       totalPages: Math.ceil(response.data.total / pageSize),
-//     };
-//   } catch (error) {
-//     console.error("Error fetching resources:", error);
-
-//     const localData = await db.resources
-//       .filter((resource) => resource.nom.includes(searchValue))
-//       .offset((page - 1) * pageSize)
-//       .limit(pageSize)
-//       .toArray();
-
-//     const totalLocalDataCount = await db.resources
-//       .filter((resource) => resource.nom.includes(searchValue))
-//       .count();
-
-//     return {
-//       data: localData,
-//       totalPages: Math.ceil(totalLocalDataCount / pageSize),
-//     };
-//   }
-// };
-
-
-
 // Function to save a resource
 export const saveResource = async (resourceData, token) => {
+  console.log("resourceData")
+    console.log(resourceData)
+
   let newData = {
     ...resourceData,
     isLocal:true,
@@ -236,14 +174,105 @@ export const saveResource = async (resourceData, token) => {
   if (!navigator.onLine) {
     try {
       const userId = localStorage.getItem("userId");
+      console.log("---------------------------------newData ---------------------------------------------------");
+      console.log(newData);
+      console.log("--------------------------------------------------------------------------------------------------");
+
+
+
+
+let parcoursData=[] 
+let modulesData=[] 
+let lessonsData=[] 
+
+        for (let parcour of resourceData.parcours) {
+          const localData = await db.parcours.get(parseInt(parcour));
+parcoursData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+        console.log("parcoursData");
+                console.log(parcoursData);
+
+
+            for (let modul of resourceData.module) {
+          const localData = await db.modules.get(parseInt(modul));
+modulesData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+        console.log("modules");
+                console.log(modulesData);
+
+                   for (let lecon of resourceData.lesson) {
+          const localData = await db.lessons.get(parseInt(lecon));
+lessonsData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+            console.log("lesson");
+                console.log(lessonsData);
+
+      // Préparer les données de la ressource
+     newData = {
+      id: resourceData.id,
+      nom: resourceData.nom,
+      format: resourceData.format,
+      parcours: parcoursData,
+      modules: modulesData,
+      lessons: lessonsData,
+      note: resourceData.note,
+      images: resourceData.images,
+      audio: resourceData.audio,
+      video: resourceData.video,
+      pdf: resourceData.pdf,
+      link: resourceData.link,
+      referenceLivre: resourceData.referenceLivre,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+        console.log("------------------------------------------------------------------------------");
+
+    console.log("this is newData");
+  console.log(newData);
+
+
+        console.log("------------------------------------------------------------------------------");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const id = await db.resources.add(newData);
         await db.offlineChanges.add({
           type: "add",
           data: {
-            userId: userId,
             ...newData,
+            userId: userId,
+
           },
           timestamp: Date.now(),
         });
@@ -293,12 +322,53 @@ export const updateResource = async (id, data, token) => {
   };
 
   if (!navigator.onLine) {
+
+let parcoursData=[] 
+let modulesData=[] 
+let lessonsData=[] 
+
+
+
+        for (let parcour of updatedData.parcours) {
+         const parcoursId = parcour.id ? parcour?.id :parcour
+          const localData = await db.parcours.get(parseInt(parcoursId));
+
+          console.log(localData);
+          parcoursData.push({
+             id: localData.id,
+             nom: localData.nom,
+            })
+        }
+        
+        updatedData.parcours=parcoursData;
+
+        for (let modul of updatedData.modules) {
+          const localData = await db.modules.get(parseInt(modul));
+          modulesData.push({
+            id: localData.id,
+            nom: localData.nom,
+          })
+        }
+
+        updatedData.modules=modulesData;
+
+        
+         for (let lecon of updatedData.lessons) {
+          const localData = await db.lessons.get(parseInt(lecon));
+
+          lessonsData.push({
+            id: localData.id,
+            nom: localData.nom,
+})
+         }
+        updatedData.lessons=lessonsData;
     try {
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
+         
           await db.resources.update(Number(existingResource.id), {
-            ...existingResource,
+            // ...existingResource,
             ...updatedData,
           });
 
@@ -334,6 +404,7 @@ export const updateResource = async (id, data, token) => {
       // Handle file uploads
       const { images, audio, pdf, video, ...resourceData } = newData;
 
+      
       // Upload new images
       const uploadedImages = [];
       for (let image of images) {
@@ -590,6 +661,29 @@ export const syncOfflineChangesResource = async (token, queryClient) => {
            if (change.type === "add") {
         const { images, audio, pdf, video, ...resourceData } = change.data;
 
+/*************************************************************************************/
+let parcoursData=[]
+let modulesData=[] 
+let lessonsData=[] 
+
+      
+  for (let parcour of resourceData.parcours) {
+parcoursData.push(parcour.id)
+        }
+        resourceData.parcours=parcoursData
+
+            for (let module of resourceData.modules) {
+modulesData.push(module.id)
+        }
+            resourceData.modules = modulesData;
+
+
+          for (let lesson of resourceData.lessons) {
+lessonsData.push(lesson.id)
+        }
+            resourceData.lessons = lessonsData;
+
+        /******************************************************************************/ 
         // Upload images
         const uploadedImages = [];
         for (let image of images) {
@@ -681,8 +775,54 @@ if (video) {
         });
 
       } 
+      /******************************************************************************************/ 
     else if (change.type === "update") {
   const { images, audio, pdf, video, ...resourceData } = change.data;
+
+
+
+  
+
+  let parcoursData=[]
+  let modulesData=[]
+  let lessonsData=[]
+
+
+
+
+
+    // Problemm esttt icccc
+   for (let parcour of resourceData.parcours) {
+parcoursData.push(parcour.id)
+        }
+
+  
+        resourceData.parcours=parcoursData
+       
+            for (let module of resourceData.modules) {
+modulesData.push(module.id)
+        }
+            resourceData.modules = modulesData;
+   
+
+      for (let module of resourceData.modules) {
+parcoursData.push(module.id)
+        }
+        resourceData.parcours=resourceData
+
+          for (let lesson of resourceData.lessons) {
+lessonsData.push(lesson.id)
+        }
+            resourceData.lessons = lessonsData;
+
+
+             console.log("i am heeerrrrrrrrrrrrrr");
+    console.log("i am heeerrrrrrrrrrrrrr");
+
+/************************************************************/
+/************************************************************/ 
+ 
+
 
   const remoteData = await axios
     .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
@@ -693,12 +833,27 @@ if (video) {
     })
     .then((response) => response.data);
 
+
   const resolvedData = handleConflict(resourceData, remoteData);
 
+
+    console.log("id iamages ::::::::");
+    console.log(images);
   // Upload images
   const uploadedImages = [];
+  
+
   for (let image of images) {
+
+    console.log("-----------------------------------image----------------------------");
+console.log(image);
+console.log("----------------------------------------------------------------------------");
+
     const fileFromDB = await db.files.get(image.id);
+console.log("-----------------------------------images----------------------------");
+console.log(fileFromDB);
+console.log("----------------------------------------------------------------------------");
+
     if (fileFromDB) {
       const file = await prepareDataForUpload(fileFromDB);
       const uploadedImage = await uploadFileToStrapi(file, token);
@@ -769,38 +924,83 @@ if (video) {
     }
   }
 
-        console.log("resolvedData");
-                console.log(resolvedData);
-
+  
 
                 const dataPush=
-                {...resolvedData,
+                {
+                  ...resolvedData,
                   userId:userId
                 }
-        const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, dataPush, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
 
-        await db.transaction("rw", [db.resources], async () => {
-          const existingResource = await db.resources.get(Number(resolvedData.id));
-          if (existingResource) {
-            await db.resources.update(resolvedData.id, resolvedData);
-          } else {
-            console.error("Resource not found in IndexedDB for update after sync:", resolvedData.id);
-          }
-        });
 
-        queryClient.setQueryData(["resources"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.map((item) =>
-              item.id === resolvedData.id ? resolvedData : item
-            ),
-          };
-        });
+        //         console.log("dataPush");
+        //         console.log(dataPush);
+        // const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, dataPush, {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // });
+
+        //        console.log("response");
+        //         console.log(response);
+
+        // await db.transaction("rw", [db.resources], async () => {
+        //   const existingResource = await db.resources.get(Number(resolvedData.id));
+        //   if (existingResource) {
+        //     await db.resources.update(resolvedData.id, resolvedData);
+        //   } else {
+        //     console.error("Resource not found in IndexedDB for update after sync:", resolvedData.id);
+        //   }
+        // });
+
+        // queryClient.setQueryData(["resources"], (oldData) => {
+        //   return {
+        //     ...oldData,
+        //     data: oldData.data.map((item) =>
+        //       item.id === resolvedData.id ? resolvedData : item
+        //     ),
+        //   };
+        // });
+
+        try {
+  // Supprimer les références circulaires
+  const cleanDataPush = removeCircularReferences(dataPush);
+
+  const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, cleanDataPush, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  console.log("response", response);
+
+  // Assurez-vous que response.data est défini avant de l'utiliser
+  if (response.data) {
+    await db.transaction("rw", [db.resources], async () => {
+      const existingResource = await db.resources.get(Number(resolvedData.id));
+      if (existingResource) {
+        await db.resources.update(resolvedData.id, resolvedData);
+      } else {
+        console.error("Resource not found in IndexedDB for update after sync:", resolvedData.id);
+      }
+    });
+
+    queryClient.setQueryData(["resources"], (oldData) => {
+      return {
+        ...oldData,
+        data: oldData.data.map((item) =>
+          item.id === resolvedData.id ? resolvedData : item
+        ),
+      };
+    });
+  } else {
+    console.error("No data returned from server.");
+  }
+} catch (error) {
+  console.error("Error during axios.put:", error);
+}
       }  else if (change.type === "delete") {
         await axios.delete(`${API_BASE_URL}/resources/${change.data.id}`, {
           headers: {
@@ -855,6 +1055,7 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
   try {
     console.log("Start handling resource:", resource);
 
+    
     // Préparer les données de la ressource
     const resourceData = {
       id: resource.id,

@@ -73,8 +73,8 @@ export default function UpdateResource() {
       nom: "",
       format: "",
       parcours: [],
-      module: [],
-      lesson: [],
+      modules: [],
+      lessons: [],
       note: "",
       youtubeLink: "",
       images: [],
@@ -183,8 +183,8 @@ export default function UpdateResource() {
           nom: resource.nom,
           format: resource.format,
           parcours: resource.parcours.map((p) => p.id),
-          module: resource.modules.map((m) => m.id),
-          lesson: resource.lessons.map((l) => l.id),
+          modules: resource.modules.map((m) => m.id),
+          lessons: resource.lessons.map((l) => l.id),
           note: resource.note,
           youtubeLink: resource.youtubeLink,
           images: resource.images ? resource.images.map(image => ({ preview: image.url, id: image.id, raw: null })) : [],
@@ -228,14 +228,14 @@ export default function UpdateResource() {
   };
 
   const handleModulesChange = (selectedModules) => {
-    formik.setFieldValue("module", selectedModules.map((m) => m.value).filter(Boolean));
+    formik.setFieldValue("modules", selectedModules.map((m) => m.value).filter(Boolean));
     const selectedModulesIds = selectedModules.map((m) => m.value).filter(Boolean);
     const filteredLessons = getLessonsFromLocalStorage().filter((l) => selectedModulesIds.includes(l.idmodule));
     setLessonOptions(filteredLessons.map((l) => ({ value: l.id, label: l.name })));
   };
 
   const handleLessonsChange = (selectedLessons) => {
-    formik.setFieldValue("lesson", selectedLessons.map((l) => l.value).filter(Boolean));
+    formik.setFieldValue("lessons", selectedLessons.map((l) => l.value).filter(Boolean));
   };
 
   const handleDescriptionChange = (content) => {
@@ -378,14 +378,14 @@ export default function UpdateResource() {
               <Select
                 isMulti
                 options={moduleOptions}
-                name="module"
+                name="modules"
                 onChange={handleModulesChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
-                value={moduleOptions.filter((m) => formik.values.module.includes(m.value))}
+                value={moduleOptions.filter((m) => formik.values.modules.includes(m.value))}
               />
-              {formik.errors.module && (
-                <div className="text-danger">{formik.errors.module}</div>
+              {formik.errors.modules && (
+                <div className="text-danger">{formik.errors.modules}</div>
               )}
             </Form.Group>
 
@@ -394,14 +394,14 @@ export default function UpdateResource() {
               <Select
                 isMulti
                 options={lessonOptions}
-                name="lesson"
+                name="lessons"
                 onChange={handleLessonsChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
-                value={lessonOptions.filter((l) => formik.values.lesson.includes(l.value))}
+                value={lessonOptions.filter((l) => formik.values.lessons.includes(l.value))}
               />
-              {formik.errors.lesson && (
-                <div className="text-danger">{formik.errors.lesson}</div>
+              {formik.errors.lessons && (
+                <div className="text-danger">{formik.errors.lessons}</div>
               )}
             </Form.Group>
 
