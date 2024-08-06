@@ -3,7 +3,6 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import {
   fetchModules,
   updateModule,
-  deleteModule,
   syncOfflineChangesModule,
 } from "../../api/apiModule";
 import Loader from "../loader/Loader";
@@ -34,9 +33,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["modules", searchValue, idParcours, currentPage],
-    async () => {
-      return fetchModulesMemoized(currentPage, searchValue);
-    },
+    () => fetchModulesMemoized(currentPage, searchValue),
     {
       keepPreviousData: true,
       onSuccess: (response) => {
@@ -46,13 +43,22 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   );
 
   useEffect(() => {
-    refetch();
-  }, [currentPage, searchValue, token, refetch]);
+    refetch(); // Recharger les données après changement de page ou de filtre
+  }, [currentPage, searchValue, refetch, token]);
 
   useEffect(() => {
     const handleOnline = async () => {
-      await syncOfflineChangesModule(token, queryClient);
-      await refetch();
+      try {
+        await syncOfflineChangesModule(token, queryClient);
+        await queryClient.invalidateQueries([
+          "modules",
+          searchValue,
+          idParcours,
+        ]);
+        refetch(); // Recharger les données après synchronisation
+      } catch (error) {
+        console.error("Error syncing offline changes:", error);
+      }
     };
 
     window.addEventListener("online", handleOnline);
@@ -60,7 +66,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
     return () => {
       window.removeEventListener("online", handleOnline);
     };
-  }, [token, queryClient, refetch]);
+  }, [token, queryClient, searchValue, idParcours, refetch]);
 
   const updateModuleMutation = useMutation(
     (data) => updateModule(data.id, { nom: data.name }, token),
@@ -127,14 +133,47 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
           ))}
         </TableBody>
       </Table>
-      <div className="d-flex justify-content-center">
-        <PaginationComponent
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
     </>
+    // <>
+    //   <Table responsive className="text-center table-dashboard">
+    //     <TableHeader header={header} />
+    //     <TableBody>
+    //       {data?.data.map((item, index) => (
+    //         <TableRow key={item.id}>
+    //           <TableCell
+    //             item={index + 1 + (currentPage - 1) * pageSize}
+    //             dataLabel={header[0]}
+    //             className="border-table-right"
+    //           />
+    //           <TableCell item={item.nom} dataLabel={header[1]} />
+    //           <TableCell item={item.totalResource ?? 0} dataLabel={header[2]} />
+    //           <TableCell
+    //             item={
+    //               item.createdAt
+    //                 ? format(parseISO(item.createdAt), "dd-MM-yyyy")
+    //                 : "N/A"
+    //             }
+    //             dataLabel={header[3]}
+    //           />
+    //           <TableIconeModule
+    //             moduleId={item.id || ""}
+    //             moduleName={item.nom || ""}
+    //             dataLabel={header[4]}
+    //             className="border-table-left"
+    //             handleUpdateModule={handleUpdateModule}
+    //           />
+    //         </TableRow>
+    //       ))}
+    //     </TableBody>
+    //   </Table>
+    //   <div className="d-flex justify-content-center">
+    //     <PaginationComponent
+    //       totalPages={totalPages}
+    //       currentPage={currentPage}
+    //       onPageChange={handlePageChange}
+    //     />
+    //   </div>
+    // </>
   );
 };
 

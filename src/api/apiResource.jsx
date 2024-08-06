@@ -314,13 +314,22 @@ lessonsData.push({
   }
 };
 
+
+/*************************************************/ 
 // Function to update a resource
 export const updateResource = async (id, data, token) => {
+ 
   const updatedData = {
     ...data,
         isLocal:true,
     updatedAt: new Date().toISOString(),
   };
+
+   console.log("-----------------data--------------------------------------");
+    console.log(id);
+  console.log(updatedData);
+    console.log("-----------------------------------------------------------------");
+
 
   if (!navigator.onLine) {
 
@@ -364,13 +373,20 @@ let lessonsData=[]
          }
         updatedData.lessons=lessonsData;
     try {
+
+      console.log(updatedData);
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const existingResource = await db.resources.get(Number(id));
+console.log("----------------------------------------");
+console.log("existingResource");
+console.log(existingResource);
+console.log("----------------------------------------");
+
         if (existingResource) {
          
           await db.resources.update(Number(existingResource.id), {
             // ...existingResource,
-            ...updatedData,
+            updatedData,
           });
 
           await db.offlineChanges.add({
@@ -463,6 +479,9 @@ let lessonsData=[]
   }
 };
 
+
+
+/********************************************************************************************/ 
 // Function to delete a resource
 export const deleteResource = async (id, token) => {
   if (!navigator.onLine) {
@@ -540,15 +559,8 @@ export const getResourceById = async (id, token) => {
     if (!navigator.onLine) {
       console.log("Offline: Fetching resource from IndexedDB");
       const resource = await db.resources.get(Number(id));
-
-console.log("resource")
-          console.log(resource)
-
       if (resource) {
-
         if (resource.isLocalUpload){
-
-
 
 let imagesLink = []
 let audioLink ;
@@ -604,6 +616,11 @@ isLocalUpload:true
           //  console.log(resourceDataItem);
           return resourceDataItem
         }
+        console.log("********************************************************************************************");
+        console.log("this is resrouce ");
+        console.log(resource);
+                console.log("********************************************************************************************");
+
         return resource; // Resource already contains all necessary data
       } else {
         throw new Error("Resource not found in IndexedDB");
@@ -1287,23 +1304,38 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
       updatedAt: resource.updatedAt,
     };
 
-    // Mise en cache des fichiers si nécessaire
-    if (resource.images && Array.isArray(resource.images)) {
-      resourceData.images = await Promise.all(resource.images.map(async (image) => {
-        return await cacheFile(`http://localhost:1337${image.url}`) || `http://localhost:1337${image.url}`;
-      }));
-    }
+    // // Mise en cache des fichiers si nécessaire
+    // if (resource.images && Array.isArray(resource.images)) {
+    //   resourceData.images = await Promise.all(resource.images.map(async (image) => {
+    //     return await cacheFile(`http://localhost:1337${image.url}`) || `http://localhost:1337${image.url}`;
+    //   }));
+    // }
 
+    if (resource.images && Array.isArray(resource.images)) {
+  resourceData.images = await Promise.all(resource.images.map(async (image) => {
+    const cachedUrl = await cacheFile(`http://localhost:1337${image.url}`) || `http://localhost:1337${image.url}`;
+    return { id: image.id, url: cachedUrl };
+  }));
+}
     if (resource.audio && resource.audio.url) {
-      resourceData.audio = await cacheFile(`http://localhost:1337${resource.audio.url}`);
+      resourceData.audio = {
+        id: resource.audio.id,
+        url:await cacheFile(`http://localhost:1337${resource.audio.url}`)
+      };
     }
 
     if (resource.video && resource.video.url) {
-      resourceData.video = await cacheFile(`http://localhost:1337${resource.video.url}`);
+      resourceData.video ={
+        id: resource.video.id,
+        url:  await cacheFile(`http://localhost:1337${resource.video.url}`)
+      }
     }
 
     if (resource.pdf && resource.pdf.url) {
-      resourceData.pdf = await cacheFile(`http://localhost:1337${resource.pdf.url}`);
+      resourceData.pdf = {
+        id: resource.pdf.id,
+        url: await cacheFile(`http://localhost:1337${resource.pdf.url}`)
+      }
     }
 
     // Stockage ou mise à jour de la ressource dans IndexedDB

@@ -19,7 +19,17 @@ const handleConflict = (localData, remoteData) => {
 const addOrUpdateModuleInIndexedDB = async (module) => {
   const existingModule = await db.modules.get(module.id);
   if (!existingModule) {
-    await db.modules.put({
+    await db.modules.add({
+      id: module.id,
+      nom: module.nom,
+      parcour: module.parcour.id,
+      lessons: module.lessons,
+      updatedAt: module.updatedAt,
+      createdAt: module.createdAt,
+      version: module.version || 1,
+    });
+  } else {
+    await db.modules.update(module.id, {
       id: module.id,
       nom: module.nom,
       parcour: module.parcour.id,
@@ -30,6 +40,58 @@ const addOrUpdateModuleInIndexedDB = async (module) => {
     });
   }
 };
+
+// export const fetchModules = async (page, token, search = "", parcoursId) => {
+//   try {
+//     const response = await axios.get(`${API_BASE_URL}/modules`, {
+//       params: {
+//         _page: page,
+//         _limit: 5,
+//         _q: search,
+//         parcour: parcoursId,
+//       },
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     // Insert modules into IndexedDB only if they do not already exist
+//     await db.transaction("rw", db.modules, async () => {
+//       for (const module of response.data.data) {
+//         await addOrUpdateModuleInIndexedDB(module);
+//       }
+//     });
+
+//     return {
+//       data: response.data.data,
+//       totalPages: Math.ceil(response.data.meta.pagination.total / 5),
+//     };
+//   } catch (error) {
+//     console.error("Error fetching modules:", error);
+
+//     // Fetch local data from IndexedDB in case of error
+//     const localData = await db.modules
+//       .where("parcour")
+//       .equals(Number(parcoursId))
+//       .filter((module) => module.nom.includes(search))
+//       .offset((page - 1) * 5)
+//       .limit(5)
+//       .toArray();
+
+//     // Count the total number of local modules
+//     const totalLocalDataCount = await db.modules
+//       .where("parcour")
+//       .equals(Number(parcoursId))
+//       .filter((module) => module.nom.includes(search))
+//       .count();
+
+//     return {
+//       data: localData,
+//       totalPages: Math.ceil(totalLocalDataCount / 5),
+//     };
+//   }
+// };
 
 export const fetchModules = async (page, token, search = "", parcoursId) => {
   try {
@@ -46,7 +108,7 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
       },
     });
 
-    // Insert modules into IndexedDB only if they do not already exist
+    // Insertion dans IndexedDB
     await db.transaction("rw", db.modules, async () => {
       for (const module of response.data.data) {
         await addOrUpdateModuleInIndexedDB(module);
@@ -60,7 +122,13 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
   } catch (error) {
     console.error("Error fetching modules:", error);
 
-    // Fetch local data from IndexedDB in case of error
+    console.log("====================================");
+    console.log("recupertation du parcours id pour test ");
+    console.log("====================================");
+    console.log(parcoursId);
+    console.log("====================================");
+    console.log("====================================");
+    // Récupération depuis IndexedDB en cas d'erreur
     const localData = await db.modules
       .where("parcour")
       .equals(Number(parcoursId))
@@ -69,13 +137,18 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
       .limit(5)
       .toArray();
 
-    // Count the total number of local modules
     const totalLocalDataCount = await db.modules
       .where("parcour")
       .equals(Number(parcoursId))
       .filter((module) => module.nom.includes(search))
       .count();
 
+    console.log("====================================");
+    console.log("after localData ");
+    console.log("====================================");
+    console.log(localData);
+    console.log("====================================");
+    console.log("====================================");
     return {
       data: localData,
       totalPages: Math.ceil(totalLocalDataCount / 5),

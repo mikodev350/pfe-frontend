@@ -54,8 +54,6 @@ const ResourceDetails = ({ resource }) => {
   const [cachedVideo, setCachedVideo] = useState(null);
   const [cachedAudio, setCachedAudio] = useState(null);
   const [cachedPDF, setCachedPDF] = useState(null);
-    const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-
   const [blobObject, setBlobObject] = useState({
     images: [],
     video: "",
@@ -78,17 +76,13 @@ const ResourceDetails = ({ resource }) => {
   const fetchMediaFromCache = async (url) => {
     if (!url) return null;
 
+    console.log(fetchMediaFromCache)
+    console.log(url);
     try {
       const cache = await caches.open('resource-files');
       const response = await cache.match(url);
-
-      console.log('URL demandée :', url);
-      console.log('Réponse du cache :', response);
-
       if (response) {
-        const blobUrl = URL.createObjectURL(await response.blob());
-        console.log('Blob URL créée :', blobUrl);
-        return blobUrl;
+        return URL.createObjectURL(await response.blob());
       }
     } catch (error) {
       console.error(`Failed to fetch media from cache for URL: ${url}`, error);
@@ -99,7 +93,6 @@ const ResourceDetails = ({ resource }) => {
   useEffect(() => {
     const cacheResources = async () => {
       if (resource.isLocalUpload) {
-        setIsLocalUpdate(true);
         setBlobObject({
           images: resource.images || [],
           video: resource.video || "",
@@ -108,13 +101,13 @@ const ResourceDetails = ({ resource }) => {
         });
       } else if (navigator.onLine) {
         if (resource.images && Array.isArray(resource.images)) {
-          const onlineImageUrls = await Promise.all(
+          const cachedImageUrls = await Promise.all(
             resource.images.map(async (image) => {
               const imageUrl = `http://localhost:1337${image.url}`;
               return { url: imageUrl };
             })
           );
-          setCachedImages(onlineImageUrls);
+          setCachedImages(cachedImageUrls);
         }
 
         if (resource.video) {
@@ -133,33 +126,27 @@ const ResourceDetails = ({ resource }) => {
         }
       } else {
         if (resource.images && Array.isArray(resource.images)) {
-          const offlineImageUrls = await Promise.all(
+          const cachedImageUrls = await Promise.all(
             resource.images.map(async (image) => {
-               const imageUrl = navigator.onLine ? `http://localhost:1337${image?.url}` : image.url;
-
-              const cachedUrl = await fetchMediaFromCache(imageUrl);
+              const cachedUrl = await fetchMediaFromCache(`http://localhost:1337${image.url}`);
               return { url: cachedUrl || image.url };
             })
           );
-          setCachedImages(offlineImageUrls);
+          setCachedImages(cachedImageUrls);
         }
 
         if (resource.video) {
-      const videoUrl = navigator.onLine ? `http://localhost:1337${resource.video?.url}` : resource.video.url;
-          const cachedUrl = await fetchMediaFromCache(videoUrl);
+          const cachedUrl = await fetchMediaFromCache(`http://localhost:1337${resource.video.url}`);
           setCachedVideo({ url: cachedUrl || resource.video.url });
         }
 
         if (resource.audio) {
-         const audiodUrl = navigator.onLine ? `http://localhost:1337${resource.audio?.url}` : resource.audio.url;
-          const cachedUrl = await fetchMediaFromCache(audiodUrl);
+          const cachedUrl = await fetchMediaFromCache(`http://localhost:1337${resource.audio.url}`);
           setCachedAudio({ url: cachedUrl || resource.audio.url });
         }
 
         if (resource.pdf) {
-                   const pdf = navigator.onLine ? `http://localhost:1337${resource.pdf?.url}` : resource.pdf.url;
-
-          const cachedUrl = await fetchMediaFromCache(pdf);
+          const cachedUrl = await fetchMediaFromCache(resource.pdf.url);
           setCachedPDF({ url: cachedUrl || resource.pdf.url });
         }
       }
@@ -274,8 +261,7 @@ const ResourceDetails = ({ resource }) => {
             <div dangerouslySetInnerHTML={{ __html: resource.note }} />
           </Col>
           <Col md={6}>
-              {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderVideo(cachedVideo) :(!navigator.onLine && isLocalUpdate)? renderBlobVideo():null}
-
+            {navigator.onLine ? renderVideo(cachedVideo) : renderBlobVideo()}
           </Col>
         </Row>
         <Row className="mt-4">
@@ -312,9 +298,9 @@ const ResourceDetails = ({ resource }) => {
             ))}
           </Col>
           <Col md={6}>
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderAudio(cachedAudio) :(!navigator.onLine && isLocalUpdate)? renderBlobAudio():null}
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderPDF(cachedPDF) :(!navigator.onLine && isLocalUpdate)? renderBlobPDF():null}
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate)? (
+            {navigator.onLine ? renderAudio(cachedAudio) : renderBlobAudio()}
+            {navigator.onLine ? renderPDF(cachedPDF) : renderBlobPDF()}
+            {navigator.onLine ? (
               <div className="mt-4">
                 <h3>Images</h3>
                 <Row>{cachedImages.map((image, index) => (
@@ -328,7 +314,7 @@ const ResourceDetails = ({ resource }) => {
                   </Col>
                 ))}</Row>
               </div>
-            ) :(!navigator.onLine && isLocalUpdate)? renderBlobImages():(null)}
+            ) : renderBlobImages()}
             {resource.link && (
               <div className="mt-4">
                 <h3>Lien</h3>
@@ -343,7 +329,6 @@ const ResourceDetails = ({ resource }) => {
 };
 
 export default ResourceDetails;
-
 
 
 
