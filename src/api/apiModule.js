@@ -19,14 +19,13 @@ const handleConflict = (localData, remoteData) => {
 const addOrUpdateModuleInIndexedDB = async (module) => {
   const existingModule = await db.modules.get(module.id);
   if (!existingModule) {
-    await db.modules.add({
+    await db.modules.put({
       id: module.id,
       nom: module.nom,
       parcour: module.parcour.id,
-      lessons: module.lessons,
       updatedAt: module.updatedAt,
       createdAt: module.createdAt,
-      version: module.version || 1,
+      // version: module.version || 1,
     });
   } else {
     await db.modules.update(module.id, {
@@ -36,7 +35,7 @@ const addOrUpdateModuleInIndexedDB = async (module) => {
       lessons: module.lessons,
       updatedAt: module.updatedAt,
       createdAt: module.createdAt,
-      version: module.version || 1,
+      // version: module.version || 1,
     });
   }
 };
@@ -107,7 +106,9 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("response.data.data");
 
+    console.log(response.data.data);
     // Insertion dans IndexedDB
     await db.transaction("rw", db.modules, async () => {
       for (const module of response.data.data) {
@@ -155,57 +156,122 @@ export const fetchModules = async (page, token, search = "", parcoursId) => {
     };
   }
 };
+/***************************************************************************************/
+// export const createModule = async (moduleData, token) => {
+//   if (!navigator.onLine) {
+//     const newData = {
+//       ...moduleData,
+//       createdAt: new Date().toISOString(),
+//       updatedAt: new Date().toISOString(),
+//     };
+//     try {
+//       const id = await db.modules.add(newData);
+//       await db.offlineChanges.add({
+//         type: "add",
+//         data: { id, ...newData },
+//         timestamp: Date.now(),
+//       });
+//       return { status: "offline" };
+//     } catch (error) {
+//       console.error("Error adding data to IndexedDB:", error);
+//       throw error;
+//     }
+//   }
 
+//   try {
+//     const newData = {
+//       ...moduleData,
+//       createdAt: new Date().toISOString(),
+//       updatedAt: new Date().toISOString(),
+//     };
+//     const response = await axios.post(
+//       `${API_BASE_URL}/modules`,
+//       { data: newData },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     try {
+//       await db.modules.add({ id: response.data.data.id, ...newData });
+//     } catch (error) {
+//       console.error("Error adding data to IndexedDB:", error);
+//       throw error;
+//     }
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error creating module:", error);
+//     throw error;
+//   }
+// };
+
+// Fonction pour créer un module
 export const createModule = async (moduleData, token) => {
+  console.log("====================================");
+  console.log("this is the module ");
+  console.log(moduleData);
+
+  console.log("====================================");
+  const newData = {
+    nom: moduleData.nom,
+    parcour: Number(moduleData.parcour),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  console.log("Creating module:", newData);
+
   if (!navigator.onLine) {
-    const newData = {
-      ...moduleData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
     try {
-      const id = await db.modules.add(newData);
-      await db.offlineChanges.add({
-        type: "add",
-        data: { id, ...newData },
-        timestamp: Date.now(),
+      const id = await db.transaction(
+        "rw",
+        [db.modules, db.offlineChanges],
+        async () => {
+          const id = await db.modules.add(newData);
+          await db.offlineChanges.add({
+            type: "add",
+            data: { id, ...newData },
+            timestamp: Date.now(),
+          });
+          console.log("Offline create added to offlineChanges:", newData);
+          return id;
+        }
+      );
+      return { status: "offline", data: { id, ...newData } };
+    } catch (error) {
+      console.error("Error adding data to IndexedDB:", error);
+      throw error;
+    }
+  } else {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/modules`,
+        { data: newData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await db.transaction("rw", [db.modules], async () => {
+        await db.modules.add({ id: response.data.data.id, ...newData });
       });
-      return { status: "offline" };
+
+      console.log(
+        "Module created online and added to IndexedDB:",
+        response.data.data
+      );
+      return { status: "success", data: response.data.data };
     } catch (error) {
-      console.error("Error adding data to IndexedDB:", error);
+      console.error("Error creating module:", error);
       throw error;
     }
-  }
-
-  try {
-    const newData = {
-      ...moduleData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    const response = await axios.post(
-      `${API_BASE_URL}/modules`,
-      { data: newData },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    try {
-      await db.modules.add({ id: response.data.data.id, ...newData });
-    } catch (error) {
-      console.error("Error adding data to IndexedDB:", error);
-      throw error;
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Error creating module:", error);
-    throw error;
   }
 };
+/*******************************************************************************************************************/
 
 export const updateModule = async (id, moduleData, token) => {
   const updatedData = {
@@ -306,6 +372,11 @@ export const syncOfflineChangesModule = async (token, queryClient) => {
             },
           }
         );
+        console.log("====================================");
+        console.log("I AM HEERRR MOTHER FUCCKKERRRR");
+        console.log("====================================");
+        console.log(response.data.data);
+        console.log("====================================");
         await db.modules.put(response.data.data);
         queryClient.setQueryData(["modules"], (oldData) => {
           return {
@@ -313,6 +384,9 @@ export const syncOfflineChangesModule = async (token, queryClient) => {
             data: [...oldData.data, response.data.data],
           };
         });
+        console.log("====================================");
+        /*********************************************************************************/
+        /***************************************************************************************/
       } else if (change.type === "update") {
         const remoteData = await axios
           .get(`${API_BASE_URL}/modules/${change.data.id}`, {

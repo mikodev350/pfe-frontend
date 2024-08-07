@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -23,7 +23,7 @@ const ModelModule = ({
     },
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (initialData) {
       formik.setValues({ nom: initialData.nom });
     }

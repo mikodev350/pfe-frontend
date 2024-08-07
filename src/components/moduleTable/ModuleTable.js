@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import {
   fetchModules,
@@ -10,12 +10,12 @@ import { Table } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
 import TableBody from "../table/TableBody";
 import TableCell from "../table/TableCell";
-import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import TableIconeModule from "../table/TableIconeModule";
+import PaginationComponent from "../pagination/Pagination";
 import { parseISO, format } from "date-fns";
 
-const header = ["#", "Module", "Total de resources", "Date", "Options"];
+const header = ["#", "Module", "Total de ressources", "Date", "Options"];
 
 const ModuleTable = ({ searchValue, idParcours, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,47 +133,12 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
           ))}
         </TableBody>
       </Table>
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </>
-    // <>
-    //   <Table responsive className="text-center table-dashboard">
-    //     <TableHeader header={header} />
-    //     <TableBody>
-    //       {data?.data.map((item, index) => (
-    //         <TableRow key={item.id}>
-    //           <TableCell
-    //             item={index + 1 + (currentPage - 1) * pageSize}
-    //             dataLabel={header[0]}
-    //             className="border-table-right"
-    //           />
-    //           <TableCell item={item.nom} dataLabel={header[1]} />
-    //           <TableCell item={item.totalResource ?? 0} dataLabel={header[2]} />
-    //           <TableCell
-    //             item={
-    //               item.createdAt
-    //                 ? format(parseISO(item.createdAt), "dd-MM-yyyy")
-    //                 : "N/A"
-    //             }
-    //             dataLabel={header[3]}
-    //           />
-    //           <TableIconeModule
-    //             moduleId={item.id || ""}
-    //             moduleName={item.nom || ""}
-    //             dataLabel={header[4]}
-    //             className="border-table-left"
-    //             handleUpdateModule={handleUpdateModule}
-    //           />
-    //         </TableRow>
-    //       ))}
-    //     </TableBody>
-    //   </Table>
-    //   <div className="d-flex justify-content-center">
-    //     <PaginationComponent
-    //       totalPages={totalPages}
-    //       currentPage={currentPage}
-    //       onPageChange={handlePageChange}
-    //     />
-    //   </div>
-    // </>
   );
 };
 

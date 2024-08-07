@@ -292,6 +292,9 @@ export const syncOfflineChangesLesson = async (token, queryClient) => {
           await db.lessons.put(response.data.data);
         });
 
+        console.log("====================================");
+        console.log(" iam new new lessonn pls let s chec");
+        console.log("====================================");
         queryClient.setQueryData(["lessons"], (oldData) => {
           return {
             ...oldData,

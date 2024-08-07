@@ -7,7 +7,11 @@ import ModelModule from "../../components/modelModule/ModelModule copy";
 
 import { useParams } from "react-router-dom";
 import { getToken } from "../../util/authUtils";
-import { createModule, updateModule } from "../../api/apiModule";
+import {
+  createModule,
+  syncOfflineChangesModule,
+  updateModule,
+} from "../../api/apiModule";
 import { useQueryClient } from "react-query";
 
 const Module = () => {
@@ -43,32 +47,49 @@ const Module = () => {
   //   }
   // };
 
-  /*******************************************************************************/
+  /*******************************************************************
+   * ************/
   const handleSaveModule = async (moduleData) => {
     try {
-      console.log("Initial Data:", initialData);
+      console.log("Starting handleSaveModule");
       console.log("Module Data:", moduleData);
+      console.log("Initial Data:", initialData);
+      console.log("Token:", token);
 
       if (initialData) {
-        console.log("Updating module...");
+        console.log("Updating existing module with ID:", initialData.id);
         await updateModule(initialData.id, moduleData, token);
+        console.log("Module updated successfully.");
       } else {
-        console.log("Creating new module...");
+        console.log("Creating new module.");
         await createModule(moduleData, token);
+        console.log("Module created successfully.");
       }
 
-      console.log("Invalidating queries...");
+      console.log("Invalidating queries for modules.");
       await queryClient.invalidateQueries(["modules", idParcours]);
-      console.log("Queries invalidated.");
+      console.log(
+        "----------------------------------------------------------------------"
+      );
+
+      console.log(await queryClient.invalidateQueries(["modules"]));
+      console.log("Queries invalidated successfully.");
+      console.log(
+        "----------------------------------------------------------------------"
+      );
 
       if (navigator.onLine && !isSyncing) {
+        console.log("Online and not syncing. Starting synchronization.");
         setIsSyncing(true);
-        // await syncOfflineChangesLesson(token, queryClient);
-        console.log("Syncing changes...");
+        await syncOfflineChangesModule(token, queryClient);
         setIsSyncing(false);
+        console.log("Synchronization completed.");
+      } else {
+        console.log("Either offline or currently syncing.");
       }
 
       setShowModal(false);
+      console.log("Modal closed.");
     } catch (error) {
       console.error("Error saving module:", error);
     }
