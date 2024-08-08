@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { store } from "./redux/store";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const queryClient = new QueryClient();
 

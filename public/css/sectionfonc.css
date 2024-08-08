@@ -1,0 +1,16 @@
+.services__scroll-container {
+    overflow-x: auto; /* Permet le défilement horizontal */
+    white-space: nowrap; /* Empêche les retours à la ligne */
+    padding: 0; /* Élimine le padding par défaut */
+    margin: 0; /* Élimine la marge par défaut */
+  }
+  
+  .services__items {
+    display: flex; /* Aligne les éléments horizontalement */
+  }
+  
+  .services__item {
+    /* Styles pour les éléments de service */
+    display: inline-flex; /* Affiche les éléments en ligne */
+  }
+  
