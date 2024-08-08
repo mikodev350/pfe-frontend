@@ -8,7 +8,7 @@ import { getToken } from "../../util/authUtils";
 import {
   createLesson,
   updateLesson,
-  syncOfflineChangesLesson,
+  // syncOfflineChangesLesson,
 } from "../../api/apiLesson";
 import { useQueryClient } from "react-query";
 
@@ -48,7 +48,7 @@ const Lesson = () => {
       ]);
       if (navigator.onLine && !isSyncing) {
         setIsSyncing(true);
-        await syncOfflineChangesLesson(token, queryClient);
+        // await syncOfflineChangesLesson(token, queryClient);
         setIsSyncing(false);
       }
       setShowModal(false);
@@ -61,7 +61,7 @@ const Lesson = () => {
     const handleOnline = async () => {
       if (!isSyncing) {
         setIsSyncing(true);
-        await syncOfflineChangesLesson(token, queryClient);
+        // await syncOfflineChangesLesson(token, queryClient);
         queryClient.invalidateQueries([
           "lessons",
           { searchValue, moduleId: idModule, currentPage: 1 },

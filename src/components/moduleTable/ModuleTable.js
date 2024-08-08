@@ -3,7 +3,7 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import {
   fetchModules,
   updateModule,
-  syncOfflineChangesModule,
+  // syncOfflineChangesModule,
 } from "../../api/apiModule";
 import Loader from "../loader/Loader";
 import { Table } from "react-bootstrap";
@@ -49,7 +49,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   useEffect(() => {
     const handleOnline = async () => {
       try {
-        await syncOfflineChangesModule(token, queryClient);
+        // await syncOfflineChangesModule(token, queryClient);
         await queryClient.invalidateQueries([
           "modules",
           searchValue,

@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 import { getToken } from "../../util/authUtils";
 import {
   createModule,
-  syncOfflineChangesModule,
+  // syncOfflineChangesModule,
   updateModule,
 } from "../../api/apiModule";
 import { useQueryClient } from "react-query";
@@ -81,7 +81,7 @@ const Module = () => {
       if (navigator.onLine && !isSyncing) {
         console.log("Online and not syncing. Starting synchronization.");
         setIsSyncing(true);
-        await syncOfflineChangesModule(token, queryClient);
+        // await syncOfflineChangesModule(token, queryClient);
         setIsSyncing(false);
         console.log("Synchronization completed.");
       } else {

@@ -8,7 +8,7 @@ import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
 import { getToken } from "../../util/authUtils"; 
-import { saveResource, syncOfflineChangesResource, addFileInToIndexedDB } from "../../api/apiResource";
+import { saveResource, addFileInToIndexedDB } from "../../api/apiResource";
 import { useQueryClient } from "react-query";
 import { uploadFile } from "../../api/apiUpload";
 
@@ -64,7 +64,7 @@ export default function AddResource() {
   useEffect(() => {
     const handleOnline = async () => {
       try {
-        await syncOfflineChangesResource(token, queryClient);
+        // await syncOfflineChangesResource(token, queryClient);
         console.log("Synced offline changes successfully.");
       } catch (error) {
         console.error("Error syncing offline changes:", error);

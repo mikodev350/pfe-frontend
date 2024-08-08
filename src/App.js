@@ -17,7 +17,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./custom-bootstrap.css";
 
 import Notification from "./components/Notifications";
-import useSyncOnConnectionRestore from "./hooks/useSyncOnConnectionRestore";
 
 // import ResourceAccessPage from "./components/ResourceAccessPageResource/resource-access-page";
 // import ResourcePreviewPage from "./pages/resourcePreviewPage/ResourcePreviewPage";
@@ -25,7 +24,6 @@ import useSyncOnConnectionRestore from "./hooks/useSyncOnConnectionRestore";
 // import ResourcePreviewPageWithId from "./pages/resourceDetail/ResourcePreviewPageWithId";
 
 function App() {
-  useSyncOnConnectionRestore();
   return (
     <>
       <Router>

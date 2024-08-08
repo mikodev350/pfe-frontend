@@ -95,6 +95,7 @@ export const createLesson = async (lessonData, token) => {
           const id = await db.lessons.add(newData);
           await db.offlineChanges.add({
             type: "add",
+            dataBase: "lesson",
             data: { id, ...newData },
             timestamp: Date.now(),
           });
@@ -160,6 +161,8 @@ export const updateLesson = async (id, lessonData, token) => {
 
           await db.offlineChanges.add({
             type: "update",
+            dataBase: "lesson",
+
             data: { id, ...updatedData },
             timestamp: Date.now(),
           });
@@ -224,6 +227,8 @@ export const deleteLesson = async (id, token) => {
 
           await db.offlineChanges.add({
             type: "delete",
+            dataBase: "lesson",
+
             data: { id },
             timestamp: Date.now(),
           });
@@ -268,123 +273,229 @@ export const deleteLesson = async (id, token) => {
     }
   }
 };
+/*****************************************************************************************************************/
 
-// Function to sync offline changes for lessons
-export const syncOfflineChangesLesson = async (token, queryClient) => {
-  const offlineChanges = await db.offlineChanges.toArray();
-  console.log("Syncing offline changes:", offlineChanges);
+export const syncOfflineChangesLesson = async (token, queryClient, change) => {
+  try {
+    const data = change.data;
 
-  for (const change of offlineChanges) {
-    try {
-      if (change.type === "add") {
-        const response = await axios.post(
-          `${API_BASE_URL}/lessons`,
-          { data: change.data },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        await db.transaction("rw", [db.lessons], async () => {
-          await db.lessons.put(response.data.data);
-        });
-
-        console.log("====================================");
-        console.log(" iam new new lessonn pls let s chec");
-        console.log("====================================");
-        queryClient.setQueryData(["lessons"], (oldData) => {
-          return {
-            ...oldData,
-            data: [...oldData.data, response.data.data],
-          };
-        });
-
-        console.log("Lesson added and synced online:", response.data.data);
-      } else if (change.type === "update") {
-        const remoteData = await axios
-          .get(`${API_BASE_URL}/lessons/${change.data.id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => response.data);
-
-        const resolvedData = handleConflict(change.data, remoteData.data);
-
-        const response = await axios.put(
-          `${API_BASE_URL}/lessons/${resolvedData.id}`,
-          resolvedData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        await db.transaction("rw", [db.lessons], async () => {
-          const existingLesson = await db.lessons.get(Number(resolvedData.id));
-          if (existingLesson) {
-            await db.lessons.update(resolvedData.id, resolvedData);
-            console.log(
-              "Lesson updated in IndexedDB after sync:",
-              resolvedData
-            );
-          } else {
-            console.error(
-              "Lesson not found in IndexedDB for update after sync:",
-              resolvedData.id
-            );
-          }
-        });
-
-        queryClient.setQueryData(["lessons"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.map((item) =>
-              item.id === resolvedData.id ? resolvedData : item
-            ),
-          };
-        });
-      } else if (change.type === "delete") {
-        await axios.delete(`${API_BASE_URL}/lessons/${change.data.id}`, {
+    if (change.type === "add") {
+      const response = await axios.post(
+        `${API_BASE_URL}/lessons`,
+        { data },
+        {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        });
+        }
+      );
 
-        await db.transaction("rw", [db.lessons], async () => {
-          const existingLesson = await db.lessons.get(Number(change.data.id));
-          if (existingLesson) {
-            await db.lessons.delete(Number(change.data.id));
-            console.log(
-              "Lesson deleted in IndexedDB after sync:",
-              change.data.id
-            );
-          } else {
-            console.error(
-              "Lesson not found in IndexedDB for delete after sync:",
-              change.data.id
-            );
-          }
-        });
+      console.log("====================================");
+      console.log("response.data.data");
+      console.log(response.data.data);
+      console.log("====================================");
 
-        queryClient.setQueryData(["lessons"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.filter((item) => item.id !== change.data.id),
-          };
-        });
-      }
-    } catch (error) {
-      console.error("Error syncing change:", change, error);
+      await db.lessons.put(response.data.data);
+      queryClient.setQueryData(["lessons"], (oldData) => {
+        return {
+          ...oldData,
+          data: [...oldData.data, response.data.data],
+        };
+      });
+
+      console.log("Lesson added and synced online:", response.data.data);
+    } else if (change.type === "update") {
+      const remoteData = await axios
+        .get(`${API_BASE_URL}/lessons/${data?.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => response.data);
+
+      const resolvedData = handleConflict(data, remoteData.data);
+      console.log("====================================");
+      console.log("====================================");
+      console.log("remoteData");
+      console.log(remoteData);
+      console.log("====================================");
+      console.log("====================================");
+      console.log("data");
+      console.log(data);
+      console.log("====================================");
+      console.log("i AM HERREEEE PTOO MAXX ");
+      console.log("====================================");
+      console.log(resolvedData);
+      console.log("====================================");
+      console.log("====================================");
+
+      const response = await axios.put(
+        `${API_BASE_URL}/lessons/${resolvedData.id}`,
+        resolvedData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await db.lessons.update(resolvedData.id, resolvedData);
+      queryClient.setQueryData(["lessons"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.map((item) =>
+            item.id === resolvedData.id ? resolvedData : item
+          ),
+        };
+      });
+
+      console.log("Lesson updated in IndexedDB after sync:", resolvedData);
+    } else if (change.type === "delete") {
+      await axios.delete(`${API_BASE_URL}/lessons/${data.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      await db.lessons.delete(data.id);
+      queryClient.setQueryData(["lessons"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.filter((item) => item.id !== data.id),
+        };
+      });
+
+      console.log("Lesson deleted in IndexedDB after sync:", data.id);
     }
+  } catch (error) {
+    console.error("Error syncing change:", error);
   }
-  await db.offlineChanges.clear();
-  console.log("Offline changes cleared after sync");
 };
+/*******************************************************************************************************************/
+// // Function to sync offline changes for lessons
+// export const syncOfflineChangesLesson = async (token, queryClient) => {
+//   console.log("it gonna execute itttt ");
+//   const offlineChanges = await db.offlineChanges.toArray();
+//   console.log("Syncing offline changes:", offlineChanges);
+
+//   for (const change of offlineChanges) {
+//     try {
+//       if (change.type === "add") {
+//         const response = await axios.post(
+//           `${API_BASE_URL}/lessons`,
+//           { data: change.data },
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+
+//         await db.transaction("rw", [db.lessons], async () => {
+//           await db.lessons.put(response.data.data);
+//         });
+
+//         console.log("====================================");
+//         console.log(" iam new new lessonn pls let s chec");
+//         console.log("====================================");
+//         queryClient.setQueryData(["lessons"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: [...oldData.data, response.data.data],
+//           };
+//         });
+
+//         console.log("Lesson added and synced online:", response.data.data);
+//       } else if (change.type === "update") {
+//         const remoteData = await axios
+//           .get(`${API_BASE_URL}/lessons/${change.data.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           })
+//           .then((response) => response.data);
+
+//         const resolvedData = handleConflict(change.data, remoteData.data);
+
+//         const response = await axios.put(
+//           `${API_BASE_URL}/lessons/${resolvedData.id}`,
+//           resolvedData,
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+
+//         await db.transaction("rw", [db.lessons], async () => {
+//           const existingLesson = await db.lessons.get(Number(resolvedData.id));
+//           if (existingLesson) {
+//             await db.lessons.update(resolvedData.id, resolvedData);
+//             console.log(
+//               "Lesson updated in IndexedDB after sync:",
+//               resolvedData
+//             );
+//           } else {
+//             console.error(
+//               "Lesson not found in IndexedDB for update after sync:",
+//               resolvedData.id
+//             );
+//           }
+//         });
+
+//         queryClient.setQueryData(["lessons"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.map((item) =>
+//               item.id === resolvedData.id ? resolvedData : item
+//             ),
+//           };
+//         });
+//       } else if (change.type === "delete") {
+//         console.log("change.data.id");
+//         console.log(change.data.id);
+
+//         await axios.delete(`${API_BASE_URL}/lessons/${change.data.id}`, {
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+
+//         await db.transaction("rw", [db.lessons], async () => {
+//           const existingLesson = await db.lessons.get(Number(change.data.id));
+//           if (existingLesson) {
+//             await db.lessons.delete(Number(change.data.id));
+//             console.log(
+//               "Lesson deleted in IndexedDB after sync:",
+//               change.data.id
+//             );
+//           } else {
+//             console.error(
+//               "Lesson not found in IndexedDB for delete after sync:",
+//               change.data.id
+//             );
+//           }
+//         });
+
+//         queryClient.setQueryData(["lessons"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.filter((item) => item.id !== change.data.id),
+//           };
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error syncing change:", change, error);
+//     }
+//   }
+//   // await db.offlineChanges.clear();
+//   console.log("Offline changes cleared after sync");
+// };

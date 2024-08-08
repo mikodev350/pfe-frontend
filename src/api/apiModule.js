@@ -232,6 +232,7 @@ export const createModule = async (moduleData, token) => {
           const id = await db.modules.add(newData);
           await db.offlineChanges.add({
             type: "add",
+            dataBase: "module",
             data: { id, ...newData },
             timestamp: Date.now(),
           });
@@ -284,6 +285,7 @@ export const updateModule = async (id, moduleData, token) => {
       await db.modules.update(Number(id), updatedData);
       await db.offlineChanges.add({
         type: "update",
+        dataBase: "module",
         data: { id, ...updatedData },
         timestamp: Date.now(),
       });
@@ -325,6 +327,8 @@ export const deleteModule = async (id, token) => {
       await db.modules.delete(id);
       await db.offlineChanges.add({
         type: "delete",
+        dataBase: "module",
+
         data: { id },
         timestamp: Date.now(),
       });
@@ -355,90 +359,264 @@ export const deleteModule = async (id, token) => {
     throw error;
   }
 };
+/*************************************************************************************************************/
+/*************************************************************************************************************/
+export const syncOfflineChangesModule = async (token, queryClient, change) => {
+  try {
+    console.log("====================================");
+    console.log(" this is changee dataa change");
+    console.log(change);
 
-export const syncOfflineChangesModule = async (token, queryClient) => {
-  const offlineChanges = await db.offlineChanges.toArray();
-
-  for (const change of offlineChanges) {
-    try {
-      if (change.type === "add") {
-        const response = await axios.post(
-          `${API_BASE_URL}/modules`,
-          { data: change.data },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("====================================");
-        console.log("I AM HEERRR MOTHER FUCCKKERRRR");
-        console.log("====================================");
-        console.log(response.data.data);
-        console.log("====================================");
-        await db.modules.put(response.data.data);
-        queryClient.setQueryData(["modules"], (oldData) => {
-          return {
-            ...oldData,
-            data: [...oldData.data, response.data.data],
-          };
-        });
-        console.log("====================================");
-        /*********************************************************************************/
-        /***************************************************************************************/
-      } else if (change.type === "update") {
-        const remoteData = await axios
-          .get(`${API_BASE_URL}/modules/${change.data.id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => response.data);
-
-        const resolvedData = handleConflict(change.data, remoteData.data);
-
-        // Use resolvedData directly instead of resolvedData.data
-        const response = await axios.put(
-          `${API_BASE_URL}/modules/${resolvedData.id}`,
-          resolvedData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("this is response");
-        console.log(response);
-        await db.modules.update(resolvedData.id, resolvedData);
-        queryClient.setQueryData(["modules"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.map((item) =>
-              item.id === resolvedData.id ? resolvedData : item
-            ),
-          };
-        });
-      } else if (change.type === "delete") {
-        await axios.delete(`${API_BASE_URL}/modules/${change.data.id}`, {
+    console.log("====================================");
+    const data = change.data;
+    if (change.type === "add") {
+      const response = await axios.post(
+        `${API_BASE_URL}/modules`,
+        { data },
+        {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        });
-        await db.modules.delete(change.data.id);
-        queryClient.setQueryData(["modules"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.filter((item) => item.id !== change.data.id),
-          };
-        });
-      }
-    } catch (error) {
-      console.error("Error syncing change:", change, error);
+        }
+      );
+
+      console.log("====================================");
+      console.log("response.data.data");
+      console.log(response.data.data);
+
+      console.log("====================================");
+      await db.modules.put(response.data.data);
+      queryClient.setQueryData(["modules"], (oldData) => {
+        return {
+          ...oldData,
+          data: [...oldData.data, response.data.data],
+        };
+      });
+    } else if (change.type === "update") {
+      const remoteData = await axios
+        .get(`${API_BASE_URL}/modules/${data.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => response.data);
+
+      const resolvedData = handleConflict(data, remoteData.data);
+      const response = await axios.put(
+        `${API_BASE_URL}/modules/${resolvedData.id}`,
+        resolvedData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await db.modules.update(resolvedData.id, resolvedData);
+      queryClient.setQueryData(["modules"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.map((item) =>
+            item.id === resolvedData.id ? resolvedData : item
+          ),
+        };
+      });
+    } else if (change.type === "delete") {
+      await axios.delete(`${API_BASE_URL}/modules/${data.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      await db.modules.delete(data.id);
+      queryClient.setQueryData(["modules"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.filter((item) => item.id !== data.id),
+        };
+      });
     }
+  } catch (error) {
+    console.error("Error syncing change:", error);
   }
-  await db.offlineChanges.clear();
 };
+
+/*************************************************************************************************************************/
+
+// export const syncOfflineChangesModule = async (token, queryClient) => {
+//   const offlineChanges = await db.offlineChanges.toArray();
+
+//   for (const change of offlineChanges) {
+//     try {
+//       if (change.type === "add") {
+//         const response = await axios.post(
+//           `${API_BASE_URL}/modules`,
+//           { data: change.data },
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("====================================");
+//         console.log("I AM HEERRR MOTHER FUCCKKERRRR");
+//         console.log("====================================");
+//         console.log(response.data.data);
+//         console.log("====================================");
+//         await db.modules.put(response.data.data);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: [...oldData.data, response.data.data],
+//           };
+//         });
+//         console.log("====================================");
+//       } else if (change.type === "update") {
+//         const remoteData = await axios
+//           .get(`${API_BASE_URL}/modules/${change.data.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           })
+//           .then((response) => response.data);
+
+//         const resolvedData = handleConflict(change.data, remoteData.data);
+
+//         const response = await axios.put(
+//           `${API_BASE_URL}/modules/${resolvedData.id}`,
+//           resolvedData,
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("this is response");
+//         console.log(response);
+//         await db.modules.update(resolvedData.id, resolvedData);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.map((item) =>
+//               item.id === resolvedData.id ? resolvedData : item
+//             ),
+//           };
+//         });
+//       } else if (change.type === "delete") {
+//         await axios.delete(`${API_BASE_URL}/modules/${change.data.id}`, {
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+//         await db.modules.delete(change.data.id);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.filter((item) => item.id !== change.data.id),
+//           };
+//         });
+//       }
+
+//       // Supprimer l'élément traité de offlineChanges
+//       await db.offlineChanges.delete(change.id);
+//     } catch (error) {
+//       console.error("Error syncing change:", change, error);
+//     }
+//   }
+// };
+/***************************************************************************************************************/
+// export const syncOfflineChangesModule = async (token, queryClient) => {
+//   const offlineChanges = await db.offlineChanges.toArray();
+
+//   for (const change of offlineChanges) {
+//     try {
+//       if (change.type === "add") {
+//         const response = await axios.post(
+//           `${API_BASE_URL}/modules`,
+//           { data: change.data },
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("====================================");
+//         console.log("I AM HEERRR MOTHER FUCCKKERRRR");
+//         console.log("====================================");
+//         console.log(response.data.data);
+//         console.log("====================================");
+//         await db.modules.put(response.data.data);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: [...oldData.data, response.data.data],
+//           };
+//         });
+//         console.log("====================================");
+//         /*********************************************************************************/
+//         /***************************************************************************************/
+//       } else if (change.type === "update") {
+//         const remoteData = await axios
+//           .get(`${API_BASE_URL}/modules/${change.data.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           })
+//           .then((response) => response.data);
+
+//         const resolvedData = handleConflict(change.data, remoteData.data);
+
+//         // Use resolvedData directly instead of resolvedData.data
+//         const response = await axios.put(
+//           `${API_BASE_URL}/modules/${resolvedData.id}`,
+//           resolvedData,
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("this is response");
+//         console.log(response);
+//         await db.modules.update(resolvedData.id, resolvedData);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.map((item) =>
+//               item.id === resolvedData.id ? resolvedData : item
+//             ),
+//           };
+//         });
+//       } else if (change.type === "delete") {
+//         await axios.delete(`${API_BASE_URL}/modules/${change.data.id}`, {
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+//         await db.modules.delete(change.data.id);
+//         queryClient.setQueryData(["modules"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.filter((item) => item.id !== change.data.id),
+//           };
+//         });
+//       }
+//             await db.offlineChanges.delete(change.id);
+
+//     } catch (error) {
+//       console.error("Error syncing change:", change, error);
+//     }
+//   }
+//   // await db.offlineChanges.clear();
+// };
