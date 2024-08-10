@@ -1,0 +1,139 @@
+.testimonial__area {
+  background-color: #10266f18;
+  margin-top: 140px;
+}
+.testimonial__text {
+  padding-left: 20px;
+}
+.testimonial_btn {
+  background-color: #1e80c9; /* Primary button colo8 */
+  border-radius: 50px;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  color: #fff !important;
+  cursor: pointer;
+  &:hover {
+    background-color: #10266f; /* Updated hover color */
+    transform: scale(1.05); /* Slightly larger on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
+  }
+  /* overflow: hidden; / */
+}
+/* .features__area {
+  padding: 2rem;
+  background-color: #59bcf3;
+} */
+
+.features-list-three {
+  list-style: none; /* Supprime les puces par défaut */
+  padding-left: 0;
+}
+
+.features-list-three li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+
+.features-list-three .icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  width: 2rem; /* Ajustez la taille du cercle si nécessaire */
+  height: 2rem; /* Ajustez la taille du cercle si nécessaire */
+}
+
+.features-list-three .icon {
+  color: #eea129; /* Couleur du cercle */
+  font-size: 1.5rem; /* Taille de l'icône */
+  margin-left: 0px;
+}
+.testimonial_img2,
+.testimonial_img1 {
+  display: flex;
+  align-items: center;
+}
+
+
+.testimonial_img1 {
+  padding-top:50px ;
+}
+.testimonial_img2 {
+  height: auto;
+}
+/* Initialement, les icônes sont en bleu clair */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(80%) sepia(60%) saturate(500%) hue-rotate(180deg)
+    brightness(100%) contrast(90%);
+}
+
+/* Lorsque vous voulez les changer en bleu foncé */
+.carousel-control-prev-icon.dark-blue,
+.carousel-control-next-icon.dark-blue {
+  filter: invert(20%) sepia(100%) saturate(800%) hue-rotate(180deg)
+    brightness(75%) contrast(100%);
+}
+
+.features-list-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.features-list-one ,.features-list-two {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  width: 48%; /* Ajuste la largeur pour que les listes tiennent côte à côte */
+}
+
+.features-list-one,
+.features-list-two {
+  padding: 0; /* Supprime les marges internes */
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.icon-wrapper {
+  margin-right: 10px;
+}
+
+.icon {
+  margin-top: 8px;
+  color: #eea129; /* Couleur du cercle */
+  margin-left: 0px;
+  font-size: 1.2rem; /* Taille de l'icône */
+ 
+
+}
+.carousel-item {
+  position: relative;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.carousel-item img {
+  width: 100%;
+  transition: filter 0.15s ease-in-out;
+}
+
+.carousel-item-next, .carousel-item-prev {
+  opacity: 0.6;
+}
+
+.carousel-item-next,
+.carousel-item-prev {
+  opacity: 0.6;
+}
+

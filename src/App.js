@@ -25,7 +25,7 @@ import useSyncOnConnectionRestore from "./hooks/useSyncOnConnectionRestore";
 // import ResourcePreviewPageWithId from "./pages/resourceDetail/ResourcePreviewPageWithId";
 
 function App() {
-  useSyncOnConnectionRestore();
+  // useSyncOnConnectionRestore();
   return (
     <>
       <Router>

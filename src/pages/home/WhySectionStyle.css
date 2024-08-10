@@ -1,0 +1,95 @@
+.why__area {
+  margin-top: -24.5rem;
+}
+.why__btn .e-btn {
+  background-color: #1e80c9; /* Primary button colo8 */
+  border-radius: 50px;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  color: #fff !important;
+  cursor: pointer;
+  &:hover {
+    background-color: #10266f; /* Updated hover color */
+    transform: scale(1.05); /* Slightly larger on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
+  }
+}
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.why__thumb {
+  animation: slideInLeft 1s ease-out;
+}
+
+.why__content {
+  animation: slideInRight 1s ease-out;
+}
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px); /* Déplace l'image vers le haut */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.why__thumb {
+  animation: slideInLeft 1s ease-out;
+}
+
+.why__content {
+  animation: slideInRight 1s ease-out;
+}
+.why-green,
+.why__thumb {
+  position: fixed; /* ou position: absolute; selon le besoin */
+  animation: float 3s ease-in-out infinite; /* Applique l'animation */
+}

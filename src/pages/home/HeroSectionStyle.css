@@ -1,0 +1,85 @@
+.hero__area {
+  display: flex;
+  flex-direction: column; /* Aligne les éléments en colonne */
+  align-items: flex-start; /* Aligne les éléments au début du conteneur */
+  /* box-shadow: #1e7fc992; */
+  margin-top: -55px;
+  overflow: hidden; 
+}
+
+/* Ajoutez ceci dans votre fichier CSS */
+@keyframes float {
+  0% {
+    transform: translatey(0px);
+  }
+  50% {
+    transform: translatey(-10px);
+  }
+  100% {
+    transform: translatey(0px);
+  }
+}
+
+.hero-big {
+  animation: float 3s ease-in-out infinite;
+}
+.hero__big-shape {
+  position: absolute;
+  top: 0;
+  right: 0; /* Positionner à droite */
+  width: 200rem; /* Taille ajustée (300px initial + 100px) */
+  height: 65rem; /* Taille ajustée (300px initial + 100px) */
+  background-color: #eea22922;
+  border-radius: 10%;
+  border-top-left-radius: 40px;
+  z-index: 0;
+  transform: translate(
+    50%,
+    -50%
+  ); /* Ajuster la transformation pour aligner correctement */
+  pointer-events: none;
+}
+.hero__big-shape2 {
+  position: absolute;
+  top: 0;
+  right: 0; /* Positionner à droite */
+  width: 200rem; /* Taille ajustée (300px initial + 100px) */
+  height:50rem; /* Taille ajustée (300px initial + 100px) */
+  background-color: #eea22922;
+  border-radius: 50%;
+  border-top-left-radius: 40px;
+  z-index: 0;
+  transform: translate(
+    50%,
+    -50%
+  ); /* Ajuster la transformation pour aligner correctement */
+  pointer-events: none;
+}
+.hero__small-shape {
+  position: absolute;
+  bottom: 600px;
+  right: -100px;
+  width: 20rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
+  height: 20rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
+  background-color: #eea22922;/* Même couleur que la grande forme */
+  border-radius: 50%;
+  border-top-left-radius: 20px; /* Ajustez si nécessaire */
+  z-index: 0; /* Assurez-vous que la forme est derrière le contenu */
+  transform: translate(0%, 0%); /* Pas de transformation nécessaire */
+  pointer-events: none; /* Assurez-vous que la forme n'interfère pas avec les interactions */
+}
+
+.hero__small-shape2 {
+  position: absolute;
+  bottom: 230px;
+  left: -200px;
+  width: 22rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
+  height: 22rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
+  background-color: #eea22955; /* Même couleur que la grande forme */
+  border-radius: 50%;
+  border-top-left-radius: 20px; /* Ajustez si nécessaire */
+  z-index: 0; /* Assurez-vous que la forme est derrière le contenu */
+  transform: translate(0%, 0%); /* Pas de transformation nécessaire */
+  pointer-events: none; /* Assurez-vous que la forme n'interfère pas avec les interactions */
+}
+
