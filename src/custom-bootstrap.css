@@ -76,9 +76,9 @@ input.date-inputs,
 }
 
 /********************** Navbar **********************************/
-.show {
+/* .show {
     display: none;
-}
+} */
 
 /* .form-check-input{
     width: 52px !important;
@@ -325,9 +325,9 @@ select:focus {
 /***************************************************************************/
 /**************************Accordion for question **************************/
 
-form.mt-5 .accordion .accordion-item .show {
+/* form.mt-5 .accordion .accordion-item .show {
     display: block;
-}
+} */
 
 /* .accordion-collapse */
 

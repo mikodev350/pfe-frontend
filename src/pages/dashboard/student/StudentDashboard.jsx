@@ -21,7 +21,10 @@ import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPa
 import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
 import { useQueryClient } from 'react-query'; // Ou le client de requête que vous utilisez
 import useSyncOnConnectionRestore from "./../../../hooks/useSyncOnConnectionRestore";
-
+import GestionDevoir from "../../gestion-devoir/GestionDevoir";
+import Devoir from "../../devoir/Devoir";
+import ListeEtudiants from "../../../components/liste-etudiants/ListeEtudiants";
+import Progression from "../../../components/progression/Progression";
 export default function StudentDashboard() {
 
   const queryClient = useQueryClient(); // Si vous utilisez react-query, par exemple
@@ -75,6 +78,37 @@ export default function StudentDashboard() {
           element={<ResourcePreviewPageWithId />}
         />
         {/* ***************************************************************************************************** */}
+
+                            {/* THIS GONNA BE FOR THE TEACHHERRRRR */}
+
+                            {/* Devoirrr  */}
+                            
+  <Route
+          path="/devoirs/nouveau"
+          element={<GestionDevoir />}
+        />
+  <Route
+          path="/devoirs/modifier/:id"
+          element={<GestionDevoir />}
+        />
+                <Route path="/devoirs" element={<Devoir />} />
+
+        {/* ***************************************************************************************************** */}
+
+
+
+{/* LISTE ETUDIANT / GROUOPPPEE  */}
+
+{/* ************************************************************************************************* */}
+    {/* Route pour afficher la liste des étudiants et des groupes */}
+        <Route path="/etudiants" element={<ListeEtudiants />} />
+        <Route path="/progression/:type/:id" element={<Progression />} />
+
+        {/* Route pour afficher les détails d'un étudiant individuel */}
+        {/* <Route path="/etudiant/:id" element={<DetailsEtudiant />} /> */}
+
+        {/* Route pour gérer un groupe d'étudiants */}
+        {/* <Route path="/groupe/:id" element={<GestionGroupe />} /> */}
       </Routes>
     </Layout>
   );

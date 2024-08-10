@@ -27,7 +27,7 @@ const ResourceTable = ({ searchValue }) => {
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["resources", currentPage, pageSize, searchValue],
-    () => fetchResources(currentPage, pageSize, searchValue, token),
+    () => fetchResources(currentPage, pageSize,searchValue, token),
     { keepPreviousData: true }
   );
 

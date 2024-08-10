@@ -12,17 +12,46 @@ import { fetchGroupConversations, fetchPrivateConversations } from "../../api/ap
 const API_BASE_URL = "http://localhost:1337";
 const GROUP_IMAGE_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxUv4CmCk5Vn_z61JnwvIzcdzDuJjZYd9ZxA&s";
 
-const AvatarWithName = (participants, type, id, title) => {
+// const AvatarWithName = (participants, type, id, title) => {
+//   let imageUrl = "";
+//   let name = title;
+//   let url = GROUP_IMAGE_URL;
+//   if (type === "PRIVATE") {
+//     const usersFiltered = participants.filter((item) => item.id !== id);
+//     const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
+//     name = username;
+//     imageUrl = API_BASE_URL + url;
+//   } else if (type === "GROUP") {
+//     imageUrl = GROUP_IMAGE_URL;
+//   }
+//   return (
+//     <ItemCard>
+//       <AvatarImage src={imageUrl} />
+//       <div>{name}</div>
+//     </ItemCard>
+//   );
+// };
+
+
+const AvatarWithName = ({ participants, type, id, title }) => {
   let imageUrl = "";
   let name = title;
+
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);
-    const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
-    name = username;
-    imageUrl = API_BASE_URL + url;
+    
+    if (usersFiltered.length > 0) {
+      const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
+      name = username;
+      imageUrl = API_BASE_URL + (url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s');
+    } else {
+      // Si aucun autre utilisateur n'est trouvé, vous pouvez définir une image par défaut ou gérer autrement
+      imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s';
+    }
   } else if (type === "GROUP") {
     imageUrl = GROUP_IMAGE_URL;
   }
+
   return (
     <ItemCard>
       <AvatarImage src={imageUrl} />
@@ -30,6 +59,7 @@ const AvatarWithName = (participants, type, id, title) => {
     </ItemCard>
   );
 };
+
 
 const ChatApp = () => {
   const [showSidebar, setShowSidebar] = useState(false);
