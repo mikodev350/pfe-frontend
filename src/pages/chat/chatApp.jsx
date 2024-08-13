@@ -33,20 +33,21 @@ const GROUP_IMAGE_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ
 // };
 
 
-const AvatarWithName = ({ participants, type, id, title }) => {
+const AvatarWithName = (participants, type, id, title) => {
   let imageUrl = "";
   let name = title;
 
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);
-    
+
     if (usersFiltered.length > 0) {
-      const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
-      name = username;
-      imageUrl = API_BASE_URL + (url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s');
+      const user = usersFiltered[0];
+      name = user.username;
+      imageUrl = user.profil?.photoProfil?.url 
+        ? API_BASE_URL + user.profil.photoProfil.url 
+        : 'http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg';
     } else {
-      // Si aucun autre utilisateur n'est trouvé, vous pouvez définir une image par défaut ou gérer autrement
-      imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s';
+      imageUrl = 'http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg';
     }
   } else if (type === "GROUP") {
     imageUrl = GROUP_IMAGE_URL;
@@ -78,6 +79,7 @@ const ChatApp = () => {
     fetchPrivateConversations
   );
 
+
   const { isLoading: isLoadingGroup, data: dataGroup, error: errorGroup } = useQuery(
     ["groupConversations"],
     fetchGroupConversations
@@ -85,6 +87,8 @@ const ChatApp = () => {
 
   if (isLoadingPrivate || isLoadingGroup) return <div>Loading...</div>;
   if (errorPrivate || errorGroup) return <div>Error...</div>;
+
+
 
   return (
     <>
@@ -106,6 +110,7 @@ const ChatApp = () => {
                         key={item.id}
                         onClick={() => handleShowConversation(item.id)}
                       >
+                        
                         {AvatarWithName(
                           item.participants,
                           item.type,
