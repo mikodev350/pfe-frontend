@@ -23,3 +23,14 @@ export const getQuiz = async ({ token, id }) => {
 
   return response.data;
 };
+
+export const getQuizzes = async ({ token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.get(`${API_BASE_URL}/my-quizzes`, config);
+
+  return response.data;
+};

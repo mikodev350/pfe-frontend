@@ -48,8 +48,8 @@ export default function Quiz() {
     });
     setDetails(brigeDetails);
     setQuiz(brigeQuiz);
-    console.log(brigeQuiz);
   };
+
   React.useEffect(() => {
     if (id) {
       fetchQuiz();
@@ -109,25 +109,28 @@ export default function Quiz() {
         answers: [
           {
             id: uuidv4(),
-            text: "",
+            answer: "",
           },
         ],
       },
     ]);
   };
-  const submit = async (e) => {
-    e.preventDefault();
-    const result = await postQuiz({
-      token: localStorage.getItem("token"),
-      form: { ...details, quiz: quiz },
-    });
-  };
+  // ------- delete wrong answer ----------- //
   const onhandleDeleteWrongAnswer = ({ id }) => {
     let updateQuiz = quiz.map((item) => {
       let updatedAnswers = item.answers.filter((item) => item.id !== id);
       return { ...item, answers: updatedAnswers };
     });
     setQuiz(updateQuiz);
+  };
+
+  // ------- submit  quistion ----------- //
+  const submit = async (e) => {
+    e.preventDefault();
+    const result = await postQuiz({
+      token: localStorage.getItem("token"),
+      form: { ...details, quiz: quiz },
+    });
   };
   return (
     <Layout>
@@ -143,9 +146,9 @@ export default function Quiz() {
                 >
                   <Form.Label>Titile: *</Form.Label>
                   <Form.Control
-                    rows={3}
                     name={`title:`}
                     required
+                    type="text"
                     onChange={onHandleChangeQuiz}
                   />
                 </Form.Group>
@@ -155,16 +158,17 @@ export default function Quiz() {
                   className="mb-3"
                   controlId="exampleForm.ControlTextarea1"
                 >
-                  <Form.Label>Duration: *</Form.Label>
+                  <Form.Label>Duration: (min) *</Form.Label>
                   <Form.Control
-                    rows={3}
                     name={`duration:`}
                     required
+                    type="number"
                     onChange={onHandleChangeQuiz}
                   />
                 </Form.Group>
               </Col>
             </Row>
+            {id && <Button variant="success">Save Changes</Button>}
           </Card.Body>
         </Card>
         <Tabs
@@ -253,7 +257,24 @@ export default function Quiz() {
                     }
                   >
                     Add Wrong Answer
-                  </Button>
+                  </Button>{" "}
+                  {id && (
+                    <Button
+                      variant="success"
+                      disabled={
+                        item.answers[
+                          item.answers.length >= 1 ? item.answers.length - 1 : 0
+                        ].answer.length === 0
+                      }
+                      onClick={() =>
+                        onHanldeNewNewWrongAsnwer({
+                          questionPosition: item.id,
+                        })
+                      }
+                    >
+                      Save Changes
+                    </Button>
+                  )}
                 </Card.Body>
               </Card>
             </Tab>
@@ -262,10 +283,14 @@ export default function Quiz() {
         <Button variant="primary" onClick={() => onHanldeNewNewQuiz()}>
           Add New Quiz
         </Button>
-        <hr />
-        <Button variant="primary" type="submit" style={{ float: "right" }}>
-          Submit
-        </Button>
+        {!id && (
+          <>
+            <hr />
+            <Button variant="primary" type="submit" style={{ float: "right" }}>
+              Submit
+            </Button>
+          </>
+        )}
       </Form>
     </Layout>
   );
