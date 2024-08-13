@@ -25,22 +25,29 @@ import GestionDevoir from "../../gestion-devoir/GestionDevoir";
 import Devoir from "../../devoir/Devoir";
 import ListeEtudiants from "../../../components/liste-etudiants/ListeEtudiants";
 import Progression from "../../../components/progression/Progression";
+import Quiz from "../../quiz/quiz/Quiz";
+import Quizzes from "../../quiz/quiz/Quizzes";
+
+
+
 export default function StudentDashboard() {
 
   const queryClient = useQueryClient(); // Si vous utilisez react-query, par exemple
   useSyncOnConnectionRestore(queryClient);
+
+
   return (
     <Layout>
       <Routes>
-        {/* ***************************************************************************************************** */}
+        {/****************************************************************************************************** */}
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
-        {/* ***************************************************************************************************** */}
+        {/****************************************************************************************************** */}
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
-        {/* ***************************************************************************************************** */}
+        {/****************************************************************************************************** */}
 
         <Route
           path="update-parcour/:pathwayId"
@@ -79,28 +86,29 @@ export default function StudentDashboard() {
         />
         {/* ***************************************************************************************************** */}
 
-                            {/* THIS GONNA BE FOR THE TEACHHERRRRR */}
+        {/* THIS GONNA BE FOR THE TEACHHERRRRR */}
 
-                            {/* Devoirrr  */}
-                            
-  <Route
+        {/* Devoirrr  */}
+
+        <Route
           path="/devoirs/nouveau"
           element={<GestionDevoir />}
         />
-  <Route
+        <Route
           path="/devoirs/modifier/:id"
           element={<GestionDevoir />}
         />
-                <Route path="/devoirs" element={<Devoir />} />
+        <Route path="/devoirs" element={<Devoir />} />
 
         {/* ***************************************************************************************************** */}
 
+          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/quizzes" element={<Quizzes />} />
 
+        {/* LISTE ETUDIANT / GROUOPPPEE  */}
 
-{/* LISTE ETUDIANT / GROUOPPPEE  */}
-
-{/* ************************************************************************************************* */}
-    {/* Route pour afficher la liste des étudiants et des groupes */}
+        {/* ************************************************************************************************* */}
+        {/* Route pour afficher la liste des étudiants et des groupes */}
         <Route path="/etudiants" element={<ListeEtudiants />} />
         <Route path="/progression/:type/:id" element={<Progression />} />
 

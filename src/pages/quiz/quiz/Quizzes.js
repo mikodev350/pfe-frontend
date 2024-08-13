@@ -35,64 +35,63 @@ export default function Quizzes() {
   const handleDelete = (id) => {};
   return (
     <>
-      <Layout>
-        <h3>My Quizzes</h3>
-        <Button
-          variant="primary"
-          onClick={onhandleNewQuiz}
-          title="Modifier le Groupe"
-        >
-          New Quiz
-        </Button>
-        <hr />
-        <Card style={{ marginBottom: "20px" }}>
+      <h3>My Quizzes</h3>
+      <Button
+        variant="primary"
+        onClick={onhandleNewQuiz}
+        title="Modifier le Groupe"
+      >
+        New Quiz
+      </Button>
+      <hr />
+      <Card style={{ marginBottom: "20px" }}>
+        <Card.Body>
+          <Row>
+            <Col>
+              <b>Titre</b>
+            </Col>
+            <Col>
+              <b>Total Questions</b>
+            </Col>
+            <Col style={{ textAlign: "right" }} md="1">
+              <b>Actions</b>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+      {quizzes.map((item) => (
+        <Card key={item.id} style={accordionStyles.card}>
           <Card.Body>
             <Row>
               <Col>
-                <b>Titre</b>
+                <span>{item.titre}</span>
               </Col>
               <Col>
-                <b>Total Questions</b>
+                <span>{item.questions}</span>
               </Col>
               <Col style={{ textAlign: "right" }} md="1">
-                <b>Actions</b>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "10px",
+                  }}
+                >
+                  <FiEdit2
+                    size={20}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onhandleredirect(item.id)}
+                  />
+                  <FaRegTrashAlt
+                    size={20}
+                    style={{ cursor: "pointer", color: "red" }}
+                  />
+                </div>
               </Col>
             </Row>
           </Card.Body>
-        </Card>
-        {quizzes.map((item) => (
-          <Card key={item.id} style={accordionStyles.card}>
-            <Card.Body>
-              <Row>
-                <Col>
-                  <span>{item.titre}</span>
-                </Col>
-                <Col>
-                  <span>{item.questions}</span>
-                </Col>
-                <Col style={{ textAlign: "right" }} md="1">
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "10px",
-                    }}
-                  >
-                    <FiEdit2
-                      size={20}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => onhandleredirect(item.id)}
-                    />
-                    <FaRegTrashAlt
-                      size={20}
-                      style={{ cursor: "pointer", color: "red" }}
-                    />
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
 
-            {/* <Button
+          {/* <Button
                 variant="primary"
                 style={accordionStyles.updateButton}
                 size="sm"Row
@@ -108,9 +107,8 @@ export default function Quizzes() {
               >
                 Supprimer
               </Button> */}
-          </Card>
-        ))}
-      </Layout>
+        </Card>
+      ))}
     </>
   );
 }
