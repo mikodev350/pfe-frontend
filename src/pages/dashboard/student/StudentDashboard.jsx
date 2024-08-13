@@ -25,10 +25,17 @@ import GestionDevoir from "../../gestion-devoir/GestionDevoir";
 import Devoir from "../../devoir/Devoir";
 import ListeEtudiants from "../../../components/liste-etudiants/ListeEtudiants";
 import Progression from "../../../components/progression/Progression";
+ 
 import Quiz from "../../quiz/quiz/Quiz";
 import Quizzes from "../../quiz/quiz/Quizzes";
 
 
+ 
+import HomeDashboard from "../../../components/home-dashboard/HomeDashboard";
+import AssignmentList from "../../../components/assignment-list/assignmentList";
+import AssignmentDetail from "../../../components/assignment-detail/assignmentDetail";
+import AssignmentSubmit from "../../../components/assignment-submit/AssignmentSubmit";
+ 
 
 export default function StudentDashboard() {
 
@@ -39,7 +46,14 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <Routes>
+ 
         {/****************************************************************************************************** */}
+ 
+
+
+        <Route path="home"  element={<HomeDashboard />} />
+        {/* ***************************************************************************************************** */}
+ 
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
@@ -117,6 +131,23 @@ export default function StudentDashboard() {
 
         {/* Route pour gérer un groupe d'étudiants */}
         {/* <Route path="/groupe/:id" element={<GestionGroupe />} /> */}
+
+
+
+        {/* Coteerr etuidant Assignment */}
+                            <Route
+                        path="/assignments"
+                        element={<AssignmentList />}
+                    />
+                    <Route
+                        path="/assignments/:id"
+                        element={<AssignmentDetail  />}
+                    />
+                    <Route
+                        path="/assignments/:id/submit"
+                        element={<AssignmentSubmit  />}
+                    />
+
       </Routes>
     </Layout>
   );
