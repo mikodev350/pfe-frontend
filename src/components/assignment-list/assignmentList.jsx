@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchStudentAssignations } from '../../api/apiDevoir';  // Import de la fonction de récupération des assignations
 
 const styles = {
     assignmentItem: {
@@ -9,7 +10,7 @@ const styles = {
         marginBottom: '10px',
         backgroundColor: '#f8f9fa',
         padding: '15px',
-        textAlign: 'left',  // Alignement à gauche
+        textAlign: 'left',
     },
     assignmentItemHover: {
         transform: 'translateY(-5px)',
@@ -20,27 +21,27 @@ const styles = {
         color: '#343a40',
         textDecoration: 'none',
         transition: 'color 0.2s ease-in-out',
-        display: 'flex',  // Utilisation de flex pour aligner le badge à gauche du texte
-        alignItems: 'center',  // Alignement vertical du texte et du badge
+        display: 'flex',
+        alignItems: 'center',
     },
     assignmentLinkHover: {
         color: '#007bff',
     },
     responsiveItem: {
         flexDirection: 'column',
-        alignItems: 'flex-start',  // Alignement à gauche
+        alignItems: 'flex-start',
     },
     responsiveAlignment: {
         marginTop: '10px',
         width: '100%',
-        justifyContent: 'flex-start',  // Alignement à gauche
+        justifyContent: 'flex-start',
     },
     sectionTitle: {
         marginBottom: '20px',
         borderBottom: '2px solid #007bff',
         paddingBottom: '10px',
         color: '#007bff',
-        textAlign: 'left',  // Alignement à gauche
+        textAlign: 'left',
     },
     statusBadge: {
         marginLeft: '10px',
@@ -58,15 +59,25 @@ const styles = {
 };
 
 function AssignmentList() {
+    const [assignments, setAssignments] = useState([]);
     const [hovered, setHovered] = useState(null);
 
-    const assignments = [
-        { id: 1, title: 'Devoir 1', dueDate: '2024-08-20', status: 'En attente', type: 'Devoir' },
-        { id: 2, title: 'Quiz 1', dueDate: '2024-08-22', status: 'Soumis', type: 'Quiz' }
-    ];
+    useEffect(() => {
+        const fetchAssignments = async () => {
+            try {
+                const token = localStorage.getItem('token'); // Assurez-vous que le token est bien stocké
+                const data = await fetchStudentAssignations(token); // Appel API pour récupérer les assignations de l'étudiant
+                setAssignments(data);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des assignations :", error);
+            }
+        };
 
-    const devoirs = assignments.filter(assignment => assignment.type === 'Devoir');
-    const quiz = assignments.filter(assignment => assignment.type === 'Quiz');
+        fetchAssignments();
+    }, []);
+
+    const devoirs = assignments.filter(assignment => assignment.type === 'DEVOIR');
+    const quiz = assignments.filter(assignment => assignment.type === 'QUIZ');
 
     const renderAssignments = (assignments) => {
         return assignments.map((assignment) => (
@@ -84,7 +95,7 @@ function AssignmentList() {
                         to={`/assignments/${assignment.id}`} 
                         style={styles.assignmentLink}
                     >
-                        <strong>{assignment.title}</strong>
+                        <strong>{assignment.titre}</strong>
                         <span 
                             style={{
                                 ...styles.statusBadge,
@@ -94,7 +105,7 @@ function AssignmentList() {
                             {assignment.status === 'Soumis' ? 'Fait' : 'Non fait'}
                         </span>
                     </Link>
-                    <small style={{ color: '#6c757d' }}>Date limite: {assignment.dueDate}</small>
+                    <small style={{ color: '#6c757d' }}>Date limite: {assignment.date}</small>
                 </div>
                 <div style={styles.responsiveAlignment}>
                     <Link 

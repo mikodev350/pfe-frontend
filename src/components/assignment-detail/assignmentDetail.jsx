@@ -2,124 +2,37 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { FiTrash2, FiImage } from 'react-icons/fi';
+import { fetchOneDevoir } from './../../api/apiDevoir';
+import { getToken } from '../../util/authUtils';
+import { uploadFile } from './../../api/apiUpload';
+import { createAnswerHistory } from './../../api/apiReponseStudent'; // Import the function
 
-const styles = {
-    cardHeader: {
-        backgroundColor: '#007bff',
-        color: '#fff',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    cardBody: {
-        padding: '20px',
-        backgroundColor: '#f8f9fa',
-    },
-    cardText: {
-        fontSize: '1rem',
-        marginBottom: '10px',
-    },
-    button: {
-        marginTop: '20px',
-        display: 'block',
-        width: '100%',
-        padding: '10px 20px',
-        fontSize: '16px',
-        fontWeight: 'bold',
-        color: '#fff',
-        backgroundColor: '#28a745',
-        borderColor: '#28a745',
-        borderRadius: '5px',
-        transition: 'background-color 0.3s ease',
-        cursor: 'pointer',
-        textAlign: 'center',
-    },
-    buttonHover: {
-        backgroundColor: '#218838',
-    },
-    statusText: {
-        fontWeight: 'bold',
-        color: '#dc3545',
-    },
-    loadingText: {
-        textAlign: 'center',
-        fontSize: '1.2rem',
-        color: '#007bff',
-    },
-    imagePreviewContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '10px',
-        marginTop: '10px',
-    },
-    imagePreview: {
-        position: 'relative',
-        width: '100px',
-        height: '100px',
-        objectFit: 'cover',
-        borderRadius: '4px',
-        border: '1px solid #ddd',
-    },
-    removeButton: {
-        position: 'absolute',
-        top: '5px',
-        right: '5px',
-        backgroundColor: '#dc3545',
-        borderColor: '#dc3545',
-        color: '#fff',
-        borderRadius: '50%',
-        padding: '2px 6px',
-    },
-    addImageButton: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#17a2b8',
-        color: '#fff',
-        padding: '10px 15px',
-        borderRadius: '5px',
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: '16px',
-        transition: 'background-color 0.3s ease',
-    },
-    addImageButtonHover: {
-        backgroundColor: '#138496',
-    },
-    addImageIcon: {
-        marginRight: '10px',
-    },
-};
-
-function AssignmentDetail() {
+const AssignmentDetail = () => {
     const { id } = useParams();
     const [assignment, setAssignment] = useState(null);
-    const [images, setImages] = useState([]); // Stocke les images sélectionnées
+    const [images, setImages] = useState([]);
     const hiddenFileInput = useRef(null);
 
     useEffect(() => {
-        // Simuler la récupération des détails du devoir depuis une API ou une source externe
-        // Remplacer cela par un appel réel à une API
         const fetchAssignment = async () => {
-            const data = {
-                id: parseInt(id),
-                title: 'Devoir 1',
-                dueDate: '2024-08-20',
-                description: 'Description du devoir 1',
-                status: 'En attente'
-            };
-            setAssignment(data);
+            try {
+                const token = getToken();
+                const data = await fetchOneDevoir(id, token);
+                setAssignment(data);
+            } catch (error) {
+                console.error("Erreur lors de la récupération du devoir:", error);
+            }
         };
         fetchAssignment();
     }, [id]);
 
     const handleFileChange = (event) => {
-        const files = Array.from(event.target.files); // Convertir les fichiers en tableau
+        const files = Array.from(event.target.files);
         const newImages = files.map(file => ({
-            preview: URL.createObjectURL(file), // Générer un aperçu
-            raw: file // Stocker le fichier brut
+            preview: URL.createObjectURL(file),
+            raw: file
         }));
-        setImages([...images, ...newImages]); // Ajouter les nouvelles images aux précédentes
+        setImages([...images, ...newImages]);
     };
 
     const handleClick = () => {
@@ -128,22 +41,45 @@ function AssignmentDetail() {
 
     const removeImage = (index) => {
         const newImages = [...images];
-        newImages.splice(index, 1); // Supprimer l'image sélectionnée
-        setImages(newImages); // Mettre à jour l'état avec les images restantes
+        newImages.splice(index, 1);
+        setImages(newImages);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (images.length > 0) {
-            // Logique pour soumettre les images via une API ou autre méthode
-            console.log("Soumettre les images : ", images);
-            alert('Images soumises avec succès !');
+            try {
+                const token = getToken();
+                const uploadedImages = [];
+
+                // Upload each image
+                for (let image of images) {
+                    const uploadedImage = await uploadFile(image.raw, token);
+                    uploadedImages.push(uploadedImage[0].id); // Get the file ID
+                }
+
+                // Create the AnswerHistory entry
+                const answerHistoryEntry = {
+                    attachement: uploadedImages, // Array of uploaded file IDs
+                };
+                console.log('====================================');
+                console.log(answerHistoryEntry);
+                console.log('====================================');
+
+                const result = await createAnswerHistory(answerHistoryEntry, token);
+                console.log("AnswerHistory created:", result);
+                alert('Images soumises avec succès et associées à l\'historique de réponses !');
+                setImages([]); // Clear images after successful submission
+            } catch (error) {
+                console.error("Erreur lors de l'upload et de l'association des images:", error);
+                alert("Une erreur est survenue lors de l'upload des images.");
+            }
         } else {
             alert("Veuillez sélectionner des images à soumettre.");
         }
     };
 
     if (!assignment) {
-        return <div style={styles.loadingText}>Chargement...</div>;
+        return <div>Chargement...</div>;
     }
 
     return (
@@ -151,72 +87,57 @@ function AssignmentDetail() {
             <Row className="mt-4">
                 <Col>
                     <Card>
-                        <Card.Header style={styles.cardHeader}>{assignment.title}</Card.Header>
-                        <Card.Body style={styles.cardBody}>
-                            <Card.Text style={styles.cardText}>
-                                <strong>Date limite: </strong> {assignment.dueDate}
+                        <Card.Header>{assignment.titre}</Card.Header>
+                        <Card.Body>
+                            <Card.Text>
+                                <strong>Description: </strong>
+                                <div dangerouslySetInnerHTML={{ __html: assignment.description }} />
                             </Card.Text>
-                            <Card.Text style={styles.cardText}>
-                                <strong>Description: </strong> {assignment.description}
+                            <Card.Text>
+                                <strong>Statut: </strong> <span>{assignment.status}</span>
                             </Card.Text>
-                            <Card.Text style={styles.cardText}>
-                                <strong>Statut: </strong> <span style={styles.statusText}>{assignment.status}</span>
-                            </Card.Text>
-                            {assignment.status === 'En attente' && (
-                                <Form>
-                                    <Form.Group controlId="formFile" className="mb-3">
-                                        <Form.Label>Sélectionner des images pour soumettre</Form.Label>
-                                        <Button
-                                            onClick={handleClick}
-                                            style={styles.addImageButton}
-                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.addImageButtonHover.backgroundColor}
-                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.addImageButton.backgroundColor}
-                                        >
-                                            <FiImage size={20} style={styles.addImageIcon} />
-                                            Ajouter des images
-                                        </Button>
-                                        <input
-                                            type="file"
-                                            accept="image/png, image/jpeg"
-                                            ref={hiddenFileInput}
-                                            onChange={handleFileChange}
-                                            multiple // Permettre la sélection multiple
-                                            style={{ display: "none" }}
-                                        />
-                                        <div style={styles.imagePreviewContainer}>
-                                            {images.length > 0 && images.map((image, index) => (
-                                                <div key={index} className="image-preview" style={{ position: 'relative' }}>
-                                                    <img src={image.preview} alt={`Preview ${index}`} style={styles.imagePreview} />
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        onClick={() => removeImage(index)}
-                                                        style={styles.removeButton}
-                                                    >
-                                                        <FiTrash2 size={16} />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Form.Group>
-                                    <div className='d-flex justify-content-center'>
-                                        <Button
-                                            variant="primary"
-                                            style={styles.button}
-                                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor}
-                                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.button.backgroundColor}
-                                            onClick={handleSubmit}
-                                        >
-                                            Soumettre
-                                        </Button>
+                            <Form>
+                                <Form.Group controlId="formFile" className="mb-3">
+                                    <Form.Label>Sélectionner des images pour soumettre</Form.Label>
+                                    <Button onClick={handleClick}>
+                                        <FiImage size={20} />
+                                        Ajouter des images
+                                    </Button>
+                                    <input
+                                        type="file"
+                                        accept="image/png, image/jpeg"
+                                        ref={hiddenFileInput}
+                                        onChange={handleFileChange}
+                                        multiple
+                                        style={{ display: "none" }}
+                                    />
+                                    <div>
+                                        {images.length > 0 && images.map((image, index) => (
+                                            <div key={index} style={{ position: 'relative', display: 'inline-block', margin: '10px' }}>
+                                                <img src={image.preview} alt={`Preview ${index}`} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                                                <Button
+                                                    variant="outline-danger"
+                                                    onClick={() => removeImage(index)}
+                                                    style={{ position: 'absolute', top: '5px', right: '5px' }}
+                                                >
+                                                    <FiTrash2 size={16} />
+                                                </Button>
+                                            </div>
+                                        ))}
                                     </div>
-                                </Form>
-                            )}
+                                </Form.Group>
+                                <div className='d-flex justify-content-center'>
+                                    <Button variant="primary" onClick={handleSubmit}>
+                                        Soumettre
+                                    </Button>
+                                </div>
+                            </Form>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
         </Container>
     );
-}
+};
 
 export default AssignmentDetail;

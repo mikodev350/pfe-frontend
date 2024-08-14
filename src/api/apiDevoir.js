@@ -99,6 +99,27 @@ export const fetchAssignations = async (group, TypeElement, type, token) => {
 
   return response.data;
 };
+/**********************************************************************************************************/
+export const fetchOneDevoir = async (id, token) => {
+  try {
+    console.log("====================================");
+    console.log("id");
+    console.log(id);
+    console.log("====================================");
+    console.log("token");
+    console.log(token);
+    console.log("====================================");
+    const response = await axios.get(`${API_BASE_URL}/devoirs/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération du devoir:", error);
+    throw error;
+  }
+};
 /******************************************************/
 // Delete an Assignation
 // / Fonction pour supprimer une assignation
@@ -127,5 +148,27 @@ export const deleteAssignation = async (
   } catch (error) {
     console.error("Failed to delete assignation", error);
     throw new Error("Failed to delete assignation");
+  }
+};
+
+/**************************************************************************************************************/
+export const fetchStudentAssignations = async (token) => {
+  console.log("fetchStudentAssignations");
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/assignations-custom/student`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des assignations de l'étudiant :",
+      error
+    );
+    throw error;
   }
 };
