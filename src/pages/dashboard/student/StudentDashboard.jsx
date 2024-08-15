@@ -27,6 +27,7 @@ import ListeEtudiants from "../../../components/liste-etudiants/ListeEtudiants";
 import Progression from "../../../components/progression/Progression";
 import Quiz from "../../quiz/quiz/Quiz";
 import Quizzes from "../../quiz/quiz/Quizzes";
+import Evaluation from "../../quiz/evaluation/Evaluation";
 
 
 
@@ -103,6 +104,7 @@ export default function StudentDashboard() {
         {/* ***************************************************************************************************** */}
 
           <Route path="/quiz" element={<Quiz />} />
+           <Route path="/evaluation/quiz" element={<Evaluation  />} />
           <Route path="/quizzes" element={<Quizzes />} />
 
         {/* LISTE ETUDIANT / GROUOPPPEE  */}

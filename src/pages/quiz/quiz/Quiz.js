@@ -133,7 +133,7 @@ export default function Quiz() {
     });
   };
   return (
-    <Layout>
+    <>
       <h2>{id ? "Edit QUIZ" : "ADD NEW QUIZ"}</h2>
       <Form onSubmit={submit} style={{ paddingBottom: "200px" }}>
         <Card style={{ marginBottom: "50px" }}>
@@ -292,6 +292,6 @@ export default function Quiz() {
           </>
         )}
       </Form>
-    </Layout>
+    </>
   );
 }
