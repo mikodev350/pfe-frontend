@@ -10,7 +10,7 @@ import CreateModelGroupe from "../../components/create-groupe/Create-model-group
 import { fetchGroupConversations, fetchPrivateConversations } from "../../api/apiConversation";
 
 const API_BASE_URL = "http://localhost:1337";
-const GROUP_IMAGE_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxUv4CmCk5Vn_z61JnwvIzcdzDuJjZYd9ZxA&s";
+const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
 
 // const AvatarWithName = (participants, type, id, title) => {
 //   let imageUrl = "";
@@ -63,6 +63,7 @@ const AvatarWithName = (participants, type, id, title) => {
 
 
 const ChatApp = () => {
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const navigate = useNavigate();
@@ -99,9 +100,12 @@ const ChatApp = () => {
         <StyledContainer>
           <Row>
             <Col md={4} className={`sidebar ${showSidebar ? "show" : ""}`}>
-              <StyledCreateGroupButton onClick={() => {}}>
-                Create Group
-              </StyledCreateGroupButton>
+            
+<CreateModelGroupe 
+  show={showCreateGroupModal} 
+  handleClose={() => setShowCreateGroupModal(false)} 
+/>
+
               <StyledTabs defaultActiveKey="private">
                 <StyledTab eventKey="private" title="Private">
                   <StyledListGroup>

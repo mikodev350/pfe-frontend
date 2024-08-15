@@ -5,26 +5,39 @@ import { FiTrash2, FiImage } from 'react-icons/fi';
 import { fetchOneDevoir } from './../../api/apiDevoir';
 import { getToken } from '../../util/authUtils';
 import { uploadFile } from './../../api/apiUpload';
-import { createAnswerHistory } from './../../api/apiReponseStudent'; // Import the function
+import { checkDevoir, putDevoir } from './../../api/apiReponseStudent'; // Import the functions
 
 const AssignmentDetail = () => {
     const { id } = useParams();
     const [assignment, setAssignment] = useState(null);
     const [images, setImages] = useState([]);
+    const [canSubmit, setCanSubmit] = useState(true); // State to track if user can submit
+    const [isUpdate, setIsUpdate] = useState(false); // Track if the assignment is an update
     const hiddenFileInput = useRef(null);
+    const token = getToken();
 
     useEffect(() => {
         const fetchAssignment = async () => {
             try {
-                const token = getToken();
                 const data = await fetchOneDevoir(id, token);
                 setAssignment(data);
+
+                // Check if the student has already completed the devoir
+                const checkResult = await checkDevoir(id, token);
+                if (checkResult.update) {
+                    alert("Vous avez déjà soumis ce devoir. Vous pouvez le mettre à jour.");
+                    setCanSubmit(true);
+                    setIsUpdate(true); // Mark this as an update
+                } else {
+                    setCanSubmit(true);
+                    setIsUpdate(false);
+                }
             } catch (error) {
                 console.error("Erreur lors de la récupération du devoir:", error);
             }
         };
         fetchAssignment();
-    }, [id]);
+    }, [id, token]);
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
@@ -46,9 +59,13 @@ const AssignmentDetail = () => {
     };
 
     const handleSubmit = async () => {
+        if (!canSubmit) {
+            alert("Vous ne pouvez pas soumettre ce devoir.");
+            return;
+        }
+
         if (images.length > 0) {
             try {
-                const token = getToken();
                 const uploadedImages = [];
 
                 // Upload each image
@@ -57,17 +74,18 @@ const AssignmentDetail = () => {
                     uploadedImages.push(uploadedImage[0].id); // Get the file ID
                 }
 
-                // Create the AnswerHistory entry
+                // Prepare the payload for submission
                 const answerHistoryEntry = {
                     attachement: uploadedImages, // Array of uploaded file IDs
                 };
-                console.log('====================================');
-                console.log(answerHistoryEntry);
-                console.log('====================================');
 
-                const result = await createAnswerHistory(answerHistoryEntry, token);
-                console.log("AnswerHistory created:", result);
-                alert('Images soumises avec succès et associées à l\'historique de réponses !');
+                const result = await putDevoir(id, answerHistoryEntry, token);
+                if (isUpdate) {
+                    alert('Votre devoir a été mis à jour avec succès.');
+                } else {
+                    alert('Images soumises avec succès et associées à l\'historique de réponses !');
+                }
+
                 setImages([]); // Clear images after successful submission
             } catch (error) {
                 console.error("Erreur lors de l'upload et de l'association des images:", error);
@@ -99,9 +117,9 @@ const AssignmentDetail = () => {
                             <Form>
                                 <Form.Group controlId="formFile" className="mb-3">
                                     <Form.Label>Sélectionner des images pour soumettre</Form.Label>
-                                    <Button onClick={handleClick}>
+                                    <Button onClick={handleClick} disabled={!canSubmit}>
                                         <FiImage size={20} />
-                                        Ajouter des images
+                                        {isUpdate ? "Mettre à jour les images" : "Ajouter des images"}
                                     </Button>
                                     <input
                                         type="file"
@@ -127,8 +145,8 @@ const AssignmentDetail = () => {
                                     </div>
                                 </Form.Group>
                                 <div className='d-flex justify-content-center'>
-                                    <Button variant="primary" onClick={handleSubmit}>
-                                        Soumettre
+                                    <Button variant="primary" onClick={handleSubmit} disabled={!canSubmit}>
+                                        {isUpdate ? "Mettre à jour" : "Soumettre"}
                                     </Button>
                                 </div>
                             </Form>

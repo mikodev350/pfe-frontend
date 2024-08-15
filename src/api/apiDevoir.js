@@ -84,11 +84,18 @@ export const createAssignation = async (newAssignation, token) => {
 /****************************************************************************/
 
 // Fonction pour récupérer les assignations
-export const fetchAssignations = async (group, TypeElement, type, token) => {
+export const fetchAssignations = async (
+  group,
+  TypeElement,
+  type,
+  IdEtudiant,
+  token
+) => {
   const params = {
     group: group,
     type: type.toUpperCase(),
     TypeElement: TypeElement,
+    etudantId: IdEtudiant,
   };
   const response = await axios.get(`${API_BASE_URL}/assignations`, {
     headers: {

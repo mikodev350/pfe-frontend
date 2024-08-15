@@ -35,6 +35,7 @@ import HomeDashboard from "../../../components/home-dashboard/HomeDashboard";
 import AssignmentList from "../../../components/assignment-list/assignmentList";
 import AssignmentDetail from "../../../components/assignment-detail/assignmentDetail";
 import AssignmentSubmit from "../../../components/assignment-submit/AssignmentSubmit";
+import AllAssignationsDevoir from "../../../components/all-assignations-devoir/AllAssignationsDevoir";
  
 
 export default function StudentDashboard() {
@@ -49,8 +50,6 @@ export default function StudentDashboard() {
  
         {/****************************************************************************************************** */}
  
-
-
         <Route path="home"  element={<HomeDashboard />} />
         {/* ***************************************************************************************************** */}
  
@@ -135,6 +134,8 @@ export default function StudentDashboard() {
 
 
         {/* Coteerr etuidant Assignment */}
+                <Route path="/devoir/correction" element={<AllAssignationsDevoir />} />
+
                             <Route
                         path="/assignments"
                         element={<AssignmentList />}
@@ -147,6 +148,7 @@ export default function StudentDashboard() {
                         path="/assignments/:id/submit"
                         element={<AssignmentSubmit  />}
                     />
+
 
       </Routes>
     </Layout>

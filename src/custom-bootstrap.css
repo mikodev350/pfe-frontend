@@ -3,8 +3,9 @@
 input.react-datepicker-ignore-onclickoutside,
 input.date-inputs,
 .Img-brd,
+.css-qbdosj-Input,
 .accordion-item {
-    border-radius: 15px !important;
+    border-radius: 20px !important;
 }
 
 .form-control,
@@ -239,7 +240,7 @@ select.form-select {
     padding: 15px 20px;
     margin: 8px 0;
     box-sizing: border-box;
-    border-radius: 5px;
+    border-radius: 16px;
     border: none;
     color: white;
     border: 1px solid rgb(92, 92, 92);

@@ -56,7 +56,8 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
 
   const fetchAssignationsWithLogic = async (groupId, assignmentType, token) => {
     const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
-    const response = await fetchAssignations(groupId, TypeElement, assignmentType, token);
+    const IdEtudiant =  !selectedStudentOrGroup.membres ? selectedStudentOrGroup.id :null;
+    const response = await fetchAssignations(groupId, TypeElement, assignmentType,IdEtudiant, token);
     return response;
   };
 

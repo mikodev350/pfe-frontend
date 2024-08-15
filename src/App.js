@@ -50,26 +50,3 @@ function App() {
 }
 
 export default App;
-
-// // App.js
-// import React from "react";
-// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-// import Home from "./pages/home/Home";
-// import CustomNavbar from "./pages/home/other-header";
-// import Login from "./pages/login/Login";
-
-// <CustomNavbar />
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/login" element={<Login />} />
-//         {/* Ajoutez d'autres routes ici */}
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
