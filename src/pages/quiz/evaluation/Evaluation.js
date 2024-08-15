@@ -50,7 +50,7 @@ export default function Evaluation() {
   // ------- we should use sotket to onEndEvaluation result ----------- //
   const onEndEvaluation = async (e) => {
     socket.emit("end-quiz", {
-      assignationId: 1,
+      assignationId: id,
     });
     return navigate("/student/my-profile");
   };
