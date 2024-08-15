@@ -7,15 +7,14 @@ import Tab from 'react-bootstrap/Tab';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Select from 'react-select';
-import { FiMessageSquare, FiFileText, FiBarChart2, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiMessageSquare, FiFileText, FiBarChart2, FiPlus, FiEdit2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchStudents, fetchGroups, createGroup, updateGroup, deleteGroup } from '../../api/apiStudent';
+import { useQuery } from 'react-query';
+import { fetchStudents } from '../../api/apiStudent'; // Assurez-vous que le chemin est correct
 import { Col, Row } from 'react-bootstrap';
-import SearchForm from '../../components/searchForm/SearchForm';
-import { getToken } from '../../util/authUtils';
-import DevoirModal from '../DevoirModalSend/DevoirModal';
+import SearchForm from '../../components/searchForm/SearchForm'; // Assurez-vous que le chemin est correct
 
+// Styles en ligne
 const styles = {
   tabsContainer: {
     marginBottom: '20px',
@@ -104,56 +103,23 @@ const styles = {
   },
 };
 
+const groupesEtudiants = [
+  { id: 1, nom: 'Groupe 1', role: 'Projet JavaScript', date: '21.08.2023', membres: ['Alice Dupont', 'Bob Martin'] },
+  { id: 2, nom: 'Groupe 2', role: 'Projet React', date: '20.08.2023', membres: ['Claire Dubois'] },
+];
+
 const ListeEtudiants = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [groupName, setGroupName] = useState('');
   const [selectedMembers, setSelectedMembers] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [groupSearchValue, setGroupSearchValue] = useState(""); 
-  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
-  const [assignmentType, setAssignmentType] = useState('');
-  const [selectedStudentOrGroup, setSelectedStudentOrGroup] = useState(null);
+  const [searchValue, setSearchValue] = useState(""); // Ajout de l'état de recherche
 
-  const queryClient = useQueryClient();
-  const token = React.useMemo(() => getToken(), []);
-
-  const { data: students, error: studentError, isLoading: isLoadingStudents } = useQuery(
+  // Utilisation de React Query pour récupérer les étudiants avec la recherche
+  const { data, error, isLoading } = useQuery(
     ['students', searchValue],
-    () => fetchStudents(searchValue, token)
-  );
-
-  const { data: groups, error: groupError, isLoading: isLoadingGroups } = useQuery(
-    ['groups', groupSearchValue],
-    () => fetchGroups(token, groupSearchValue)
-  );
-
-  const createGroupMutation = useMutation(
-    (newGroup) => createGroup(newGroup, token),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('groups');
-      },
-    }
-  );
-
-  const updateGroupMutation = useMutation(
-    (updatedGroup) => updateGroup(updatedGroup.id, updatedGroup, token),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('groups');
-      },
-    }
-  );
-
-  const deleteGroupMutation = useMutation(
-    (groupId) => deleteGroup(groupId, token),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('groups');
-      },
-    }
+    () => fetchStudents(searchValue, localStorage.getItem('token'))
   );
 
   const handleShowModal = () => setShowModal(true);
@@ -165,76 +131,62 @@ const ListeEtudiants = () => {
   };
 
   const handleGroupNameChange = (e) => setGroupName(e.target.value);
-  const handleMembersChange = (selectedOptions) => setSelectedMembers(selectedOptions);
-  const handleSearch = (value) => setSearchValue(value);
-  const handleGroupSearch = (value) => setGroupSearchValue(value);
-  
-  const handleOpenAssignmentModal = (type, entity) => {
-    setAssignmentType(type);
-    setSelectedStudentOrGroup(entity);
-    setShowAssignmentModal(true);
+
+  const handleMembersChange = (selectedOptions) => {
+    setSelectedMembers(selectedOptions);
   };
 
-  const handleCloseAssignmentModal = () => {
-    setShowAssignmentModal(false);
-    setAssignmentType('');
-    setSelectedStudentOrGroup(null);
+  const handleSearch = (value) => {
+    setSearchValue(value);
   };
 
   const handleSubmit = () => {
-    const groupData = {
-      nom: groupName,
-      members: selectedMembers.map((member) => member.value),
-    };
-
     if (isEditing) {
-      updateGroupMutation.mutate({ id: selectedGroup.id, ...groupData });
+      console.log('Groupe modifié :', selectedGroup, 'Nouveau nom :', groupName, 'Nouveaux membres:', selectedMembers);
     } else {
-      createGroupMutation.mutate(groupData);
+      console.log('Nouveau groupe créé :', groupName, 'avec les membres:', selectedMembers);
     }
-
-    handleCloseModal();
+    handleCloseModal(); // Utilisation de handleCloseModal pour fermer et réinitialiser
   };
 
-  const handleEditGroup = (group) => {
+  const handleEditGroup = (groupe) => {
     setIsEditing(true);
-    setSelectedGroup(group);
-    setGroupName(group.nom);
-    setSelectedMembers(group.membres.map((member) => ({
-      value: member.id,
-      label: member.username,
+    setSelectedGroup(groupe);
+    setGroupName(groupe.nom);
+    setSelectedMembers(groupe.membres.map((membre) => ({
+      value: data?.find((etudiant) => etudiant.username === membre).id,
+      label: membre,
     })));
     setShowModal(true);
-  };
-
-  const handleDeleteGroup = (groupId) => {
-    deleteGroupMutation.mutate(groupId);
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <div style={styles.tabsContainer}>
+        
         <Tabs defaultActiveKey="individuels" id="etudiants-tabs" className="mb-3">
           <Tab eventKey="individuels" title="Étudiants Individuels">
             <Card style={styles.card}>
-              <Row style={{ marginBottom: '20px' }}>
-                <div className="d-flex flex-row-reverse">
-                  <Col xs={12} md={12} lg={4}>
-                    <SearchForm searchValue={searchValue} onSearch={handleSearch} />
-                  </Col>
-                </div>
-              </Row>
-              <h3>Étudiants Individuels</h3>
 
-              {isLoadingStudents ? (
+                <Row style={{ marginBottom: '20px' }}>
+    <div  className="d-flex flex-row-reverse">
+          <Col xs={12} md={12} lg={4}>
+            <SearchForm searchValue={searchValue} onSearch={handleSearch} />
+          </Col>
+    </div>
+
+        </Row>
+              <h3>Étudiants Individuels</h3>
+            
+              {isLoading ? (
                 <p>Chargement...</p>
-              ) : studentError ? (
-                <p>Erreur lors du chargement des étudiants: {studentError.message}</p>
+              ) : error ? (
+                <p>Erreur lors du chargement des étudiants: {error.message}</p>
               ) : (
                 <ListGroup variant="flush">
-                  {students?.map((student) => (
+                  {data?.map((etudiant) => (
                     <ListGroup.Item
-                      key={student.id}
+                      key={etudiant.id}
                       style={styles.listItem}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'scale(1.03)';
@@ -246,23 +198,18 @@ const ListeEtudiants = () => {
                       }}
                     >
                       <div style={styles.iconContainer}>
-                        <span>{student.username.charAt(0)}</span>
+                        <span>{etudiant.username.charAt(0)}</span>
                       </div>
-                      <div style={styles.name}>{student.username}</div>
-                      <div style={styles.detail}>{student.email}</div>
+                      <div style={styles.name}>{etudiant.username}</div>
+                      <div style={styles.detail}>{etudiant.email}</div>
                       <div style={styles.actions}>
                         <Link to="/" style={styles.button} title="Message">
                           <FiMessageSquare size={20} />
                         </Link>
-                        <Button
-                          variant="link"
-                          style={{ ...styles.button, color: '#17a2b8' }}
-                          onClick={() => handleOpenAssignmentModal('Devoir', student)}
-                          title="Assigner un Devoir"
-                        >
+                        <Link to="/" style={styles.button} title="Quiz/Devoirs">
                           <FiFileText size={20} />
-                        </Button>
-                        <Link to={`/student/progression/student/${student.id}`} style={styles.button} title="Progress">
+                        </Link>
+                        <Link to={`/student/progression/student/${etudiant.id}`} style={styles.button} title="Progress">
                           <FiBarChart2 size={20} />
                         </Link>
                       </div>
@@ -274,88 +221,57 @@ const ListeEtudiants = () => {
           </Tab>
           <Tab eventKey="groupes" title="Groupes d'Étudiants">
             <Card style={styles.card}>
-              <Row style={{ marginBottom: '20px' }}>
-                <div className="d-flex flex-row-reverse">
-                  <Col xs={12} md={12} lg={4}>
-                    <SearchForm searchValue={groupSearchValue} onSearch={handleGroupSearch} />
-                  </Col>
-                </div>
-              </Row>
-              <h3>Groupes d'Étudiants</h3>
               <Button style={styles.addButton} onClick={handleShowModal}>
                 <FiPlus size={20} style={{ marginRight: '8px' }} />
                 Créer un Groupe
               </Button>
-              {isLoadingGroups ? (
-                <p>Chargement...</p>
-              ) : groupError ? (
-                <p>Erreur lors du chargement des groupes: {groupError.message}</p>
-              ) : (
-                <ListGroup variant="flush">
-                  {groups?.map((group) => (
-                    <ListGroup.Item
-                      key={group.id}
-                      style={styles.listItem}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.03)';
-                        e.currentTarget.style.boxShadow = '0px 8px 16px rgba(0, 0, 0, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.0)';
-                        e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.05)';
-                      }}
-                    >
-                      <div style={styles.iconContainer}>
-                        <span>{group.nom.charAt(0)}</span>
+              <h3>Groupes d'Étudiants</h3>
+              <ListGroup variant="flush">
+                {groupesEtudiants.map((groupe) => (
+                  <ListGroup.Item
+                    key={groupe.id}
+                    style={styles.listItem}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.03)';
+                      e.currentTarget.style.boxShadow = '0px 8px 16px rgba(0, 0, 0, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.0)';
+                      e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.05)';
+                    }}
+                  >
+                    <div style={styles.iconContainer}>
+                      <span>{groupe.nom.charAt(0)}</span>
+                    </div>
+                    <div style={styles.name}>
+                      {groupe.nom}
+                      <div style={{ fontSize: '0.85rem', color: '#6c757d' }}>
+                        Membres: {groupe.membres.join(', ')}
                       </div>
-                      <div style={styles.name}>
-                        {group.nom}
-                        <div style={{ fontSize: '0.85rem', color: '#6c757d' }}>
-                          {group.membres && group.membres.length > 0 ? (
-                            <span>
-                              Membres: {group.membres.map((member) => member.username).join(', ')}
-                            </span>
-                          ) : (
-                            <p>Aucun membre</p>
-                          )}
-                        </div>
-                      </div>
-                      <div style={styles.detail}>
-                        <span>Professeur: {group.professeur.username}</span>
-                      </div>
-                      <div style={styles.actions}>
-                        <Link to={`/student/progression/group/${group.id}`} style={styles.button} title="Progress">
-                          <FiBarChart2 size={20} />
-                        </Link>
-                        <Button
-                          variant="link"
-                          style={{ ...styles.button, color: '#17a2b8' }}
-                          onClick={() => handleOpenAssignmentModal('Devoir', group)}
-                          title="Assigner un Devoir"
-                        >
-                          <FiFileText size={20} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          style={{ ...styles.button, color: '#007bff' }}
-                          onClick={() => handleEditGroup(group)}
-                          title="Modifier le Groupe"
-                        >
-                          <FiEdit2 size={20} />
-                        </Button>
-                        <Button
-                          variant="link"
-                          style={{ ...styles.button, color: '#dc3545' }}
-                          onClick={() => handleDeleteGroup(group.id)}
-                          title="Supprimer le Groupe"
-                        >
-                          <FiTrash2 size={20} />
-                        </Button>
-                      </div>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
+                    </div>
+                    <div style={styles.detail}>{groupe.role}</div>
+                    <div style={styles.actions}>
+                      <Link to="/" style={styles.button} title="Message">
+                        <FiMessageSquare size={20} />
+                      </Link>
+                      <Link to="/" style={styles.button} title="Quiz/Devoirs">
+                        <FiFileText size={20} />
+                      </Link>
+                      <Link to={`/student/progression/group/${groupe.id}`} style={styles.button} title="Progress">
+                        <FiBarChart2 size={20} />
+                      </Link>
+                      <Button
+                        variant="link"
+                        style={{ ...styles.button, color: '#007bff' }}
+                        onClick={() => handleEditGroup(groupe)}
+                        title="Modifier le Groupe"
+                      >
+                        <FiEdit2 size={20} />
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </Card>
           </Tab>
         </Tabs>
@@ -381,9 +297,9 @@ const ListeEtudiants = () => {
               <Form.Label>Sélectionner les Membres</Form.Label>
               <Select
                 isMulti
-                options={students?.map((student) => ({
-                  value: student.id,
-                  label: student.username,
+                options={data?.map((etudiant) => ({
+                  value: etudiant.id,
+                  label: etudiant.username,
                 }))}
                 value={selectedMembers}
                 onChange={handleMembersChange}
@@ -401,15 +317,6 @@ const ListeEtudiants = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Modal pour assigner un devoir */}
-      <DevoirModal 
-        show={showAssignmentModal} 
-        handleClose={handleCloseAssignmentModal} 
-        selectedStudentOrGroup={selectedStudentOrGroup}
-        assignmentType={assignmentType} 
-        groupId={selectedStudentOrGroup?.id} // Passez l'ID de l'entité sélectionnée (groupe ou étudiant)
-      />
     </div>
   );
 };
