@@ -25,11 +25,11 @@ export default function Quizzes() {
   }, []);
 
   const onhandleredirect = (id) => {
-    navigate(`/quiz?id=${id}`);
+    navigate(`/student/quiz?id=${id}`);
   };
 
   const onhandleNewQuiz = () => {
-    navigate(`/quiz`);
+    navigate(`/student/quiz`);
   };
 
   const handleDelete = (id) => {};

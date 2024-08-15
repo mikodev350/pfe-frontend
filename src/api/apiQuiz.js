@@ -24,6 +24,17 @@ export const getQuiz = async ({ token, id }) => {
   return response.data;
 };
 
+export const getQuizTest = async ({ token, id }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.get(`${API_BASE_URL}/take-quiz/${id}`, config);
+
+  return response.data;
+};
+
 export const getQuizzes = async ({ token }) => {
   const config = {
     headers: {
