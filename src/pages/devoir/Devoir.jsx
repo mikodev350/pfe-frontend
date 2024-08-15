@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AllDevoirs from '../../components/all-devoirs/AllDevoirs';
-import DevoirForm from '../../components/devoir-form/DevoirForm';
 
 const Devoir = () => {
   const navigate = useNavigate();
