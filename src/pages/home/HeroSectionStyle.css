@@ -19,25 +19,14 @@
     transform: translatey(0px);
   }
 }
-
+.imgStyle {
+  width: 450px;
+  height: auto;
+  margin-left: 70px;
+  margin-top: -30px;
+}
 .hero-big {
   animation: float 3s ease-in-out infinite;
-}
-.hero__big-shape {
-  position: absolute;
-  top: 0;
-  right: 0; /* Positionner à droite */
-  width: 200rem; /* Taille ajustée (300px initial + 100px) */
-  height: 65rem; /* Taille ajustée (300px initial + 100px) */
-  background-color: #eea22922;
-  border-radius: 10%;
-  border-top-left-radius: 40px;
-  z-index: 0;
-  transform: translate(
-    50%,
-    -50%
-  ); /* Ajuster la transformation pour aligner correctement */
-  pointer-events: none;
 }
 .hero__big-shape2 {
   position: absolute;
@@ -55,31 +44,46 @@
   ); /* Ajuster la transformation pour aligner correctement */
   pointer-events: none;
 }
-.hero__small-shape {
-  position: absolute;
-  bottom: 600px;
-  right: -100px;
-  width: 20rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
-  height: 20rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
-  background-color: #eea22922;/* Même couleur que la grande forme */
-  border-radius: 50%;
-  border-top-left-radius: 20px; /* Ajustez si nécessaire */
-  z-index: 0; /* Assurez-vous que la forme est derrière le contenu */
-  transform: translate(0%, 0%); /* Pas de transformation nécessaire */
-  pointer-events: none; /* Assurez-vous que la forme n'interfère pas avec les interactions */
-}
 
-.hero__small-shape2 {
-  position: absolute;
-  bottom: 230px;
-  left: -200px;
-  width: 22rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
-  height: 22rem; /* Taille de la petite forme, ajustée par rapport à la grande forme */
-  background-color: #eea22955; /* Même couleur que la grande forme */
-  border-radius: 50%;
-  border-top-left-radius: 20px; /* Ajustez si nécessaire */
-  z-index: 0; /* Assurez-vous que la forme est derrière le contenu */
-  transform: translate(0%, 0%); /* Pas de transformation nécessaire */
-  pointer-events: none; /* Assurez-vous que la forme n'interfère pas avec les interactions */
+/* Styles pour les écrans de taille inférieure à 992px */
+@media (max-width: 991px){
+  .yellow-shape{
+    display: none;
+  }
+  .imgStyle {
+    margin-left: -11px; /* Pas de marge à gauche */
+  }
+  .hero__content .hero__title  {
+ font-size:40px;
+  }
 }
+@media (max-width: 770px) {
+  .container .imgStyle {
+    overflow: hidden !important;
+    width: 90%;
+    margin-top: 10px;
+    margin-left: 20px;
+  }
+  .hero__content .hero__title  {
+    
+ font-size:30px;
+  }
 
+  .hero__big-shape2 {
+    width:350%;
+  height:80%;
+
+  }
+  .row{
+    display: flex;
+    flex-wrap:wrap;
+    flex-direction:column-reverse;
+  }
+  @media (max-width: 575px) {
+    .hero__big-shape2 {
+      width:350%;
+    height:100%;
+  
+    }
+}
+}

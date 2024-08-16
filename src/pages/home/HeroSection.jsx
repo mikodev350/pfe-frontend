@@ -40,7 +40,7 @@ const HeroSection = () => {
               <div className="hero__thumb-wrapper">
                 <div className="hero__thumb-2 scene">
                   {/* ****** Ajoutit image t3 hero ****** */}
-                  <div style={{ width: 450, height: "auto",marginLeft:70,marginTop:-30 }}>
+                  <div className='imgStyle'>
                     <Ratio>
                       <embed src={headerimg} />
                     </Ratio>

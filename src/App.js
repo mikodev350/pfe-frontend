@@ -38,6 +38,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/student/*" element={<StudentDashboard />} />
+          <Route path="/dashbord" element={<mainDashbord/>} />
           <Route path="/chat" element={<ChatApp />} />
           <Route path="/settings/*" element={<Settings />} />
         </Routes>

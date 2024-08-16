@@ -65,7 +65,7 @@ const Footer = () => {
           </div>
         </div>
         {/* Short Border Line */}
-        <div style={{ borderBottom: '1px solid #1e80c9', width: '450px', margin: '5px auto' }}></div>
+        {/* <div style={{ borderBottom: '1px solid #1e80c9', width: '450px', margin: '5px auto' }}></div> */}
         {/* Social Icons */}
         <div className="footer__social text-center" style={{ padding: '20px 0' }}>
           <ul className="d-flex justify-content-center gap-3 list-unstyled">
