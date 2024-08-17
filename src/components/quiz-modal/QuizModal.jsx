@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { useQuery } from 'react-query';
-import { fetchForModelDevoirs, createAssignation, deleteAssignation, fetchAssignations } from '../../api/apiDevoir';
 import { useMutation, useQueryClient } from 'react-query';
 import { getToken } from '../../util/authUtils';
+import { getQuizzes } from '../../api/apiQuiz';
 import { FiTrash2 } from 'react-icons/fi';
+import {  createAssignation, deleteAssignation, fetchAssignations } from '../../api/apiDevoir';
+
+
+
+
 
 const styles = {
   modalTitle: {
@@ -39,46 +44,56 @@ const styles = {
   },
 };
 
-const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType, groupId }) => {
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
+const QuizModal = ({ show, handleClose, selectedStudentOrGroup, groupId }) => {
+  const [selectedQuizzes, setSelectedQuizzes] = useState([]);
   const [showSelect, setShowSelect] = useState(false);
   const queryClient = useQueryClient();
   const token = React.useMemo(() => getToken(), []);
 
-  // Récupérer les devoirs ou quiz disponibles selon le type d'assignation
+  // Récupérer les quiz disponibles
   const {
-    data: assignmentOptions,
-    isLoading: isLoadingAssignments,
-    error: errorAssignments,
-  } = useQuery([assignmentType, token], () => fetchForModelDevoirs(token, assignmentType), {
-    select: (response) => response.data.map(assignment => ({ value: assignment.id, label: assignment.titre })),
+    data: quizOptions,
+    isLoading: isLoadingQuizzes,
+    error: errorQuizzes,
+  } = useQuery(['quiz', token], () => getQuizzes({token}), {
+    select: (response) => response.map(quiz => ({ value: quiz.id, label: quiz.titre })),
   });
 
-  const fetchAssignationsWithLogic = async (groupId, assignmentType, token) => {
-      if (!selectedStudentOrGroup) return [];
+  // const fetchAssignationsWithLogic = async (groupId, token) => {
+  //   const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
+  //   const response = await fetchAssignations(groupId, TypeElement,'QUIZ' ,token);
+  //   return response;
+  // };
 
-    const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
-    const response = await fetchAssignations(groupId, TypeElement, assignmentType, token);
-    console.log("response  of devoirrr ");
-    console.log(response);
-    
-    
-    return response;
-  };
+/*************************************************************************************/
+const fetchAssignationsWithLogic = async (groupId, token) => {
+  if (!selectedStudentOrGroup) return [];
+
+  const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
+  const response = await fetchAssignations(groupId, TypeElement, 'QUIZ', token);
+  return response;
+};
+
+/***************************************************************************************/  
+
+
+
+
+
 
   const {
     data: assignations,
     isLoading: isLoadingAssignations,
     error: errorAssignations,
   } = useQuery(
-    ['assignations', groupId, assignmentType],
-    () => fetchAssignationsWithLogic(groupId, assignmentType, token)
+    ['assignationsQuiz', groupId],
+    () => fetchAssignationsWithLogic(groupId, token)
   );
 
   const mutation = useMutation(
-    ({ entityData, token }) => createAssignation(entityData, token,"DEVOIR"), {
+    ({ entityData, token }) => createAssignation(entityData, token,"QUIZ"), {
       onSuccess: () => {
-        queryClient.invalidateQueries([assignmentType]);
+        queryClient.invalidateQueries(['quiz']);
         handleClose();
       },
       onError: (error) => {
@@ -87,17 +102,17 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
   });
 
   const deleteMutation = useMutation(
-    (assignationId) => deleteAssignation(assignationId, groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", assignmentType, token), {
+    (assignationId) => deleteAssignation(assignationId, groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", token), {
       onSuccess: () => {
-        queryClient.invalidateQueries(['assignations', groupId, assignmentType]);
+        queryClient.invalidateQueries(['assignationsQuiz', groupId]);
       },
       onError: (error) => {
         console.error('Erreur lors de la suppression de l\'assignation:', error);
       },
   });
 
-  const handleAssignmentChange = (selectedOptions) => {
-    setSelectedAssignments(selectedOptions);
+  const handleQuizChange = (selectedOptions) => {
+    setSelectedQuizzes(selectedOptions);
   };
 
   const handleDelete = (assignationId) => {
@@ -121,8 +136,7 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
     mutation.mutate({
       entityData: {
         ...entityData,
-        assignments: selectedAssignments.map(assignment => assignment.value),
-        TypeOfasssignation: assignmentType.toUpperCase(),
+      assignments: selectedQuizzes.map((quiz) => quiz.value)
       },
       token,
     });
@@ -132,30 +146,30 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
     setShowSelect(false);
   };
 
-  if (isLoadingAssignments || isLoadingAssignations) return <p>Chargement...</p>;
-  if (errorAssignments) return <p>Erreur lors du chargement des {assignmentType}s: {errorAssignments.message}</p>;
+  if (isLoadingQuizzes || isLoadingAssignations) return <p>Chargement...</p>;
+  if (errorQuizzes) return <p>Erreur lors du chargement des quiz: {errorQuizzes.message}</p>;
   if (errorAssignations) return <p>Erreur lors du chargement des assignations: {errorAssignations.message}</p>;
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title style={styles.modalTitle}>Assigner un {assignmentType}</Modal.Title>
+        <Modal.Title style={styles.modalTitle}>Assigner un Quiz</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {!showSelect ? (
           <>
             <ListGroup>
               {assignations && assignations.length > 0 ? (
-                assignations.map((assignment, index) => (
+                assignations.map((quiz, index) => (
                   <ListGroup.Item key={index} style={styles.listItem}>
                     <div>
-                      <strong>{assignment.titre}</strong>
-                      <div>{assignment.date}</div>
+                      <strong>{quiz.titre}</strong>
+                      <div>{quiz.date}</div>
                     </div>
                     <Button
                       variant="link"
                       style={styles.deleteButton}
-                      onClick={() => handleDelete(assignment.id)}
+                      onClick={() => handleDelete(quiz.id)}
                       title="Supprimer"
                     >
                       <FiTrash2 size={20} />
@@ -163,23 +177,23 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
                   </ListGroup.Item>
                 ))
               ) : (
-                <p>Aucun {assignmentType} assigné pour le moment.</p>
+                <p>Aucun quiz assigné pour le moment.</p>
               )}
             </ListGroup>
             <Button variant="primary" onClick={() => setShowSelect(true)} style={styles.addButton}>
-              Ajouter un {assignmentType}
+              Ajouter un Quiz
             </Button>
           </>
         ) : (
           <>
-            <Form.Group controlId="assignmentSelect">
-              <Form.Label>Sélectionner les {assignmentType}s à assigner</Form.Label>
+            <Form.Group controlId="quizSelect">
+              <Form.Label>Sélectionner les Quiz à assigner</Form.Label>
               <Select
                 isMulti
-                options={assignmentOptions}
-                value={selectedAssignments}
-                onChange={handleAssignmentChange}
-                placeholder={`Sélectionnez les ${assignmentType}s`}
+                options={quizOptions}
+                value={selectedQuizzes}
+                onChange={handleQuizChange}
+                placeholder="Sélectionnez les quiz"
               />
             </Form.Group>
             <Button variant="secondary" onClick={handleBack} style={styles.secondaryButton}>
@@ -200,4 +214,4 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
   );
 };
 
-export default DevoirModal;
+export default QuizModal;

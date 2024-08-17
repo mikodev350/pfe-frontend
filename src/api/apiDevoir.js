@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "./../util/authUtils";
 
 const API_BASE_URL = "http://localhost:1337/api";
 
@@ -67,11 +68,20 @@ export const fetchForModelDevoirs = async (token) => {
   return response.data;
 };
 
-export const createAssignation = async (newAssignation, token) => {
+export const createAssignation = async (
+  newAssignation,
+  token,
+  TypeOfasssignation
+) => {
   const data = {
     ...newAssignation,
-    TypeOfasssignation: "DEVOIR",
+    TypeOfasssignation: TypeOfasssignation,
   };
+  console.log("-----------------------------------------------");
+  console.log("data of createAssignation ");
+  console.log(data);
+  console.log("-----------------------------------------------");
+
   const response = await axios.post(`${API_BASE_URL}/assignations`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -88,8 +98,8 @@ export const fetchAssignations = async (
   group,
   TypeElement,
   type,
-  IdEtudiant,
-  token
+  IdEtudiant
+  // token
 ) => {
   const params = {
     group: group,
@@ -97,6 +107,8 @@ export const fetchAssignations = async (
     TypeElement: TypeElement,
     etudantId: IdEtudiant,
   };
+
+  const token = getToken();
   const response = await axios.get(`${API_BASE_URL}/assignations`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -179,3 +191,8 @@ export const fetchStudentAssignations = async (token) => {
     throw error;
   }
 };
+
+/****************************************************************************/
+/***************    fetch ell Exammm    ******************************/
+
+/******************************************************************************/

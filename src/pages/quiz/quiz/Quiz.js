@@ -19,22 +19,22 @@ let placeholderquiz = {
     },
   ],
 };
+
 export default function Quiz() {
-  //! Fetch by id, in the case Id exist we should show edit page
   const [details, setDetails] = React.useState({
-    title: "",
-    duration: 10,
+    titre: "",
+    duration: 0,
   });
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id"); // Get the 'id' query parameter
+  const id = searchParams.get("id");
+
   const fetchQuiz = async () => {
     const result = await getQuiz({
       token: localStorage.getItem("token"),
       id: id,
     });
-    console.log(result);
     const brigeDetails = {
-      title: result.title,
+      titre: result.titre,
       duration: result.duration,
     };
     const brigeQuiz = result.questions.map((item) => {
@@ -59,31 +59,34 @@ export default function Quiz() {
   const [quiz, setQuiz] = React.useState([placeholderquiz]);
 
   const onHandleChangeQuiz = (e) => {
-    let name = e.target.name.split(":")[0];
-    let id = e.target.name.split(":")[1];
-    let updateQuiz = quiz.map((item, index) => {
-      if (id === item.id && name !== "wrong_answer") {
-        if (name === "desc") {
-          item.question = e.target.value;
-        } else if (name === "correct_answer") {
-          item.correctAnswer = e.target.value;
-          return item;
-        } else if (name === "title") {
-          setDetails({ ...details, title: e.target.value });
-        } else if (name === "duration") {
-          setDetails({ ...details, duration: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "titre" || name === "duration") {
+      setDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: value,
+      }));
+    } else {
+      let updateQuiz = quiz.map((item) => {
+        if (name.startsWith("desc") && name.split(":")[1] === item.id) {
+          item.question = value;
+        } else if (
+          name.startsWith("correct_answer") &&
+          name.split(":")[1] === item.id
+        ) {
+          item.correctAnswer = value;
+        } else if (name.startsWith("wrong_answer")) {
+          item.answers = item.answers.map((answer) => {
+            if (answer.id === name.split(":")[1]) {
+              answer.answer = value;
+            }
+            return answer;
+          });
         }
-      } else {
-        item.answers = item.answers.map((answer) => {
-          if (answer.id === id) {
-            answer.answer = e.target.value;
-          }
-          return answer;
-        });
-      }
-      return item;
-    });
-    setQuiz(updateQuiz);
+        return item;
+      });
+      setQuiz(updateQuiz);
+    }
   };
 
   const onHanldeNewNewWrongAsnwer = ({ questionPosition }) => {
@@ -115,7 +118,7 @@ export default function Quiz() {
       },
     ]);
   };
-  // ------- delete wrong answer ----------- //
+
   const onhandleDeleteWrongAnswer = ({ id }) => {
     let updateQuiz = quiz.map((item) => {
       let updatedAnswers = item.answers.filter((item) => item.id !== id);
@@ -124,7 +127,6 @@ export default function Quiz() {
     setQuiz(updateQuiz);
   };
 
-  // ------- submit  quistion ----------- //
   const submit = async (e) => {
     e.preventDefault();
     const result = await postQuiz({
@@ -132,6 +134,7 @@ export default function Quiz() {
       form: { ...details, quiz: quiz },
     });
   };
+
   return (
     <>
       <h2>{id ? "Edit QUIZ" : "ADD NEW QUIZ"}</h2>
@@ -144,12 +147,13 @@ export default function Quiz() {
                   className="mb-3"
                   controlId="exampleForm.ControlTextarea1"
                 >
-                  <Form.Label>Titile: *</Form.Label>
+                  <Form.Label>titre: *</Form.Label>
                   <Form.Control
-                    name={`title:`}
-                    required
+                    name="titre"
                     type="text"
+                    value={details.titre}
                     onChange={onHandleChangeQuiz}
+                    required
                   />
                 </Form.Group>
               </Col>
@@ -160,10 +164,11 @@ export default function Quiz() {
                 >
                   <Form.Label>Duration: (min) *</Form.Label>
                   <Form.Control
-                    name={`duration:`}
-                    required
+                    name="duration"
                     type="number"
+                    value={details.duration}
                     onChange={onHandleChangeQuiz}
+                    required
                   />
                 </Form.Group>
               </Col>
@@ -178,7 +183,11 @@ export default function Quiz() {
           fill
         >
           {quiz.map((item, Qindex) => (
-            <Tab eventKey={Qindex + 1} title={`Question ` + Number(Qindex + 1)}>
+            <Tab
+              key={item.id}
+              eventKey={Qindex + 1}
+              title={`Question ` + Number(Qindex + 1)} // Utilisation de "title" ici pour éviter le conflit
+            >
               <Card key={Qindex} style={accordionStyles.card}>
                 <Card.Body>
                   <h4>question: {Qindex + 1}</h4>
@@ -207,10 +216,10 @@ export default function Quiz() {
                       onChange={onHandleChangeQuiz}
                     />
                   </Form.Group>
-                  <hr />{" "}
+                  <hr />
                   <Row>
                     {item.answers.map((wrongAnswer, index) => (
-                      <Col md={6}>
+                      <Col md={6} key={wrongAnswer.id}>
                         <div style={{ position: "relative" }}>
                           <Form.Group className="mb-3" controlId="formanswer">
                             <Form.Label>Wrong Answer {index + 1}</Form.Label>
@@ -246,14 +255,10 @@ export default function Quiz() {
                   <Button
                     variant="primary"
                     disabled={
-                      item.answers[
-                        item.answers.length >= 1 ? item.answers.length - 1 : 0
-                      ].answer.length === 0
+                      item.answers[item.answers.length - 1]?.answer.length === 0
                     }
                     onClick={() =>
-                      onHanldeNewNewWrongAsnwer({
-                        questionPosition: item.id,
-                      })
+                      onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
                     }
                   >
                     Add Wrong Answer
@@ -262,14 +267,11 @@ export default function Quiz() {
                     <Button
                       variant="success"
                       disabled={
-                        item.answers[
-                          item.answers.length >= 1 ? item.answers.length - 1 : 0
-                        ].answer.length === 0
+                        item.answers[item.answers.length - 1]?.answer.length ===
+                        0
                       }
                       onClick={() =>
-                        onHanldeNewNewWrongAsnwer({
-                          questionPosition: item.id,
-                        })
+                        onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
                       }
                     >
                       Save Changes
@@ -280,7 +282,7 @@ export default function Quiz() {
             </Tab>
           ))}
         </Tabs>
-        <Button variant="primary" onClick={() => onHanldeNewNewQuiz()}>
+        <Button variant="primary" onClick={onHanldeNewNewQuiz}>
           Add New Quiz
         </Button>
         {!id && (

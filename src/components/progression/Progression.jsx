@@ -4,6 +4,8 @@ import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
+import axios from 'axios';
+import { getToken } from '../../util/authUtils';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
 
@@ -14,28 +16,45 @@ const Progression = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let data;
-        if (type === 'student') {
-          data = {
-            name: 'Alice Dupont',
-            modules: ['Module 1', 'Module 2', 'Module 3'],
-            scores: [80, 90, 75],
-            average: 82,
-          };
-        } else if (type === 'group') {
-          data = {
-            name: 'Groupe 1',
-            modules: ['Module 1', 'Module 2', 'Module 3'],
-            students: [
-              { name: 'Alice Dupont', scores: [85, 70, 80] },
-              { name: 'Bob Martin', scores: [78, 75, 90] },
-            ],
-            average: 78,
-          };
+        const token = getToken();
+        const response = await axios.get(`http://localhost:1337/api/assignations-custom/${type}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = response.data;
+
+        if (type.toUpperCase() === 'INDIVIDUEL') {
+          setProgressData({
+            name: data[0]?.etudiant || 'Étudiant Inconnu',
+            modules: data.map(assignation => assignation.devoir || assignation.quiz),
+            scores: data.map(assignation => assignation.score),
+            average: data.reduce((sum, assignation) => sum + assignation.score, 0) / data.length,
+          });
+        } else if (type.toUpperCase() === 'GROUP') {
+          const students = data.reduce((acc, assignation) => {
+            const studentIndex = acc.findIndex(student => student.name === assignation.etudiant);
+            if (studentIndex > -1) {
+              acc[studentIndex].scores.push(assignation.score);
+            } else {
+              acc.push({
+                name: assignation.etudiant,
+                scores: [assignation.score],
+              });
+            }
+            return acc;
+          }, []);
+
+          setProgressData({
+            name: data[0]?.group || 'Groupe Inconnu',
+            modules: [...new Set(data.map(assignation => assignation.devoir || assignation.quiz))],
+            students,
+            average: data.reduce((sum, assignation) => sum + assignation.score, 0) / data.length,
+          });
         }
-        setProgressData(data);
       } catch (error) {
-        console.error('Error fetching progress data:', error);
+        console.error('Erreur lors de la récupération des données de progression:', error);
       }
     };
 
@@ -47,7 +66,7 @@ const Progression = () => {
     datasets: [
       {
         label: 'Score',
-        data: progressData ? (type === 'student' ? progressData.scores : progressData.students.map(student => student.scores.reduce((a, b) => a + b) / student.scores.length)) : [],
+        data: progressData ? (type.toUpperCase() === 'INDIVIDUEL' ? progressData.scores : progressData.students.map(student => student.scores.reduce((a, b) => a + b) / student.scores.length)) : [],
         backgroundColor: 'rgba(54, 162, 235, 0.5)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
@@ -60,7 +79,7 @@ const Progression = () => {
     datasets: [
       {
         label: 'Progression Over Time',
-        data: progressData ? (type === 'student' ? progressData.scores : progressData.students.map(student => student.scores.reduce((a, b) => a + b) / student.scores.length)) : [],
+        data: progressData ? (type.toUpperCase() === 'INDIVIDUEL' ? progressData.scores : progressData.students.map(student => student.scores.reduce((a, b) => a + b) / student.scores.length)) : [],
         fill: false,
         backgroundColor: 'rgba(75,192,192,0.4)',
         borderColor: 'rgba(75,192,192,1)',
@@ -74,7 +93,7 @@ const Progression = () => {
       {progressData ? (
         <Card>
           <Card.Header>
-            {type === 'student'
+            {type.toUpperCase() === 'INDIVIDUEL'
               ? `Progression de l'étudiant: ${progressData.name}`
               : `Progression du groupe: ${progressData.name}`}
           </Card.Header>
@@ -91,26 +110,26 @@ const Progression = () => {
               <Table striped bordered hover>
                 <thead>
                   <tr>
-                    <th>{type === 'student' ? 'Module/Quiz' : 'Étudiant'}</th>
+                    <th>{type.toUpperCase() === 'INDIVIDUEL' ? 'Module/Quiz' : 'Étudiant'}</th>
                     {progressData.modules.map((module, index) => (
                       <th key={index}>{module}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {type === 'student' ? (
+                  {type.toUpperCase() === 'INDIVIDUEL' ? (
                     <tr>
                       <td>{progressData.name}</td>
                       {progressData.scores.map((score, index) => (
-                        <td key={index}>{score}%</td>
+                        <td key={index}>{score} / 20 ({(score / 20) * 100}%)</td>
                       ))}
                     </tr>
                   ) : (
                     progressData.students.map((student, index) => (
                       <tr key={index}>
                         <td>{student.name}</td>
-                        {student.scores.map((score, scoreIndex) => (
-                          <td key={scoreIndex}>{score}%</td>
+                        {progressData.modules.map((module, moduleIndex) => (
+                          <td key={moduleIndex}>{student.scores[moduleIndex]} / 20 ({(student.scores[moduleIndex] / 20) * 100}%)</td>
                         ))}
                       </tr>
                     ))
@@ -121,7 +140,7 @@ const Progression = () => {
           </Card.Body>
         </Card>
       ) : (
-        <p>Loading...</p>
+        <p>Chargement...</p>
       )}
     </div>
   );

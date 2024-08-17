@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "../../../components/layout/Layout";
-import { getQuizzes } from "../../../api/apiQuiz";
+import { deleteQuiz, getQuizzes } from "../../../api/apiQuiz";
 import { Card, Col, Row, Button } from "react-bootstrap";
 import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
 import { FaRegTrashAlt } from "react-icons/fa";
@@ -32,7 +32,17 @@ export default function Quizzes() {
     navigate(`/student/quiz`);
   };
 
-  const handleDelete = (id) => {};
+  const handleDelete = async (id) => {
+    try {
+      await deleteQuiz({
+        token: localStorage.getItem("token"),
+        id: id,
+      });
+      setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
+    } catch (error) {
+      console.error("Failed to delete quiz", error);
+    }
+  };
   return (
     <>
       <h3>My Quizzes</h3>
@@ -85,6 +95,7 @@ export default function Quizzes() {
                   <FaRegTrashAlt
                     size={20}
                     style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => handleDelete(item.id)} // Appel à handleDelete lorsqu'on clique sur la corbeille
                   />
                 </div>
               </Col>
