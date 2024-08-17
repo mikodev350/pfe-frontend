@@ -156,6 +156,10 @@ const handleConflict = (localData, remoteData) => {
 
 // Function to save a resource
 export const saveResource = async (resourceData, token) => {
+
+let parcoursData=[] 
+let modulesData=[] 
+let lessonsData=[] 
   console.log("resourceData")
     console.log(resourceData)
 
@@ -246,10 +250,60 @@ lessonsData.push({
 
         console.log("------------------------------------------------------------------------------");
 
+        for (let parcour of resourceData.parcours) {
+          const localData = await db.parcours.get(parseInt(parcour.id));
+parcoursData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+     
+
+            for (let module of resourceData.modules) {
+          const localData = await db.modules.get(parseInt(module.id));
+modulesData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+               for (let lesson of resourceData.lessons) {
+          const localData = await db.lessons.get(parseInt(lesson.id));
+lessonsData.push({
+  id: localData.id,
+    nom: localData.nom,
+})
+        }
+
+      // Préparer les données de la ressource
+    const newData = {
+      id: resourceData.id,
+      nom: resourceData.nom,
+      format: resourceData.format,
+      parcours: parcoursData,
+      modules: modulesData,
+      lessons: lessonsData,
+      note: resourceData.note,
+      images: [],
+      audio: null,
+      video: null,
+      pdf: null,
+      link: resourceData.link,
+      referenceLivre: resourceData.referenceLivre,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    console.log("newData");
+  console.log(newData);
 
 
-
-
+  if (!navigator.onLine) {
+    try {
+      const userId = localStorage.getItem("userId");
+      console.log("---------------------------------newData ---------------------------------------------------");
+      console.log(newData);
+      console.log("--------------------------------------------------------------------------------------------------");
 
 
 

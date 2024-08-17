@@ -1,66 +1,159 @@
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/mousewheel';
-import 'swiper/css/autoplay';
-import { Navigation, Pagination, Mousewheel, Autoplay, A11y } from 'swiper/modules';
+import React, { useState } from "react";
+import Carousel from "react-bootstrap/Carousel";
+import Ratio from "react-bootstrap/Ratio";
+import "./TestimonialStyle.css";
+import textimg from "./images/Webinar-pana.png";
+import text2img from "./images/Learning-pana.png";
+import { BsCheckCircleFill } from "react-icons/bs"; // Icône de validation
+import { FaCircle, FaArrowLeft, FaArrowRight } from "react-icons/fa"; // Icône pour le cercle
 
 const TestimonialSection = () => {
-  const paginationBottom = '10px'; // Adjust this value to move the bullets further down
+  const [index, setIndex] = useState(0);
 
+  const handleSelect = (selectedIndex) => {
+    setIndex(selectedIndex);
+  };
   return (
-    <section
-      className="testimonial__area testimonial__overlay pt-175 pb-170"
-      style={{ background: 'url("/assets/img/teacher-bg.jpg") center center / cover no-repeat' }}
-    >
-      <div className="container">
-        <div className="col-xxl-12">
-          <Swiper
-            modules={[Navigation, Pagination, Mousewheel, Autoplay, A11y]}
-            spaceBetween={20}
-            slidesPerView={1}
-            navigation
-            pagination={{ clickable: true, el: '.custom-swiper-pagination' }}
-            mousewheel={{ forceToAxis: true }}
-            loop={true}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="testimonial__slider"
-          >
-            <SwiperSlide>
-              <div className="testimonial__item text-center">
-                <div className="testimonial__thumb">
-                  <img src="./assets/img/why/teacher.png" alt="testimonial" />
-                </div>
-                <div className="testimonial__content">
-                  <div className="testimonial__info">
-                    <h4>Madame Allouane</h4>
-                    <span>Encadreur de la fac</span>
+    <section className="testimonial__area">
+      <Carousel
+        activeIndex={index}
+        onSelect={handleSelect}
+        controls={true}
+        indicators={true}
+        interval={null}
+      >
+        {/* Premier Slide */}
+        <Carousel.Item>
+          <div className="container">
+            <div className="row align-items-center">
+              {/* Colonne pour la photo */}
+              <div className="col-md-5 d-flex justify-content-center">
+                <div style={{ width: 440, height: 530 }}>
+                  <div className="testimonial_img1 ml-3">
+                    <Ratio>
+                      <embed src={text2img} />
+                    </Ratio>
                   </div>
                 </div>
               </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="testimonial__item text-center">
-                <div className="testimonial__thumb">
-                  <img src="./assets/img/why/teacher.png" alt="testimonial" />
-                </div>
-                <div className="testimonial__content">
-                  <div className="testimonial__info">
-                    <h4>Madame Salmi</h4>
-                    <span>Encadreur de Cerist</span>
-                  </div>
+              {/* Colonne pour le texte */}
+              <div className="testimonial__text col-md-6">
+                <h2 style={{ color: "#1e80c9" }}>
+                  Rejoignez EasyLearn en tant que Apprenant
+                </h2>
+                <div className="features-list-container mt-40">
+                  <ul className="features-list features-list-one">
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Profitez d'outils puissants pour gérer, partager et
+                      collaborer sur vos ressources pédagogiques.
+                    </li>
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Suivez vos parcours académiques et de formation continue
+                      de manière structurée.
+                    </li>
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Communiquez facilement grâce à notre messagerie intégrée.
+                    </li>
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Personnalisez votre profil pour une expérience sur mesure.
+                    </li>
+                  </ul>
+                  <ul className="features-list features-list-two">
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Trouvez rapidement les informations et contacts essentiels 
+                      grâce à notre recherche avancée.
+                    </li>
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Trouvez des coachs spécialisés pour vous guider tout au
+                      long de votre parcours éducatif.
+                    </li>
+                    <li>
+                      <div className="icon-wrapper">
+                        <BsCheckCircleFill className="icon" />
+                      </div>
+                      Profitez de toutes les fonctionnalités même hors ligne, 
+                      pour une productivité continue, où que vous soyez.
+                    </li>
+                  </ul>
                 </div>
               </div>
-            </SwiperSlide>
-            {/* Add more SwiperSlide components as needed */}
-          </Swiper>
-          <div className="custom-swiper-pagination swiper-pagination" style={{ bottom: paginationBottom }}></div>
-        </div>
-      </div>
+            </div>
+          </div>
+        </Carousel.Item>
+
+        {/* Deuxième Slide */}
+        <Carousel.Item>
+          <div className="container">
+            <div className="row align-items-center">
+              {/* Colonne pour la photo */}
+              <div className="col-md-5 ml-50 ">
+                <div style={{ width: 450, height: 500 }}>
+                  <Ratio className="testimonial_img2 ml-45">
+                    <embed src={textimg} />
+                  </Ratio>
+                </div>
+              </div>
+              {/* Colonne pour le texte */}
+              <div className="testimonial__text col-md-6 ">
+                <h2 style={{ color: "#10266f" }}>
+                  Rejoignez EasyLearn en tant que Enseignant
+                </h2>{" "}
+                <br />
+                <ul className="features-list features-list-three ml-30">
+                  <li>
+                    <div className="icon-wrapper">
+                      <BsCheckCircleFill className="icon" />
+                    </div>
+                    Devenez un coach personnel pour chaque apprenant, les
+                    guidant à travers leur parcours éducatif.
+                  </li>
+                  <li>
+                    <div className="icon-wrapper">
+                      <BsCheckCircleFill className="icon" />
+                    </div>
+                    Offrez une motivation constante et répondez aux questions
+                    pour aider les apprenants à réussir.
+                  </li>
+                  <li>
+                    <div className="icon-wrapper">
+                      <BsCheckCircleFill className="icon" />
+                    </div>
+                    Profitez d'une vue d'ensemble des progrès des apprenants
+                    avec des outils de communication instantanés.
+                  </li>
+                  <li>
+                    <div className="icon-wrapper">
+                      <BsCheckCircleFill className="icon" />
+                    </div>
+                    Recevez un suivi personnalisé pour aider les apprenants à
+                    atteindre leurs objectifs académiques et de formation
+                    continue.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Carousel.Item>
+      </Carousel>
     </section>
   );
 };
-
 export default TestimonialSection;

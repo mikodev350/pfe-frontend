@@ -17,33 +17,37 @@ import CustomHeader from "./other-header";
 export default function Home() {
   return (
     <>
-       <Helmet>
+      <Helmet>
         <link rel="stylesheet" type="text/css" href="/css/customHome.css" />
       </Helmet>
       <CustomHeader /> {/* CustomHeader doit être rendu en premier */}
       <SideBarMobile /> {/* SideBarMobile peut suivre CustomHeader */}
+      {/* ************ header section ******* */}
       <section id="hero">
         <HeroSection />
       </section>
-      <section id="services">
-        <ServicesSection />
-      </section>
-      <section id="about">
-        <AboutSection />
-      </section>
-      <section id="what">
-        <WhatSection />
-      </section>
+      {/* ************ c quoi easylearn section ******* */}
       <section id="why">
         <WhySection />
       </section>
+       {/* ************ app + ens section ******* */}
+       <section id="testimonial">
+        <TestimonialSection />
+      </section>
+      {/* ************ fonctionalite section ******* */}
+      <section id="services">
+        <ServicesSection />
+      </section>
+      {/* ************ titre section  ******* */}
       <section id="proud">
         <ProudSection />
       </section>
-      <section id="testimonial">
-        <TestimonialSection />
-      </section>
       <br />
+      {/* ************ devloppeur section ******* */}
+      <section id="about">
+        <AboutSection />
+      </section>
+      {/* ************ footer section ******* */}
       <section id="cta">
         <CTASection />
       </section>

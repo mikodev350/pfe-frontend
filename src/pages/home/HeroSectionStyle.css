@@ -1,0 +1,89 @@
+.hero__area {
+  display: flex;
+  flex-direction: column; /* Aligne les éléments en colonne */
+  align-items: flex-start; /* Aligne les éléments au début du conteneur */
+  /* box-shadow: #1e7fc992; */
+  margin-top: -55px;
+  overflow: hidden; 
+}
+
+/* Ajoutez ceci dans votre fichier CSS */
+@keyframes float {
+  0% {
+    transform: translatey(0px);
+  }
+  50% {
+    transform: translatey(-10px);
+  }
+  100% {
+    transform: translatey(0px);
+  }
+}
+.imgStyle {
+  width: 450px;
+  height: auto;
+  margin-left: 70px;
+  margin-top: -30px;
+}
+.hero-big {
+  animation: float 3s ease-in-out infinite;
+}
+.hero__big-shape2 {
+  position: absolute;
+  top: 0;
+  right: 0; /* Positionner à droite */
+  width: 200rem; /* Taille ajustée (300px initial + 100px) */
+  height:50rem; /* Taille ajustée (300px initial + 100px) */
+  background-color: #eea22922;
+  border-radius: 50%;
+  border-top-left-radius: 40px;
+  z-index: 0;
+  transform: translate(
+    50%,
+    -50%
+  ); /* Ajuster la transformation pour aligner correctement */
+  pointer-events: none;
+}
+
+/* Styles pour les écrans de taille inférieure à 992px */
+@media (max-width: 991px){
+  .yellow-shape{
+    display: none;
+  }
+  .imgStyle {
+    margin-left: -11px; /* Pas de marge à gauche */
+  }
+  .hero__content .hero__title  {
+ font-size:40px;
+  }
+}
+@media (max-width: 770px) {
+  .container .imgStyle {
+    overflow: hidden !important;
+    width: 90%;
+    margin-top: 10px;
+    margin-left: 20px;
+  }
+  .hero__content .hero__title  {
+    
+ font-size:30px;
+  }
+
+  .hero__big-shape2 {
+    width:350%;
+  height:80%;
+
+  }
+  .row{
+    display: flex;
+    flex-wrap:wrap;
+    flex-direction:column-reverse;
+  }
+  @media (max-width: 575px) {
+    .hero__big-shape2 {
+      width:350%;
+    height:100%;
+  
+    }
+}
+}
