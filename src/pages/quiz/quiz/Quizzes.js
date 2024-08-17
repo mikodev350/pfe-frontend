@@ -9,10 +9,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function Quizzes() {
   const navigate = useNavigate();
-  // ---------------------------- //
   const [quizzes, setQuizzes] = React.useState([]);
 
-  //!TODO: Display All Quizzes
+  // Récupération des quiz depuis l'API
   const fetchQuizzes = async () => {
     const result = await getQuizzes({
       token: localStorage.getItem("token"),
@@ -40,18 +39,19 @@ export default function Quizzes() {
       });
       setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
     } catch (error) {
-      console.error("Failed to delete quiz", error);
+      console.error("Échec de la suppression du quiz", error);
     }
   };
+
   return (
     <>
-      <h3>My Quizzes</h3>
+      <h3>Mes Quiz</h3>
       <Button
         variant="primary"
         onClick={onhandleNewQuiz}
-        title="Modifier le Groupe"
+        title="Créer un nouveau quiz"
       >
-        New Quiz
+        Nouveau Quiz
       </Button>
       <hr />
       <Card style={{ marginBottom: "20px" }}>
@@ -61,7 +61,7 @@ export default function Quizzes() {
               <b>Titre</b>
             </Col>
             <Col>
-              <b>Total Questions</b>
+              <b>Total de Questions</b>
             </Col>
             <Col style={{ textAlign: "right" }} md="1">
               <b>Actions</b>
@@ -101,23 +101,6 @@ export default function Quizzes() {
               </Col>
             </Row>
           </Card.Body>
-
-          {/* <Button
-                variant="primary"
-                style={accordionStyles.updateButton}
-                size="sm"Row
-                onClick={() => onEdit(item)} // Ouvrir le formulaire de mise à jour
-              >
-                Mettre à Jour
-              </Button>
-              <Button
-                variant="danger"
-                style={accordionStyles.deleteButton}
-                size="sm"
-                onClick={() => handleDelete(item.id)} // Supprimer le devoir
-              >
-                Supprimer
-              </Button> */}
         </Card>
       ))}
     </>

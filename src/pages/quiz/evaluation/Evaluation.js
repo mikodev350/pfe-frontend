@@ -95,14 +95,14 @@ export default function Evaluation() {
               <Form.Label>question: *</Form.Label>
               {item.question}
             </Form.Group>
-            {item.answers.map((answer, index) => (
+            {item.reponses.map((answer, index) => (
               <div style={{ position: "relative" }}>
                 <Form.Group className="mb-3">
                   <Form.Check
                     type="radio"
                     name={item.id}
                     onChange={() => putAnswer(item.id, answer.id)}
-                    label={answer.answer}
+                    label={answer.reponse}
                   />
                 </Form.Group>
               </div>

@@ -67,7 +67,7 @@ export const createAnswerHistory = async (answerHistoryData, token) => {
 export const checkDevoir = async (devoirId, token) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/answer-histories/checkDevoir`,
+      `${API_BASE_URL}/reponse-etudiants/checkDevoir`,
       {
         params: {
           devoirId,
@@ -88,7 +88,7 @@ export const checkDevoir = async (devoirId, token) => {
 export const putDevoir = async (devoirId, answerHistoryData, token) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/answer-histories/putDevoir?devoirId=${devoirId}`,
+      `${API_BASE_URL}/reponse-etudiants/putDevoir?devoirId=${devoirId}`,
       answerHistoryData,
       {
         headers: {
@@ -106,7 +106,7 @@ export const putDevoir = async (devoirId, answerHistoryData, token) => {
 export const fetchFilteredAnswerHistories = async (params) => {
   const token = getToken();
   const response = await axios.get(
-    `${API_BASE_URL}/answer-histories/filtered`,
+    `${API_BASE_URL}/reponse-etudiants/filtered`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -114,6 +114,8 @@ export const fetchFilteredAnswerHistories = async (params) => {
       params,
     }
   );
+
+  console.log("response.data");
 
   console.log(response.data);
 

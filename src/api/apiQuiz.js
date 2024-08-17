@@ -9,6 +9,7 @@ export const postQuiz = async ({ token, form }) => {
     },
   };
   const data = form;
+
   const response = await axios.post(`${API_BASE_URL}/quiz`, data, config);
 
   return response.data;
@@ -25,6 +26,7 @@ export const getQuiz = async ({ token, id }) => {
 };
 
 export const getQuizTest = async ({ token, id }) => {
+  alert("Please enter");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,

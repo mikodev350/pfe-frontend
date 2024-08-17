@@ -1,5 +1,4 @@
 import React from "react";
-import Layout from "../../../components/layout/Layout";
 import { Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { FaRegTrashAlt } from "react-icons/fa";
 import Card from "react-bootstrap/Card";
@@ -11,11 +10,11 @@ import { useSearchParams } from "react-router-dom";
 let placeholderquiz = {
   id: uuidv4(),
   question: "",
-  correctAnswer: "",
-  answers: [
+  vraixreponse: "",
+  faussereponse: [
     {
       id: uuidv4(),
-      answer: "",
+      reponse: "",
     },
   ],
 };
@@ -41,8 +40,8 @@ export default function Quiz() {
       const data = {
         id: item.id,
         question: item.question,
-        correctAnswer: item.answers.filter((ans) => !!ans.isCorrect)[0].answer,
-        answers: item.answers.filter((ans) => !ans.isCorrect),
+        vraixreponse: item.reponses.filter((ans) => !!ans.isCorrect)[0].reponse,
+        faussereponse: item.reponses.filter((ans) => !ans.isCorrect),
       };
       return data;
     });
@@ -71,14 +70,14 @@ export default function Quiz() {
         if (name.startsWith("desc") && name.split(":")[1] === item.id) {
           item.question = value;
         } else if (
-          name.startsWith("correct_answer") &&
+          name.startsWith("vraixreponse") &&
           name.split(":")[1] === item.id
         ) {
-          item.correctAnswer = value;
-        } else if (name.startsWith("wrong_answer")) {
-          item.answers = item.answers.map((answer) => {
+          item.vraixreponse = value;
+        } else if (name.startsWith("faussereponse")) {
+          item.faussereponse = item.faussereponse.map((answer) => {
             if (answer.id === name.split(":")[1]) {
-              answer.answer = value;
+              answer.reponse = value;
             }
             return answer;
           });
@@ -92,9 +91,9 @@ export default function Quiz() {
   const onHanldeNewNewWrongAsnwer = ({ questionPosition }) => {
     let updateQuiz = quiz.map((item) => {
       if (item.id === questionPosition) {
-        item.answers.push({
+        item.faussereponse.push({
           id: uuidv4(),
-          answer: "",
+          reponse: "",
         });
       }
       return item;
@@ -108,11 +107,11 @@ export default function Quiz() {
       {
         id: uuidv4(),
         question: "",
-        correctAnswer: "",
-        answers: [
+        vraixreponse: "",
+        faussereponse: [
           {
             id: uuidv4(),
-            answer: "",
+            reponse: "",
           },
         ],
       },
@@ -121,8 +120,8 @@ export default function Quiz() {
 
   const onhandleDeleteWrongAnswer = ({ id }) => {
     let updateQuiz = quiz.map((item) => {
-      let updatedAnswers = item.answers.filter((item) => item.id !== id);
-      return { ...item, answers: updatedAnswers };
+      let updatedAnswers = item.faussereponse.filter((item) => item.id !== id);
+      return { ...item, faussereponse: updatedAnswers };
     });
     setQuiz(updateQuiz);
   };
@@ -137,7 +136,7 @@ export default function Quiz() {
 
   return (
     <>
-      <h2>{id ? "Edit QUIZ" : "ADD NEW QUIZ"}</h2>
+      <h2>{id ? "Modifier le QUIZ" : "Ajouter un NOUVEAU QUIZ"}</h2>
       <Form onSubmit={submit} style={{ paddingBottom: "200px" }}>
         <Card style={{ marginBottom: "50px" }}>
           <Card.Body>
@@ -147,7 +146,7 @@ export default function Quiz() {
                   className="mb-3"
                   controlId="exampleForm.ControlTextarea1"
                 >
-                  <Form.Label>titre: *</Form.Label>
+                  <Form.Label>Titre: *</Form.Label>
                   <Form.Control
                     name="titre"
                     type="text"
@@ -162,7 +161,7 @@ export default function Quiz() {
                   className="mb-3"
                   controlId="exampleForm.ControlTextarea1"
                 >
-                  <Form.Label>Duration: (min) *</Form.Label>
+                  <Form.Label>Durée: (min) *</Form.Label>
                   <Form.Control
                     name="duration"
                     type="number"
@@ -173,7 +172,9 @@ export default function Quiz() {
                 </Form.Group>
               </Col>
             </Row>
-            {id && <Button variant="success">Save Changes</Button>}
+            {id && (
+              <Button variant="success">Enregistrer les modifications</Button>
+            )}
           </Card.Body>
         </Card>
         <Tabs
@@ -186,16 +187,16 @@ export default function Quiz() {
             <Tab
               key={item.id}
               eventKey={Qindex + 1}
-              title={`Question ` + Number(Qindex + 1)} // Utilisation de "title" ici pour éviter le conflit
+              title={`Question ` + Number(Qindex + 1)}
             >
               <Card key={Qindex} style={accordionStyles.card}>
                 <Card.Body>
-                  <h4>question: {Qindex + 1}</h4>
+                  <h4>Question: {Qindex + 1}</h4>
                   <Form.Group
                     className="mb-3"
                     controlId="exampleForm.ControlTextarea1"
                   >
-                    <Form.Label>question: *</Form.Label>
+                    <Form.Label>Question: *</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
@@ -206,28 +207,30 @@ export default function Quiz() {
                     />
                   </Form.Group>
                   <Form.Group className="mb-3" controlId="formanswer">
-                    <Form.Label>Correct Answer</Form.Label>
+                    <Form.Label>Bonne réponse</Form.Label>
                     <Form.Control
                       type="text"
-                      name={`correct_answer:${item.id}`}
-                      placeholder="Correct Answer"
-                      value={item.correctAnswer}
+                      name={`vraixreponse:${item.id}`}
+                      placeholder="Bonne réponse"
+                      value={item.vraixreponse}
                       required
                       onChange={onHandleChangeQuiz}
                     />
                   </Form.Group>
                   <hr />
                   <Row>
-                    {item.answers.map((wrongAnswer, index) => (
+                    {item.faussereponse.map((wrongAnswer, index) => (
                       <Col md={6} key={wrongAnswer.id}>
                         <div style={{ position: "relative" }}>
                           <Form.Group className="mb-3" controlId="formanswer">
-                            <Form.Label>Wrong Answer {index + 1}</Form.Label>
+                            <Form.Label>
+                              Mauvaise réponse {index + 1}
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              placeholder={`Wrong Answer ${index + 1}`}
-                              name={`wrong_answer:${wrongAnswer.id}`}
-                              value={wrongAnswer.answer}
+                              placeholder={`Mauvaise réponse ${index + 1}`}
+                              name={`faussereponse:${wrongAnswer.id}`}
+                              value={wrongAnswer.reponse}
                               required
                               onChange={onHandleChangeQuiz}
                             />
@@ -255,26 +258,27 @@ export default function Quiz() {
                   <Button
                     variant="primary"
                     disabled={
-                      item.answers[item.answers.length - 1]?.answer.length === 0
+                      item.faussereponse[item.faussereponse.length - 1]?.reponse
+                        .length === 0
                     }
                     onClick={() =>
                       onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
                     }
                   >
-                    Add Wrong Answer
+                    Ajouter Mauvaise Réponse
                   </Button>{" "}
                   {id && (
                     <Button
                       variant="success"
                       disabled={
-                        item.answers[item.answers.length - 1]?.answer.length ===
-                        0
+                        item.faussereponse[item.faussereponse.length - 1]
+                          ?.reponse.length === 0
                       }
                       onClick={() =>
                         onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
                       }
                     >
-                      Save Changes
+                      Enregistrer les modifications
                     </Button>
                   )}
                 </Card.Body>
@@ -283,13 +287,13 @@ export default function Quiz() {
           ))}
         </Tabs>
         <Button variant="primary" onClick={onHanldeNewNewQuiz}>
-          Add New Quiz
+          Ajouter un Nouveau Quiz
         </Button>
         {!id && (
           <>
             <hr />
             <Button variant="primary" type="submit" style={{ float: "right" }}>
-              Submit
+              Soumettre
             </Button>
           </>
         )}

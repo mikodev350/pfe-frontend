@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Accordion, Card, Button, Modal, Form } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   fetchFilteredAnswerHistories,
   sendAssignationNote,
-} from "./../../api/apiReponseStudent";
+} from "../../api/apiReponseStudent";
 
 const accordionStyles = {
   card: {
@@ -48,29 +49,26 @@ const AllAssignationsDevoir = () => {
   const group = searchParams.get("group");
   const etudiant = searchParams.get("etudiant");
   const devoir = searchParams.get("devoir");
+  const queryClient = useQueryClient();
 
-  const [assignations, setAssignations] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedAssignation, setSelectedAssignation] = useState(null);
 
-  useEffect(() => {
-    const fetchAssignations = async () => {
-      try {
-        const params = {
-          group: group,
-          etudiant: etudiant,
-          devoir: devoir,
-        };
-        const data = await fetchFilteredAnswerHistories(params);
+  const { data: assignations, isLoading } = useQuery(
+    ["assignations", { group, etudiant, devoir }],
+    () => fetchFilteredAnswerHistories({ group, etudiant, devoir })
+  );
 
-        setAssignations(data);
-      } catch (error) {
-        console.error("Error fetching assignations:", error);
-      }
-    };
-
-    fetchAssignations();
-  }, [group, etudiant]);
+  const mutation = useMutation(
+    (noteData) => sendAssignationNote(noteData.assignationId, noteData.note),
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["assignations", { group, etudiant, devoir }]);
+        handleCloseModal();
+      },
+    }
+  );
 
   const handleShowModal = (assignation) => {
     setSelectedAssignation(assignation);
@@ -82,42 +80,24 @@ const AllAssignationsDevoir = () => {
     setSelectedAssignation(null);
   };
 
-  const handleAssignNote = async (values) => {
-    const { note } = values;
-    try {
-      await sendAssignationNote(
-        selectedAssignation?.devoir?.id,
-        selectedAssignation?.etudiant?.id,
-        note
-      );
-      alert(
-        `Note ${note} assignée avec succès à ${selectedAssignation.etudiant}`
-      );
-    } catch (error) {
-      console.error("Erreur lors de l'assignation de la note:", error);
-      alert("Une erreur est survenue lors de l'assignation de la note.");
-    }
-    handleCloseModal();
+  const handleAssignNote = (values) => {
+    mutation.mutate({ assignationId: selectedAssignation?.assignationId, note: values.note });
   };
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
 
   return (
     <div className="p-3">
       <Accordion defaultActiveKey="0">
         {assignations.map((assignation, index) => (
-          <Card key={assignation.id} style={accordionStyles.card}>
+          <Card key={assignation.assignationId} style={accordionStyles.card}>
             <Accordion.Item eventKey={index.toString()}>
               <Accordion.Header style={accordionStyles.header}>
-                <span>{assignation.devoir.titre}</span>
+                <span>{assignation.devoir}</span>
               </Accordion.Header>
               <Accordion.Body style={accordionStyles.body}>
-                <Card.Text>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: assignation.devoir.description,
-                    }}
-                  />
-                </Card.Text>
-
                 <div>
                   <strong>Étudiant: </strong>
                   {assignation.etudiant}
@@ -130,30 +110,33 @@ const AllAssignationsDevoir = () => {
                     : "Pas encore noté"}
                 </div>
 
-                {assignation.answer_histories.length > 0 && (
-                  <div>
-                    <strong>Réponses:</strong>
-                    {assignation.answer_histories.map(
-                      (history, historyIndex) => (
-                        <div key={historyIndex}>
-                          <div className="d-flex">
-                            {history.attachements.map(
-                              (attachment, attachmentIndex) => (
-                                <Zoom key={attachmentIndex}>
-                                  <img
-                                    src={`http://localhost:1337${attachment.url}`}
-                                    alt={attachment.name}
-                                    style={accordionStyles.attachmentImage}
-                                  />
-                                </Zoom>
-                              )
-                            )}
+                {assignation.reponse_etudiants &&
+                  assignation.reponse_etudiants.length > 0 && (
+                    <div>
+                      <strong>Réponses:</strong>
+                      {assignation.reponse_etudiants.map(
+                        (history, historyIndex) => (
+                          <div key={historyIndex}>
+                            <div className="d-flex">
+                              {history.attachements &&
+                                history.attachements.length > 0 &&
+                                history.attachements.map(
+                                  (attachment, attachmentIndex) => (
+                                    <Zoom key={attachmentIndex}>
+                                      <img
+                                        src={`http://localhost:1337${attachment.url}`}
+                                        alt={attachment.name}
+                                        style={accordionStyles.attachmentImage}
+                                      />
+                                    </Zoom>
+                                  )
+                                )}
+                            </div>
                           </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
+                        )
+                      )}
+                    </div>
+                  )}
 
                 <Button
                   variant="success"
