@@ -1,22 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import {
   fetchModules,
   updateModule,
-  deleteModule,
-  syncOfflineChangesModule,
+  // syncOfflineChangesModule,
 } from "../../api/apiModule";
 import Loader from "../loader/Loader";
 import { Table } from "react-bootstrap";
 import TableHeader from "../table/TableHeader";
 import TableBody from "../table/TableBody";
 import TableCell from "../table/TableCell";
-import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import TableIconeModule from "../table/TableIconeModule";
+import PaginationComponent from "../pagination/Pagination";
 import { parseISO, format } from "date-fns";
 
-const header = ["#", "Module", "Total de resources", "Date", "Options"];
+const header = ["#", "Module", "Total de ressources", "Date", "Options"];
 
 const ModuleTable = ({ searchValue, idParcours, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,9 +33,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["modules", searchValue, idParcours, currentPage],
-    async () => {
-      return fetchModulesMemoized(currentPage, searchValue);
-    },
+    () => fetchModulesMemoized(currentPage, searchValue),
     {
       keepPreviousData: true,
       onSuccess: (response) => {
@@ -46,13 +43,22 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   );
 
   useEffect(() => {
-    refetch();
-  }, [currentPage, searchValue, token, refetch]);
+    refetch(); // Recharger les données après changement de page ou de filtre
+  }, [currentPage, searchValue, refetch, token]);
 
   useEffect(() => {
     const handleOnline = async () => {
-      await syncOfflineChangesModule(token, queryClient);
-      await refetch();
+      try {
+        // await syncOfflineChangesModule(token, queryClient);
+        await queryClient.invalidateQueries([
+          "modules",
+          searchValue,
+          idParcours,
+        ]);
+        refetch(); // Recharger les données après synchronisation
+      } catch (error) {
+        console.error("Error syncing offline changes:", error);
+      }
     };
 
     window.addEventListener("online", handleOnline);
@@ -60,7 +66,7 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
     return () => {
       window.removeEventListener("online", handleOnline);
     };
-  }, [token, queryClient, refetch]);
+  }, [token, queryClient, searchValue, idParcours, refetch]);
 
   const updateModuleMutation = useMutation(
     (data) => updateModule(data.id, { nom: data.name }, token),
@@ -127,13 +133,11 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
           ))}
         </TableBody>
       </Table>
-      <div className="d-flex justify-content-center">
-        <PaginationComponent
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </>
   );
 };

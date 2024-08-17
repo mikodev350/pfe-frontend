@@ -209,6 +209,7 @@ export const createPathway = async (pathwayData, token) => {
       const id = await db.parcours.add(newData);
       await db.offlineChanges.add({
         type: "add",
+        dataBase: "parcour",
         data: { id, ...newData },
         timestamp: Date.now(),
       });
@@ -268,6 +269,7 @@ export const updatePathway = async (id, pathwayData, token) => {
       await db.parcours.update(Number(id), updatedData);
       await db.offlineChanges.add({
         type: "update",
+        dataBase: "parcour",
         data: { id, ...updatedData },
         timestamp: Date.now(),
       });
@@ -374,6 +376,8 @@ export const deletePathway = async (id, token) => {
       await db.parcours.delete(id);
       await db.offlineChanges.add({
         type: "delete",
+        dataBase: "parcour",
+
         data: { id },
         timestamp: Date.now(),
       });
@@ -418,90 +422,170 @@ export const getPathwayById = async (id, token) => {
   return response.data;
 };
 
-// Fonction pour synchroniser les modifications hors ligne
+/**************************************************************************************************/
 
-// Fonction pour synchroniser les modifications hors ligne
-export const syncOfflineChanges = async (token, queryClient) => {
-  const offlineChanges = await db.offlineChanges.toArray();
-  for (const change of offlineChanges) {
-    try {
-      console.log("Synchronizing change:", change);
-      if (change.type === "add") {
-        const response = await axios.post(
-          `${API_BASE_URL}/parcours`,
-          { data: change.data },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Add response:", response.data);
-        await db.parcours.put(response.data.data);
-        queryClient.setQueryData(["parcours"], (oldData) => {
-          return {
-            ...oldData,
-            data: [...oldData.data, response.data.data],
-          };
-        });
-      } else if (change.type === "update") {
-        const remoteData = await axios
-          .get(`${API_BASE_URL}/parcours/${change.data.id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => response.data);
+export const syncOfflineChanges = async (token, queryClient, change) => {
+  try {
+    const data = change.data; // Ajoutez cette ligne pour définir `data`
+    if (change.type === "add") {
+      const response = await axios.post(
+        `${API_BASE_URL}/parcours`,
+        { data },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      await db.parcours.put(response.data.data);
+      queryClient.setQueryData(["parcours"], (oldData) => {
+        return {
+          ...oldData,
+          data: [...oldData.data, response.data.data],
+        };
+      });
+    } else if (change.type === "update") {
+      const remoteData = await axios
+        .get(`${API_BASE_URL}/parcours/${data.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => response.data);
 
-        const resolvedData = handleConflict(change.data, remoteData);
-        const response = await axios.put(
-          `${API_BASE_URL}/parcours/${resolvedData.id}`,
-          resolvedData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const resolvedData = handleConflict(data, remoteData);
+      const response = await axios.put(
+        `${API_BASE_URL}/parcours/${resolvedData.id}`,
+        resolvedData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        console.log("Update response:", response.data);
-        await db.parcours.update(resolvedData.id, resolvedData);
-        queryClient.setQueryData(["parcours"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.map((item) =>
-              item.id === resolvedData.id ? resolvedData : item
-            ),
-          };
-        });
-      } else if (change.type === "delete") {
-        const response = await axios.delete(
-          `${API_BASE_URL}/parcours/${change.data.id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Delete response:", response.data);
-        await db.parcours.delete(change.data.id);
-        queryClient.setQueryData(["parcours"], (oldData) => {
-          return {
-            ...oldData,
-            data: oldData.data.filter((item) => item.id !== change.data.id),
-          };
-        });
-      }
-    } catch (error) {
-      console.error("Error syncing change:", change, error);
+      await db.parcours.update(resolvedData.id, resolvedData);
+      queryClient.setQueryData(["parcours"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.map((item) =>
+            item.id === resolvedData.id ? resolvedData : item
+          ),
+        };
+      });
+    } else if (change.type === "delete") {
+      const response = await axios.delete(
+        `${API_BASE_URL}/parcours/${data.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Delete response:", response.data); // Utilisez response ici
+      await db.parcours.delete(data.id);
+      queryClient.setQueryData(["parcours"], (oldData) => {
+        return {
+          ...oldData,
+          data: oldData.data.filter((item) => item.id !== data.id),
+        };
+      });
     }
+  } catch (error) {
+    console.error("Error syncing change:", error);
   }
-  await db.offlineChanges.clear();
 };
+/****************************************************************************************************************/
+
+// Fonction pour synchroniser les modifications hors ligne
+
+// // Fonction pour synchroniser les modifications hors ligne
+// export const syncOfflineChanges = async (token, queryClient) => {
+//   const offlineChanges = await db.offlineChanges.toArray();
+//   for (const change of offlineChanges) {
+//     try {
+//       console.log("Synchronizing change:", change);
+//       if (change.type === "add") {
+//         const response = await axios.post(
+//           `${API_BASE_URL}/parcours`,
+//           { data: change.data },
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("Add response:", response.data);
+//         await db.parcours.put(response.data.data);
+//         queryClient.setQueryData(["parcours"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: [...oldData.data, response.data.data],
+//           };
+//         });
+//       } else if (change.type === "update") {
+//         const remoteData = await axios
+//           .get(`${API_BASE_URL}/parcours/${change.data.id}`, {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           })
+//           .then((response) => response.data);
+
+//         const resolvedData = handleConflict(change.data, remoteData);
+//         const response = await axios.put(
+//           `${API_BASE_URL}/parcours/${resolvedData.id}`,
+//           resolvedData,
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+
+//         console.log("Update response:", response.data);
+//         await db.parcours.update(resolvedData.id, resolvedData);
+//         queryClient.setQueryData(["parcours"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.map((item) =>
+//               item.id === resolvedData.id ? resolvedData : item
+//             ),
+//           };
+//         });
+//       } else if (change.type === "delete") {
+//         const response = await axios.delete(
+//           `${API_BASE_URL}/parcours/${change.data.id}`,
+//           {
+//             headers: {
+//               "Content-Type": "application/json",
+//               Authorization: `Bearer ${token}`,
+//             },
+//           }
+//         );
+//         console.log("Delete response:", response.data);
+//         await db.parcours.delete(change.data.id);
+//         queryClient.setQueryData(["parcours"], (oldData) => {
+//           return {
+//             ...oldData,
+//             data: oldData.data.filter((item) => item.id !== change.data.id),
+//           };
+//         });
+//       }
+//       await db.offlineChanges.delete(change.id); // Supprimer l'élément traité de offlineChanges
+//     } catch (error) {
+//       console.error("Error syncing change:", change, error);
+//     }
+//   }
+//   // await db.offlineChanges.clear();
+// };
 
 /*************************************************************************************/
 // // Fonction pour synchroniser les modifications hors ligne

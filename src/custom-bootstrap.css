@@ -3,8 +3,9 @@
 input.react-datepicker-ignore-onclickoutside,
 input.date-inputs,
 .Img-brd,
+.css-qbdosj-Input,
 .accordion-item {
-    border-radius: 15px !important;
+    border-radius: 20px !important;
 }
 
 .form-control,
@@ -76,9 +77,9 @@ input.date-inputs,
 }
 
 /********************** Navbar **********************************/
-.show {
+/* .show {
     display: none;
-}
+} */
 
 /* .form-check-input{
     width: 52px !important;
@@ -239,7 +240,7 @@ select.form-select {
     padding: 15px 20px;
     margin: 8px 0;
     box-sizing: border-box;
-    border-radius: 5px;
+    border-radius: 16px;
     border: none;
     color: white;
     border: 1px solid rgb(92, 92, 92);
@@ -325,9 +326,9 @@ select:focus {
 /***************************************************************************/
 /**************************Accordion for question **************************/
 
-form.mt-5 .accordion .accordion-item .show {
+/* form.mt-5 .accordion .accordion-item .show {
     display: block;
-}
+} */
 
 /* .accordion-collapse */
 

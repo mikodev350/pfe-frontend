@@ -82,6 +82,9 @@ export const createGroup = async (groupData) => {
 export const fetchPrivateConversations = async () => {
   try {
     const response = await apiService.get("/conversations/private");
+    console.log("====================================");
+    console.log(response.data);
+    console.log("====================================");
     return response.data;
   } catch (error) {
     console.error("Error fetching private conversations:", error);

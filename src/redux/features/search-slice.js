@@ -1,22 +1,40 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { getToken } from "../../util/authUtils";
+import { fetchFromIndexedDB } from "../../api/fetchFromIndexedDB";
 
 export const fetchAdvancedSearch = createAsyncThunk(
   "search/fetchAdvancedSearch",
   async (params, { rejectWithValue }) => {
     try {
       const token = getToken();
-      const { data } = await axios.get(
-        `http://localhost:1337/api/custom-search/advanced`,
-        {
-          params,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return data;
+      const online = navigator.onLine;
+
+      if (online) {
+        // Recherche en ligne
+        const { data } = await axios.get(
+          `http://localhost:1337/api/custom-search/advanced`,
+          {
+            params,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(
+          "data --------------------------------------------------------------"
+        );
+        console.log(data);
+        console.log(
+          "data --------------------------------------------------------------"
+        );
+
+        return data;
+      } else {
+        // Recherche hors ligne depuis IndexedDB
+        const data = await fetchFromIndexedDB(params);
+        return data;
+      }
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

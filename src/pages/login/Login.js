@@ -30,7 +30,6 @@ const Login = () => {
         localStorage.setItem("userId", response.user.id);
         localStorage.setItem("username", response.user.username);
         localStorage.setItem("role", response.type);
-
         // Initialiser les données critiques après la connexion
         await initializeCriticalData(response.jwt);
 

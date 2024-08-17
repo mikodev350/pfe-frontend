@@ -8,9 +8,9 @@ import {
   Alert,
   Image,
 } from "react-bootstrap";
-import { acceptInvitation, fetchInvitations } from "../../api/apiInvitation";
+import { fetchInvitations } from "../../api/apiInvitation";
 import { FaCheck, FaTimes } from "react-icons/fa";
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import Swal from "sweetalert2";
 import { useQueryClient } from "react-query";
 import {
@@ -58,70 +58,58 @@ const styles = {
 
 const Communaute = () => {
   const [message, setMessage] = useState("");
-
-  const { data: invitations, isLoading } = useQuery(["invitations"], () =>
-    fetchInvitations()
-  );
   const queryClient = useQueryClient();
 
-  const handleAcceptInvitation = async (token) => {
-    try {
-      await acceptInvitation(token);
-      setMessage("Invitation acceptée !");
-      // setInvitations((prevInvitations) =>
-      //   prevInvitations.filter((invitation) => invitation.token !== token)
-      // );
-    } catch (error) {
-      console.error("Error accepting invitation:", error);
-      setMessage("Error accepting invitation: " + error.message);
+  // Fetch invitations using react-query
+  const { data: invitations, isLoading } = useQuery("invitations", fetchInvitations);
+
+  // Accept invitation mutation
+  const acceptInvitationMutation = useMutation(
+    (id) => acceptFriendRequest(id, getToken()),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("invitations");
+        setMessage("Invitation acceptée !");
+      },
+      onError: (error) => {
+        setMessage("Erreur lors de l'acceptation de l'invitation: " + error.message);
+      },
     }
-  };
-  const handleCancelRequest = async (id) => {
-    try {
-      Swal.fire({
-        title: "Do you want to save the changes?",
-        showCancelButton: true,
-        confirmButtonText: "Remove Relation",
-      }).then(async (result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-          const token = getToken();
-          await cancelFriendRequest(id, token);
-          Swal.fire("Saved!", "", "success");
-          // !FIX: need to update the data
-          // queryClient.setQueryData(["profile", id ? id : "me"], (oldData) => {
-          //   return {
-          //     ...oldData,
-          //     isRequestSender: false,
-          //     relationIsExist: false,
-          //     isFriends: false,
-          //   };
-          // });
-        } else if (result.isDenied) {
-          Swal.fire("Changes are not saved", "", "info");
-        }
-      });
-    } catch (error) {
-      setMessage("Error sending invitation: " + error.message);
+  );
+
+  // Cancel invitation mutation
+  const cancelInvitationMutation = useMutation(
+    (id) => cancelFriendRequest(id, getToken()),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("invitations");
+        setMessage("Invitation refusée !");
+      },
+      onError: (error) => {
+        setMessage("Erreur lors du refus de l'invitation: " + error.message);
+      },
     }
+  );
+
+  const handleAcceptRequest = (id) => {
+    acceptInvitationMutation.mutate(id);
   };
-  const handleAcceptRequest = async (id) => {
-    try {
-      const token = getToken();
-      await acceptFriendRequest(id, token);
-      // queryClient.setQueryData(["invitations"], (oldData) => {
-      //   return {
-      //     ...oldData,
-      //     isRequestSender: false,
-      //     relationIsExist: false,
-      //     isFriends: false,
-      //   };
-      // });
-    } catch (error) {
-      setMessage("Error sending invitation: " + error.message);
-    }
+
+  const handleCancelRequest = (id) => {
+    Swal.fire({
+      title: "Êtes-vous sûr de vouloir refuser cette invitation?",
+      showCancelButton: true,
+      confirmButtonText: "Refuser",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelInvitationMutation.mutate(id);
+        Swal.fire("Invitation refusée!", "", "success");
+      }
+    });
   };
-  if (isLoading) return <div>Fetching</div>;
+
+  if (isLoading) return <div>Chargement...</div>;
+
   return (
     <Container style={styles.container}>
       <h1 className="my-4 text-center">Invitations Communautaires</h1>
@@ -159,14 +147,16 @@ const Communaute = () => {
                   variant="outline-primary"
                   className="me-2"
                   style={styles.button}
-                  onClick={() => handleCancelRequest(invitation.expediteur.id)}
+                  onClick={() => handleAcceptRequest(invitation.expediteur.id)}
+                  disabled={acceptInvitationMutation.isLoading || cancelInvitationMutation.isLoading}
                 >
                   <FaCheck /> Accepter
                 </Button>
                 <Button
                   variant="outline-danger"
                   style={styles.button}
-                  onClick={() => handleAcceptRequest(invitation.expediteur.id)}
+                  onClick={() => handleCancelRequest(invitation.expediteur.id)}
+                  disabled={acceptInvitationMutation.isLoading || cancelInvitationMutation.isLoading}
                 >
                   <FaTimes /> Refuser
                 </Button>

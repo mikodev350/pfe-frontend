@@ -10,19 +10,49 @@ import CreateModelGroupe from "../../components/create-groupe/Create-model-group
 import { fetchGroupConversations, fetchPrivateConversations } from "../../api/apiConversation";
 
 const API_BASE_URL = "http://localhost:1337";
-const GROUP_IMAGE_URL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxUv4CmCk5Vn_z61JnwvIzcdzDuJjZYd9ZxA&s";
+const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
+
+// const AvatarWithName = (participants, type, id, title) => {
+//   let imageUrl = "";
+//   let name = title;
+//   let url = GROUP_IMAGE_URL;
+//   if (type === "PRIVATE") {
+//     const usersFiltered = participants.filter((item) => item.id !== id);
+//     const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
+//     name = username;
+//     imageUrl = API_BASE_URL + url;
+//   } else if (type === "GROUP") {
+//     imageUrl = GROUP_IMAGE_URL;
+//   }
+//   return (
+//     <ItemCard>
+//       <AvatarImage src={imageUrl} />
+//       <div>{name}</div>
+//     </ItemCard>
+//   );
+// };
+
 
 const AvatarWithName = (participants, type, id, title) => {
   let imageUrl = "";
   let name = title;
+
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);
-    const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
-    name = username;
-    imageUrl = API_BASE_URL + url;
+
+    if (usersFiltered.length > 0) {
+      const user = usersFiltered[0];
+      name = user.username;
+      imageUrl = user.profil?.photoProfil?.url 
+        ? API_BASE_URL + user.profil.photoProfil.url 
+        : 'http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg';
+    } else {
+      imageUrl = 'http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg';
+    }
   } else if (type === "GROUP") {
     imageUrl = GROUP_IMAGE_URL;
   }
+
   return (
     <ItemCard>
       <AvatarImage src={imageUrl} />
@@ -31,7 +61,9 @@ const AvatarWithName = (participants, type, id, title) => {
   );
 };
 
+
 const ChatApp = () => {
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const navigate = useNavigate();
@@ -48,6 +80,7 @@ const ChatApp = () => {
     fetchPrivateConversations
   );
 
+
   const { isLoading: isLoadingGroup, data: dataGroup, error: errorGroup } = useQuery(
     ["groupConversations"],
     fetchGroupConversations
@@ -55,6 +88,8 @@ const ChatApp = () => {
 
   if (isLoadingPrivate || isLoadingGroup) return <div>Loading...</div>;
   if (errorPrivate || errorGroup) return <div>Error...</div>;
+
+
 
   return (
     <>
@@ -65,9 +100,12 @@ const ChatApp = () => {
         <StyledContainer>
           <Row>
             <Col md={4} className={`sidebar ${showSidebar ? "show" : ""}`}>
-              <StyledCreateGroupButton onClick={() => {}}>
-                Create Group
-              </StyledCreateGroupButton>
+            
+<CreateModelGroupe 
+  show={showCreateGroupModal} 
+  handleClose={() => setShowCreateGroupModal(false)} 
+/>
+
               <StyledTabs defaultActiveKey="private">
                 <StyledTab eventKey="private" title="Private">
                   <StyledListGroup>
@@ -76,6 +114,7 @@ const ChatApp = () => {
                         key={item.id}
                         onClick={() => handleShowConversation(item.id)}
                       >
+                        
                         {AvatarWithName(
                           item.participants,
                           item.type,

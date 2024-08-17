@@ -37,6 +37,9 @@ export const fetchInvitations = async () => {
       Authorization: `Bearer ${token}`,
     },
   });
+  console.log("====================================");
+  console.log(response.data);
+  console.log("====================================");
   return response.data;
 };
 export const acceptInvitation = async (token) => {
