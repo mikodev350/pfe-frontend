@@ -156,74 +156,35 @@ const handleConflict = (localData, remoteData) => {
 
 // Function to save a resource
 export const saveResource = async (resourceData, token) => {
+  try {
+    const userId = localStorage.getItem("userId");
+    let parcoursData = [];
+    let modulesData = [];
+    let lessonsData = [];
 
-let parcoursData=[] 
-let modulesData=[] 
-let lessonsData=[] 
-  console.log("resourceData")
-    console.log(resourceData)
+    // Fetch local data for parcours, modules, and lessons
+    for (let parcour of resourceData.parcours) {
+      const localData = await db.parcours.get(parseInt(parcour));
+      if (localData) {
+        parcoursData.push({ id: localData.id, nom: localData.nom });
+      }
+    }
 
-  let newData = {
-    ...resourceData,
-    isLocal:true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+    for (let module of resourceData.modules) {
+      const localData = await db.modules.get(parseInt(module));
+      if (localData) {
+        modulesData.push({ id: localData.id, nom: localData.nom });
+      }
+    }
 
-    console.log("newData");
+    for (let lesson of resourceData.lessons) {
+      const localData = await db.lessons.get(parseInt(lesson));
+      if (localData) {
+        lessonsData.push({ id: localData.id, nom: localData.nom });
+      }
+    }
 
-  console.log(newData);
-
-
-  if (!navigator.onLine) {
-    try {
-      const userId = localStorage.getItem("userId");
-      console.log("---------------------------------newData ---------------------------------------------------");
-      console.log(newData);
-      console.log("--------------------------------------------------------------------------------------------------");
-
-
-
-
-let parcoursData=[] 
-let modulesData=[] 
-let lessonsData=[] 
-
-        for (let parcour of resourceData.parcours) {
-          const localData = await db.parcours.get(parseInt(parcour));
-parcoursData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-
-        console.log("parcoursData");
-                console.log(parcoursData);
-
-
-            for (let modul of resourceData.modules) {
-          const localData = await db.modules.get(parseInt(modul));
-modulesData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-
-        console.log("modules");
-                console.log(modulesData);
-
-                   for (let lecon of resourceData.lessons) {
-          const localData = await db.lessons.get(parseInt(lecon));
-lessonsData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-            console.log("lesson");
-                console.log(lessonsData);
-
-      // Préparer les données de la ressource
-     newData = {
+    let newData = {
       id: resourceData.id,
       nom: resourceData.nom,
       format: resourceData.format,
@@ -231,121 +192,34 @@ lessonsData.push({
       modules: modulesData,
       lessons: lessonsData,
       note: resourceData.note,
-      images: resourceData.images,
-      audio: resourceData.audio,
-      video: resourceData.video,
-      pdf: resourceData.pdf,
+      images: resourceData.images || [],
+      audio: resourceData.audio || null,
+      video: resourceData.video || null,
+      pdf: resourceData.pdf || null,
       link: resourceData.link,
       referenceLivre: resourceData.referenceLivre,
-      isLocalUpload:true,
+      isLocalUpload: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-        console.log("------------------------------------------------------------------------------");
+    console.log("Processed newData:", newData);
 
-    console.log("this is newData");
-  console.log(newData);
-
-
-        console.log("------------------------------------------------------------------------------");
-
-        for (let parcour of resourceData.parcours) {
-          const localData = await db.parcours.get(parseInt(parcour.id));
-parcoursData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-
-     
-
-            for (let module of resourceData.modules) {
-          const localData = await db.modules.get(parseInt(module.id));
-modulesData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-
-               for (let lesson of resourceData.lessons) {
-          const localData = await db.lessons.get(parseInt(lesson.id));
-lessonsData.push({
-  id: localData.id,
-    nom: localData.nom,
-})
-        }
-
-      // Préparer les données de la ressource
-    const newData = {
-      id: resourceData.id,
-      nom: resourceData.nom,
-      format: resourceData.format,
-      parcours: parcoursData,
-      modules: modulesData,
-      lessons: lessonsData,
-      note: resourceData.note,
-      images: [],
-      audio: null,
-      video: null,
-      pdf: null,
-      link: resourceData.link,
-      referenceLivre: resourceData.referenceLivre,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    console.log("newData");
-  console.log(newData);
-
-
-  if (!navigator.onLine) {
-    try {
-      const userId = localStorage.getItem("userId");
-      console.log("---------------------------------newData ---------------------------------------------------");
-      console.log(newData);
-      console.log("--------------------------------------------------------------------------------------------------");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if (!navigator.onLine) {
+      // Save resource locally if offline
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const id = await db.resources.add(newData);
         await db.offlineChanges.add({
           type: "add",
           dataBase: "resource",
-          data: {
-            ...newData,
-            userId: userId,
-
-          },
+          data: { ...newData, userId },
           timestamp: Date.now(),
         });
       });
-      return { status: "offline", data: newData };
-    } catch (error) {
-      console.error("Error adding data to IndexedDB:", error);
-      throw error;
-    }
-  } else {
-    try {
-      const userId = localStorage.getItem("userId");
 
-      newData = {
-        userId: userId,
-        ...newData,
-      };
+      return { status: "offline", data: newData };
+    } else {
+      // Save resource to server if online
       const response = await axios.post(`${API_BASE_URL}/resources`, newData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -358,92 +232,80 @@ lessonsData.push({
       });
 
       return { status: "success", data: response.data.data };
-    } catch (error) {
-      if (error.response) {
-        console.error("Server responded with error:", error.response.data);
-      } else {
-        console.error("Error creating resource:", error.message);
-      }
-      throw error;
     }
+  } catch (error) {
+    console.error("Error saving resource:", error);
+    throw error;
   }
 };
 
 
 /*************************************************/ 
+
+
 // Function to update a resource
 export const updateResource = async (id, data, token) => {
- 
   const updatedData = {
     ...data,
-        isLocal:true,
+    isLocal: true,
     updatedAt: new Date().toISOString(),
   };
 
-   console.log("-----------------data--------------------------------------");
-    console.log(id);
+  console.log("-----------------data--------------------------------------");
+  console.log(id);
   console.log(updatedData);
-    console.log("-----------------------------------------------------------------");
-
+  console.log("-----------------------------------------------------------------");
 
   if (!navigator.onLine) {
+    let parcoursData = [];
+    let modulesData = [];
+    let lessonsData = [];
 
-let parcoursData=[] 
-let modulesData=[] 
-let lessonsData=[] 
+    // Process parcours
+    for (let parcour of updatedData.parcours) {
+      const parcoursId = parcour.id ? parcour.id : parcour;
+      const localData = await db.parcours.get(parseInt(parcoursId));
+      if (localData) {
+        parcoursData.push({
+          id: localData.id,
+          nom: localData.nom,
+        });
+      }
+    }
+    updatedData.parcours = parcoursData;
 
+    // Process modules
+    for (let modul of updatedData.modules) {
+      const moduleId = modul.id ? modul.id : modul;
+      const localData = await db.modules.get(parseInt(moduleId));
+      if (localData) {
+        modulesData.push({
+          id: localData.id,
+          nom: localData.nom,
+        });
+      }
+    }
+    updatedData.modules = modulesData;
 
+    // Process lessons
+    for (let lecon of updatedData.lessons) {
+      const lessonId = lecon.id ? lecon.id : lecon;
+      const localData = await db.lessons.get(parseInt(lessonId));
+      if (localData) {
+        lessonsData.push({
+          id: localData.id,
+          nom: localData.nom,
+        });
+      }
+    }
+    updatedData.lessons = lessonsData;
 
-        for (let parcour of updatedData.parcours) {
-         const parcoursId = parcour.id ? parcour?.id :parcour
-          const localData = await db.parcours.get(parseInt(parcoursId));
-
-          console.log(localData);
-          parcoursData.push({
-             id: localData.id,
-             nom: localData.nom,
-            })
-        }
-        
-        updatedData.parcours=parcoursData;
-
-        for (let modul of updatedData.modules) {
-          const localData = await db.modules.get(parseInt(modul));
-          modulesData.push({
-            id: localData.id,
-            nom: localData.nom,
-          })
-        }
-
-        updatedData.modules=modulesData;
-
-        
-         for (let lecon of updatedData.lessons) {
-          const localData = await db.lessons.get(parseInt(lecon));
-
-          lessonsData.push({
-            id: localData.id,
-            nom: localData.nom,
-})
-         }
-        updatedData.lessons=lessonsData;
     try {
-
       console.log(updatedData);
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const existingResource = await db.resources.get(Number(id));
-console.log("----------------------------------------");
-console.log("existingResource");
-console.log(existingResource);
-console.log("----------------------------------------");
-
         if (existingResource) {
-         
-          await db.resources.update(Number(existingResource.id), {
-            // ...existingResource,
-            updatedData,
-          });
-
+          await db.resources.update(Number(existingResource.id), updatedData);
           await db.offlineChanges.add({
             type: "update",
             dataBase: "resource",
@@ -460,7 +322,6 @@ console.log("----------------------------------------");
           console.error("Resource not found in IndexedDB for update:", id);
         }
       });
-
       return { status: "offline", data: updatedData };
     } catch (error) {
       console.error("Error updating data in IndexedDB:", error);
@@ -470,14 +331,13 @@ console.log("----------------------------------------");
     try {
       const userId = localStorage.getItem("userId");
       const newData = {
-        userId: userId,
+        userId,
         ...updatedData,
       };
 
       // Handle file uploads
-      const { images, audio, pdf, video, ...resourceData } = newData;
+      const { images = [], audio, pdf, video, ...resourceData } = newData;
 
-      
       // Upload new images
       const uploadedImages = [];
       for (let image of images) {
@@ -490,6 +350,7 @@ console.log("----------------------------------------");
       }
       resourceData.images = uploadedImages;
 
+      // Handle audio
       if (audio && audio.raw) {
         const uploadedAudio = await uploadFile(audio.raw, token);
         resourceData.audio = uploadedAudio[0];
@@ -497,6 +358,7 @@ console.log("----------------------------------------");
         resourceData.audio = { id: audio.id, url: audio.preview };
       }
 
+      // Handle PDF
       if (pdf && pdf.raw) {
         const uploadedPdf = await uploadFile(pdf.raw, token);
         resourceData.pdf = uploadedPdf[0];
@@ -504,6 +366,7 @@ console.log("----------------------------------------");
         resourceData.pdf = { id: pdf.id, url: pdf.preview };
       }
 
+      // Handle video
       if (video && video.raw) {
         const uploadedVideo = await uploadFile(video.raw, token);
         resourceData.video = uploadedVideo[0];
@@ -511,6 +374,7 @@ console.log("----------------------------------------");
         resourceData.video = { id: video.id, url: video.preview };
       }
 
+      // Send the update request to the server
       const response = await axios.put(`${API_BASE_URL}/resources/${id}`, resourceData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -518,6 +382,7 @@ console.log("----------------------------------------");
         },
       });
 
+      // Update IndexedDB with the server response
       await db.transaction("rw", [db.resources], async () => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
@@ -534,7 +399,6 @@ console.log("----------------------------------------");
     }
   }
 };
-
 
 
 /********************************************************************************************/ 
