@@ -7,7 +7,7 @@ import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
 import TableIconeParcours from "../table/TableIconeParcours";
 import { useQuery, useQueryClient } from "react-query";
-import { fetchParcours, deletePathway, createPathway, updatePathway, syncOfflineChanges } from "../../api/ApiParcour";
+import { fetchParcours, deletePathway, createPathway, updatePathway } from "../../api/ApiParcour";
 import db from "../../database/database";
 import { format, parseISO } from "date-fns";
 
@@ -45,7 +45,6 @@ export const ParcoursTable = ({ searchValue, token }) => {
 
   useEffect(() => {
     const handleOnline = async () => {
-      await syncOfflineChanges(token, queryClient);
       await refetch();
     };
 

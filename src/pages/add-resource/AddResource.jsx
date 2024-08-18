@@ -8,7 +8,7 @@ import RichTextEditor from "../../components/richTextEditor/RichTextEditor";
 import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
 import { getToken } from "../../util/authUtils"; 
-import { saveResource, syncOfflineChangesResource, addFileInToIndexedDB } from "../../api/apiResource";
+import { saveResource, addFileInToIndexedDB } from "../../api/apiResource";
 import { useQueryClient } from "react-query";
 import { uploadFile } from "../../api/apiUpload";
 
@@ -64,7 +64,7 @@ export default function AddResource() {
   useEffect(() => {
     const handleOnline = async () => {
       try {
-        await syncOfflineChangesResource(token, queryClient);
+        // await syncOfflineChangesResource(token, queryClient);
         console.log("Synced offline changes successfully.");
       } catch (error) {
         console.error("Error syncing offline changes:", error);
@@ -80,8 +80,8 @@ export default function AddResource() {
       nom: "",
       format: "",
       parcours: [],
-      module: [],
-      lesson: [],
+      modules: [],
+      lessons: [],
       note: "",
       youtubeLink: "",
       images: [], // Change to multiple images
@@ -188,14 +188,14 @@ export default function AddResource() {
   };
 
   const handleModulesChange = (selectedModules) => {
-    formik.setFieldValue("module", selectedModules.map(m => m.value));
+    formik.setFieldValue("modules", selectedModules.map(m => m.value));
     const selectedModulesIds = selectedModules.map(m => m.value);
     const filteredLessons = getLessonsFromLocalStorage().filter(l => selectedModulesIds.includes(l.idmodule));
     setLessonOptions(filteredLessons.map(l => ({ value: l.id, label: l.name })));
   };
 
   const handleLessonsChange = (selectedLessons) => {
-    formik.setFieldValue("lesson", selectedLessons.map(l => l.value));
+    formik.setFieldValue("lessons", selectedLessons.map(l => l.value));
   };
 
   const handleDescriptionChange = (content) => {
@@ -341,13 +341,13 @@ export default function AddResource() {
               <Select
                 isMulti
                 options={moduleOptions}
-                name="module"
+                name="modules"
                 onChange={handleModulesChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
               />
-              {formik.errors.module && (
-                <div className="text-danger">{formik.errors.module}</div>
+              {formik.errors.modules && (
+                <div className="text-danger">{formik.errors.modules}</div>
               )}
             </Form.Group>
 
@@ -356,13 +356,13 @@ export default function AddResource() {
               <Select
                 isMulti
                 options={lessonOptions}
-                name="lesson"
+                name="lessons"
                 onChange={handleLessonsChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
               />
-              {formik.errors.lesson && (
-                <div className="text-danger">{formik.errors.lesson}</div>
+              {formik.errors.lessons && (
+                <div className="text-danger">{formik.errors.lessons}</div>
               )}
             </Form.Group>
 

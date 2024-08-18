@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Table } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
 import { useQuery, useQueryClient } from "react-query";
-import { fetchResources, syncOfflineChangesResource } from "../../api/apiResource";
+import { fetchResources } from "../../api/apiResource";
 import Loader from "../loader/Loader";
 import PaginationComponent from "../pagination/Pagination";
 import TableRow from "../table/TableRow";
@@ -27,13 +27,13 @@ const ResourceTable = ({ searchValue }) => {
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["resources", currentPage, pageSize, searchValue],
-    () => fetchResources(currentPage, pageSize, "", searchValue, token),
+    () => fetchResources(currentPage, pageSize,searchValue, token),
     { keepPreviousData: true }
   );
 
   useEffect(() => {
     const handleOnline = async () => {
-      await syncOfflineChangesResource(token, queryClient);
+      // await syncOfflineChangesResource(token, queryClient);
       refetch();
     };
 
