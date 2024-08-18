@@ -1,192 +1,118 @@
-login and signup styles */
+/* login.css */
 
-#login,
-#signup {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+.main-login-container {
+  display: flex;
+  align-items: center; /* Centrer verticalement */
+  justify-content: center; /* Centrer horizontalement */
+  min-height: 100vh;
+  background-color: #ffffff; /* Fond gris clair */
+  overflow: hidden;
 }
 
-#login-box,
-#signup-box {
-    background-color: white;
-    border-radius: 20px;
-    display: grid;
-    align-items: center;
-    padding: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.image-login {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  background-color: #a4cded; /* Bleu pour la colonne de l'image */
+  padding: 20px;
+  color: #fff; /* Texte blanc */
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
 }
 
-#login .container #login-row #login-column #login-box,
-#login .container #login-row form,
-#signup .container #signup-row #signup-column #signup-box,
-#signup .container #signup-row form {
-    width: 300px;
-    height: auto;
-    border-radius: 15px;
-    background-color: white;
+.image-style {
+  max-width: 85%;
+  height: auto;
+  display: block;
 }
 
-#signup-column {
-    max-width: 500px;
-    height: auto;
-    border-radius: 20px;
-    background-color: white;
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px); /* Déplace l'image vers le haut */
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
-#login .container #login-row #login-column form,
-#signup .container #signup-row #signup-column form {
-    padding: 20px;
+.image-style {
+  animation: float 3s ease-in-out infinite; /* Applique l'animation */
 }
 
-#signup-column,
 #login-box {
-    padding-right: 20px;
-    padding-left: 40px;
-}
-
-.button-Login {
-    margin: 8px 0;
-    width: 100%;
-    height: 55px;
-    background-color: #2B4EFF !important;
-    border-radius: 999px !important;
-    box-shadow: #5E5DF0 0 10px 20px -10px !important;
-    color: #FFFFFF !important;
-    cursor: pointer !important;
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    line-height: 24px !important;
-    opacity: 1 !important;
-    outline: 0 solid transparent !important;
-    padding: 8px 18px !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    touch-action: manipulation !important;
-    word-break: break-word !important;
-    border: 0 !important;
-}
-
-.button-Login:hover {
-    background-color: #1e7fc9c2 !important;
-    box-shadow: #5d5df0a9 0 10px 20px -10px !important;
-}
-
-.forgot a {
-    text-decoration: none;
-    color: #2B4EFF;
+  background: #ffffff; /* Blanc pour la colonne du formulaire */
+  padding: 0px 40px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .custom-heading {
-    font-size: 40px;
-    font-weight: 750;
-    color: #2B4EFF;
-    padding-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1e7fc9 !important; /* Bleu pour le texte du titre */
 }
-
-.main-login-container,
-.main-signup-container {
-    left: 0px;
-    right: 0px;
-    position: absolute;
-    width: 100%;
-    background-color: #F5F5F5;
-    margin-top: -90px;
+.button-Login {
+  background-color: #1e80c9;
 }
-
-.background-image {
-    position: relative;
-    background-image: url('./img/Learning-pana.svg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    width: 100%;
-    height: 100vh;
-    background-position: center;
-    /* Ajustez ces valeurs pour obtenir la couleur désirée */
+.button-Login:hover {
+  background-color: #10266f;
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
-@media (max-width: 768px) {
-
-    .main-login-container,
-    .main-signup-container {
-        width: 100%;
-        background-color: white;
-        top: 0px;
-        display: grid;
-    }
-
-    .background-image {
-        background-size: auto;
-        width: 65%;
-        height: 100vh;
-        z-index: 0;
-        margin-bottom: -9rem;
-    }
-
-    .custom-heading {
-        display: none;
-    }
-
-    .image-login,
-    .image-signup {
-        display: flex;
-        justify-content: center;
-        margin: 0px;
-    }
-
-    #login-box,
-    #signup-box {
-        padding: 0px 6cqmax;
-    }
-}
-
-@media (max-width: 650px) {
-    .background-image {
-        background-size: auto;
-        width: 60%;
-        height: 75vh;
-    }
-}
-
-/* input styles */
 .form-control {
-    border-radius: 100px !important;
-    border: none;
-}
-/* 
-button,
-.custom-button,
-.button-Login,
-.button-singup,
-.button-login {
-    background: #2B4EFF !important;
-    border-radius: 19px !important;
-    box-shadow: #5E5DF0 0 10px 20px -10px !important;
-    box-sizing: border-box !important;
-    color: #FFFFFF !important;
-    cursor: pointer !important;
-    font-size: 17px !important;
-    font-weight: 700 !important;
-    line-height: 24px !important;
-    opacity: 1 !important;
-    outline: 0 solid transparent !important;
-    padding: 8px 18px !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    touch-action: manipulation !important;
-    width: fit-content !important;
-    word-break: break-word !important;
-    border: 0 !important;
+  border-radius: 40px;
+  width: 80%; /* Réduction de la largeur à 80% */
+  margin: 0 auto; /* Centrer les champs de saisie horizontalement */
 }
 
-button:hover,
-.custom-button:hover,
-.button-Login:hover,
-.button-singup:hover,
-.button-login:hover {
-    background: #1e7fc9c2 !important;
-    box-shadow: #5d5df0a9 0 10px 20px -10px !important;
+.form-control.is-invalid {
+  border-color: #dc3545; /* Rouge pour les erreurs de formulaire */
+}
+
+.button-Login,
+.btn-color {
+  background-color: #1e7fc9; /* Bleu pour le bouton de connexion */
+  border: none;
+}
+
+.forgot p {
+  margin: 0;
+  color: #6c757d; /* Gris pour le texte secondaire */
+}
+
+.forgot a {
+  color: #1e7fc9; /* Bleu pour les liens */
+}
+
+.forgot a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 768px) {
+  .main-login-container {
+    flex-direction: column; /* Disposer les éléments verticalement */
+  }
+
+  .image-login {
+    order: 2; /* Placer l'image après le formulaire */
+    margin-top: 20px; /* Ajouter un espace au-dessus de l'image */
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 0px;
+    box-shadow: none;
+  }
+
+  #login-box {
+    order: 1; /* Placer le formulaire avant l'image */
+    border-radius: 30px;
+  }
+  .image-style {
+    max-width: 65%;
+  }
+  .custom-heading {
+    display: none; /* Cacher le titre sur les petits écrans */
+  }
 }

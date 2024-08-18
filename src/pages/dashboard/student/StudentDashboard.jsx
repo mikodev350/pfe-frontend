@@ -19,6 +19,7 @@ import Profile from "../../Profile/Profile";
 import Communaute from "../../communauté/Communaute";
 import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPageWithToken";
 import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
+import HomeDashboard from "../../../components/home-dashbord/homeDashbord";
 import { useQueryClient } from 'react-query'; // Ou le client de requête que vous utilisez
 import useSyncOnConnectionRestore from "./../../../hooks/useSyncOnConnectionRestore";
 import GestionDevoir from "../../gestion-devoir/GestionDevoir";
@@ -48,15 +49,14 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <Routes>
- 
-        {/****************************************************************************************************** */}
- 
-        <Route path="home"  element={<HomeDashboard />} />
+        <Route path="homeDashbord" element={<HomeDashboard />} />
         {/* ***************************************************************************************************** */}
  
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
+        {/* ***************************************************************************************************** */}
+
         {/****************************************************************************************************** */}
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
@@ -89,6 +89,7 @@ export default function StudentDashboard() {
           element={<AddExperience />}
         />
         {/* ***************************************************************************************************** */}
+
         <Route path="communaute" element={<Communaute />} />
         <Route
           path="/resources/access/:token"

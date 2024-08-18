@@ -9,6 +9,8 @@ import { ToastContainer, toast } from "react-toastify";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import "react-toastify/dist/ReactToastify.css";
+import "./SignUpStyle.css";
+import signImage from './Sign up-rafiki (1).png';
 
 const SignUpSchema = Yup.object().shape({
   username: Yup.string().required("Nom d'utilisateur requis"),
@@ -96,14 +98,14 @@ const SignUp = () => {
   return (
     <>
       <Helmet>
-        <link rel="stylesheet" type="text/css" href="/css/SignUp.css" />
+        <link rel="stylesheet" type="text/css" href="./SignUpStyle.css" />
       </Helmet>
       <Layout fullcontent={true} backgroundColorIdentification={true}>
         <ToastContainer />
-        <div className="main-signup-container">
+        <div className="main-signup-container mt-0">
           <Row className="justify-content-center">
-            <Col md={6} className="image-signup">
-              <div className="background-image"></div>
+            <Col md={6} className="image-signup p-0">
+            <img src={signImage} alt="Login Illustration" className="background-image w-150" />
             </Col>
             <Col md={6} id="signup-box">
               <Formik
@@ -121,7 +123,7 @@ const SignUp = () => {
                   isSubmitting,
                 }) => (
                   <Form onSubmit={handleSubmit} className="mt-5">
-                    <h2 className="text-center custom-heading">S'inscrire</h2>
+                    <h2 className="text-center custom-heading-s">S'inscrire</h2>
                     <ProgressBar now={(step / 4) * 100} className="mb-4" />
                     {step === 1 && (
                       <>
@@ -194,7 +196,7 @@ const SignUp = () => {
                           <Button
                             variant="primary"
                             onClick={nextStep}
-                            className="button-Login btn-color w-100"
+                            className="button-Login  w-100"
                           >
                             Suivant
                           </Button>
@@ -257,14 +259,14 @@ const SignUp = () => {
                           <Button
                             variant="secondary"
                             onClick={prevStep}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             Précédent
                           </Button>
                           <Button
                             variant="primary"
                             onClick={nextStep}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             Suivant
                           </Button>
@@ -325,14 +327,14 @@ const SignUp = () => {
                           <Button
                             variant="secondary"
                             onClick={prevStep}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             Précédent
                           </Button>
                           <Button
                             variant="primary"
                             onClick={nextStep}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             Suivant
                           </Button>
@@ -434,7 +436,7 @@ const SignUp = () => {
                           <Button
                             variant="secondary"
                             onClick={prevStep}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             Précédent
                           </Button>
@@ -442,7 +444,7 @@ const SignUp = () => {
                             variant="primary"
                             type="submit"
                             disabled={isSubmitting}
-                            className="button-Login btn-color w-45"
+                            className="button-Login  w-45"
                           >
                             S'inscrire
                           </Button>

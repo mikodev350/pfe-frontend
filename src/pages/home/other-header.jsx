@@ -1,29 +1,29 @@
-  import React, { useState } from "react";
-  import { Navbar, Nav, Container, Offcanvas } from "react-bootstrap";
-  import { Link as ScrollLink } from "react-scroll";
-  import styled from "styled-components";
+import React, { useState } from "react";
+import { Navbar, Nav, Container, Offcanvas } from "react-bootstrap";
+import { Link as ScrollLink } from "react-scroll";
+import styled from "styled-components";
 
-  // ******* affichier Logo ******
-  import AppLogo from "./images/ellogo.png";
+// ******* affichier Logo ******
+import AppLogo from "./images/ggg.png";
 
-  // Styled Components
-  const Header = styled.header`
-    /* Styles généraux */
+// Styled Components
+const Header = styled.header`
+  /* Styles généraux */
   .custom-navbar {
     background-color: rgba(255, 255, 255, 0) !important;
     padding: 0px 20px;
     z-index: 1000;
     box-shadow: none;
-    
   }
 
   .logo img {
-    height: 35px;
+    height: 50px;
   }
 
   .logo {
     font-size: 16px;
     font-weight: bold;
+    padding-top: 0px;
   }
 
   .nav-link-custom {
@@ -32,11 +32,13 @@
     margin: 0 10px;
     text-decoration: none;
     position: relative;
-    transition: color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      color 0.3s ease,
+      background-color 0.3s ease,
+      box-shadow 0.3s ease;
     border-radius: 5px;
     padding: 0px 10px;
     cursor: pointer;
-    
   }
 
   .nav-link-custom::before {
@@ -70,8 +72,13 @@
     border-radius: 50px;
     padding: 6px 15px !important;
     margin-left: 20px;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow:
+      rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+      rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+    transition:
+      background-color 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
     color: #fff !important;
     cursor: pointer;
   }
@@ -93,43 +100,39 @@
     background-color: #eea129;
   }
 
-    .navbar-collapse {
-      display: none; /* Cacher la barre de navigation normale */
-      
-    }
-    .navbar-toggler {
-      display: block; /* Afficher le bouton de basculement */
-    }
+  .navbar-collapse {
+    display: none; /* Cacher la barre de navigation normale */
+  }
+  .navbar-toggler {
+    display: block; /* Afficher le bouton de basculement */
+  }
 
-    .offcanvas {
-      width: auto;
-      height: 100vh;
-      // padding: 2rem;
-      text-align: center;
-      
-    }
+  .offcanvas {
+    width: auto;
+    height: 100vh;
+    // padding: 2rem;
+    text-align: center;
+  }
 
-      .offcanvas-body {
-      display: flex;
-      // flex-direction: column;
-      align-items: center; /* Centrer horizontalement */
-      justify-content: center; /* Centrer verticalement */
-      height: 100%; /* Occuper toute la hauteur */
-    
-    }
+  .offcanvas-body {
+    display: flex;
+    // flex-direction: column;
+    align-items: center; /* Centrer horizontalement */
+    justify-content: center; /* Centrer verticalement */
+    height: 100%; /* Occuper toute la hauteur */
+  }
 
-    .nav_btn {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
+  .nav_btn {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
 
-    .navbar-toggler-hidden {
-      display: none; /* Masquer le bouton de basculement lorsqu'il est actif */
-    }
-
+  .navbar-toggler-hidden {
+    display: none; /* Masquer le bouton de basculement lorsqu'il est actif */
+  }
 
   /* Styles pour les écrans de taille minimale de 993px */
   @media (min-width: 993px) {
@@ -140,77 +143,123 @@
     .navbar-collapse {
       display: flex;
       justify-content: center; /* Centrer les éléments de la navbar */
-  
     }
 
     .nav_btn {
       margin-left: auto; /* Garder les boutons à droite */
     }
-
   }
+`;
 
-  `;
+const CustomNavbar = () => {
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
 
-  const CustomNavbar = () => {
-    const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const handleToggle = () => setShowOffcanvas(!showOffcanvas);
 
-    const handleToggle = () => setShowOffcanvas(!showOffcanvas);
+  return (
+    <Header>
+      <Navbar
+        expand="lg"
+        className="custom-navbar "
+        style={{ backgroundColor: "rgba(255, 255, 255, 0) !important" }}
+      >
+        <Container>
+          <Navbar.Brand
+            as={ScrollLink}
+            to="hero"
+            smooth={true}
+            duration={500}
+            className="logo"
+          >
+            {/* ******** dert import l logo fi 3od lien  ******* */}
+            <img src={AppLogo} alt="Easy Learn Logo" />
+            {/* ******  Ajoutit titre t3 logo ******** */}
+            {/* <span style={{ color: '#10266f' }}>Easy</span><span style={{ color: '#59bcf3' }}> Learn</span> */}
+          </Navbar.Brand>
+          <Navbar.Toggle
+            aria-controls="offcanvasNavbar"
+            onClick={handleToggle}
+            className={showOffcanvas ? "navbar-toggler-hidden" : ""}
+          />
+          <Navbar.Offcanvas
+            id="offcanvasNavbar"
+            aria-labelledby="offcanvasNavbarLabel"
+            placement="top"
+            show={showOffcanvas}
+            onHide={handleToggle}
+          >
+            <Offcanvas.Header closeButton>
+              <Offcanvas.Title id="offcanvasNavbarLabel">
+                <img src={AppLogo} className="logoMenu" />
+              </Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+              <Nav className="navbar-nav link-effect-3 ml-200">
+                <Nav.Link
+                  as={ScrollLink}
+                  to="hero"
+                  smooth={true}
+                  duration={500}
+                  className="nav-link-custom"
+                >
+                  Accueil
+                </Nav.Link>
+                <Nav.Link
+                  as={ScrollLink}
+                  to="services"
+                  smooth={true}
+                  duration={500}
+                  className="nav-link-custom"
+                >
+                  Cours
+                </Nav.Link>
+                <Nav.Link
+                  as={ScrollLink}
+                  to="about"
+                  smooth={true}
+                  duration={500}
+                  className="nav-link-custom"
+                >
+                  Blog
+                </Nav.Link>
+                <Nav.Link
+                  as={ScrollLink}
+                  to="contact"
+                  smooth={true}
+                  duration={500}
+                  className="nav-link-custom"
+                >
+                  Contact
+                </Nav.Link>
+              </Nav>
+              <Nav className="nav_btn">
+                <Nav.Link
+                  as={ScrollLink}
+                  to="SignUp"
+                  smooth={true}
+                  duration={500}
+                  className="header__btn text-center"
+                  id="clssone"
+                >
+                  S'inscrire
+                </Nav.Link>
+                <Nav.Link
+                  as={ScrollLink}
+                  to="Login"
+                  smooth={true}
+                  duration={500}
+                  className="header__btn text-center"
+                  id="clsstwo"
+                >
+                  {"Se\u00A0connecter"}
+                </Nav.Link>
+              </Nav>
+            </Offcanvas.Body>
+          </Navbar.Offcanvas>
+        </Container>
+      </Navbar>
+    </Header>
+  );
+};
 
-    return (
-      <Header>
-        <Navbar expand="lg" className="custom-navbar " style={{ backgroundColor: "rgba(255, 255, 255, 0) !important" }}>
-          <Container>
-            <Navbar.Brand as={ScrollLink} to="hero" smooth={true} duration={500} className="logo">
-              {/* ******** dert import l logo fi 3od lien  ******* */}
-              <img src={AppLogo} alt="Easy Learn Logo" />
-              {/* ******  Ajoutit titre t3 logo ******** */}
-              <span style={{ color: '#10266f' }}>Easy</span><span style={{ color: '#59bcf3' }}> Learn</span>
-            </Navbar.Brand>
-            <Navbar.Toggle
-              aria-controls="offcanvasNavbar"
-              onClick={handleToggle}
-              className={showOffcanvas ? "navbar-toggler-hidden" : ""}
-            />
-            <Navbar.Offcanvas
-              id="offcanvasNavbar"
-              aria-labelledby="offcanvasNavbarLabel"
-              placement="top"
-              show={showOffcanvas}
-              onHide={handleToggle}
-              
-            >
-              <Offcanvas.Header closeButton>
-                <Offcanvas.Title id="offcanvasNavbarLabel"><img src={AppLogo} className="logoMenu"/></Offcanvas.Title>
-              </Offcanvas.Header>
-              <Offcanvas.Body>
-                <Nav className="navbar-nav link-effect-3 ml-200">
-                  <Nav.Link as={ScrollLink} to="hero" smooth={true} duration={500} className="nav-link-custom">
-                    Accueil
-                  </Nav.Link>
-                  <Nav.Link as={ScrollLink} to="services" smooth={true} duration={500} className="nav-link-custom">
-                    Cours
-                  </Nav.Link>
-                  <Nav.Link as={ScrollLink} to="about" smooth={true} duration={500} className="nav-link-custom">
-                    Blog
-                  </Nav.Link>
-                  <Nav.Link as={ScrollLink} to="contact" smooth={true} duration={500} className="nav-link-custom">
-                    Contact
-                  </Nav.Link>
-                </Nav>
-                <Nav className="nav_btn">
-                  <Nav.Link as={ScrollLink} to="sign-up" smooth={true} duration={500} className="header__btn text-center" id="clssone">
-                    S'inscrire
-                  </Nav.Link>
-                  <Nav.Link as={ScrollLink} to="login" smooth={true} duration={500} className="header__btn text-center" id="clsstwo">
-                    {"Se\u00A0connecter"}
-                  </Nav.Link>
-                </Nav>
-              </Offcanvas.Body>
-            </Navbar.Offcanvas>
-          </Container>
-        </Navbar>
-      </Header>
-    );
-  };
-
-  export default CustomNavbar;
+export default CustomNavbar;

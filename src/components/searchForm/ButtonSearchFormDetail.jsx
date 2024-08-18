@@ -34,7 +34,7 @@ const ButtonSearchFormDetail = () => {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setShowResourceModal(true)}>
+      <Button variant="yellow" onClick={() => setShowResourceModal(true)}>
         <FaSearch /> Filtrer Ressources
       </Button>
       <Button variant="primary" className="ml-2" onClick={() => setShowUserModal(true)}>
