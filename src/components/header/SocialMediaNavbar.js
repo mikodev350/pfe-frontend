@@ -3,10 +3,8 @@ import {
   Navbar,
   Nav,
   Container,
-  NavDropdown,
-  Form,
-  FormControl,
   Badge,
+  NavbarBrand,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import {
@@ -15,10 +13,12 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaCog,
+  FaUser,
 } from "react-icons/fa";
 import useOnClickOutside from "../../util/useOnClickOutside";
 import ButtonSearchFormDetail from "../searchForm/ButtonSearchFormDetail";
 import { useAppSelector } from "../../hooks/hooks";
+import AppLogo from "./GGG.png"; // Import du logo
 
 const styles = {
   navIcon: {
@@ -28,56 +28,90 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    color: "#fff",
-    backgroundColor: "#6c757d",
+    width: "45px",
+    height: "45px",
+    borderRadius: "30%",
+    color: "#10266f",
+    backgroundColor: "#cae6fa",
     cursor: "pointer",
+    transition: "transform 0.3s ease, color 0.3s ease",
+  },
+  navIconHover: {
+    color: "#1e80c9",
+    transform: "scale(1.1)",
   },
   badge: {
     position: "absolute",
-    top: "0",
-    right: "0",
-    transform: "translate(50%, -50%)",
+    top: "-5px",
+    right: "-5px",
     backgroundColor: "#dc3545",
     color: "#fff",
     border: "2px solid #fff",
-  },
-  navProfile: {
+    fontSize: "0.7rem",
+    width: "20px",
+    height: "20px",
     display: "flex",
     alignItems: "center",
-    cursor: "pointer",
+    justifyContent: "center",
+  },
+  navProfile: {
     position: "relative",
   },
-  searchBar: {
-    maxWidth: "500px",
-    flex: "1 1 auto",
+  searchBarContainer: {
+    display: "flex",
+    alignItems: "center",
+    maxWidth: "600px",
+    width: "100%",
+    borderRadius: "50px",
+    padding: "0px 15px",
+    gap: "20px",
+  },
+  searchBarInput: {
+    flex: "1",
+    border: "0",
+    outline: "none",
+    padding: "10px 15px",
+    borderRadius: "50px",
+    fontSize: "1rem",
+    backgroundColor: "#fff",
+  },
+  searchIcon: {
+    color: "#1e80c9",
+    fontSize: "1.5rem",
+    cursor: "pointer",
   },
   customDropdown: {
     cursor: "pointer",
     position: "absolute",
     backgroundColor: "#fff",
     boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-    padding: "10px",
+    padding: "8px",
     borderRadius: "5px",
-    width: "300px",
+    width: "250px",
     zIndex: 1000,
     right: 0,
   },
   dropdownItem: {
-    padding: "10px 20px",
+    padding: "8px 5px",
     textDecoration: "none",
-    color: "black",
+    color: "#10266f",
     display: "flex",
-    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: "0.9rem",
+    borderRadius: "4px",
+    margin: "2px 0",
   },
-};
+  fixedNavbar: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    zIndex: 1000,
+    backgroundColor: "transparent", // Set background to transparent
+    boxShadow: "none", // Remove any box shadow
+  },
 
-const notifications = [
-  { id: 1, text: "Notification 1", time: "1hr" },
-  { id: 2, text: "Notification 2", time: "30 mins" },
-];
+};
 
 const messages = [
   { id: 1, text: "Message 1" },
@@ -88,123 +122,157 @@ function SocialMediaNavbar({ onFilterChange }) {
   const { notifications, total_count, total_new_messages } = useAppSelector(
     (state) => state.notification
   );
+
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const [isMessageHovered, setIsMessageHovered] = useState(false);
+  const [isNotificationHovered, setIsNotificationHovered] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
 
   useOnClickOutside(messageDropdownRef, () => setIsMessagesOpen(false));
   useOnClickOutside(notificationDropdownRef, () =>
     setIsNotificationsOpen(false)
   );
+  useOnClickOutside(profileDropdownRef, () => setIsProfileOpen(false));
 
   return (
-    <Navbar bg="light" expand="lg" className="shadow-sm p-3 rounded">
+    <Navbar  expand="lg" className="pt-2 pb-1 rounded" style={{ ...styles.fixedNavbar, backgroundColor: "white" }}>
       <Container fluid>
         <Navbar.Brand as={Link} to="/" className="me-auto">
           <img
-            src="/logo.png"
-            width="30"
-            height="30"
+            src={AppLogo}
+            width="120"
+            height="60"
             className="d-inline-block align-top"
             alt="education"
-          />{" "}
-          MySocial
+          />
         </Navbar.Brand>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Form className="d-flex mx-2" style={styles.searchBar}>
-            <FormControl
-              type="search"
-              placeholder="Search"
-              className="me-auto"
-              aria-label="Search"
-            />
-          </Form>
+        <div style={styles.searchBarContainer}>
           <ButtonSearchFormDetail onFilterChange={onFilterChange} />
         </div>
         <Nav className="ms-auto">
+          {/* Message Icon with count */}
           <div style={{ position: "relative" }} ref={messageDropdownRef}>
             <div
-              style={styles.navIcon}
+              style={{
+                ...styles.navIcon,
+                ...(isMessageHovered ? styles.navIconHover : {}),
+              }}
               onClick={() => setIsMessagesOpen(!isMessagesOpen)}
+              onMouseEnter={() => setIsMessageHovered(true)}
+              onMouseLeave={() => setIsMessageHovered(false)}
             >
               <FaEnvelope />
-              <Badge pill style={styles.badge}>
-                {total_new_messages}
-              </Badge>
+              {total_new_messages > 0 && (
+                <Badge style={styles.badge}>
+                  {total_new_messages}
+                </Badge>
+              )}
             </div>
             {isMessagesOpen && (
-              <div style={styles.customDropdown}>
+              <div
+                style={styles.customDropdown}
+                className="dropdown-menu show"
+              >
                 {messages.map((message) => (
-                  <div key={message.id} style={styles.dropdownItem}>
-                    {message.text}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div style={{ position: "relative" }} ref={notificationDropdownRef}>
-            <div
-              style={styles.navIcon}
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-            >
-              <FaBell />
-              <Badge pill style={styles.badge}>
-                {total_count}
-              </Badge>
-            </div>
-            {isNotificationsOpen && (
-              <div style={styles.customDropdown}>
-                {notifications.map((notification) => (
-                  <Link
-                    to={
-                      "/" +
-                      localStorage.getItem("role").toLowerCase() +
-                      notification.redirect_url +
-                      `?notif_id=${notification.id}`
-                    }
-                    key={notification.id}
+                  <a
+                    key={message.id}
+                    href="#"
+                    className="dropdown-item"
                     style={styles.dropdownItem}
                   >
-                    {notification?.expediteur?.username +
-                      " " +
-                      notification?.notifText}
-                    <small className="text-muted">{notification.time}</small>
-                  </Link>
+                    {message.text}
+                  </a>
                 ))}
               </div>
             )}
           </div>
-          <NavDropdown
-            title={<FaUserCircle style={{ fontSize: "1.5rem" }} />}
-            id="nav-dropdown-profile"
-            align="end"
-            className="no-arrow custom-nav-dropdown"
-            style={styles.navProfile}
-          >
-            <NavDropdown.Item
-              as={Link}
-              to="/profile"
-              style={styles.dropdownItem}
+
+          {/* Notification Icon with count */}
+          <div style={{ position: "relative" }} ref={notificationDropdownRef}>
+            <div
+              style={{
+                ...styles.navIcon,
+                ...(isNotificationHovered ? styles.navIconHover : {}),
+              }}
+              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              onMouseEnter={() => setIsNotificationHovered(true)}
+              onMouseLeave={() => setIsNotificationHovered(false)}
             >
-              <FaUserCircle /> My Profile
-            </NavDropdown.Item>
-            <NavDropdown.Item
-              as={Link}
-              to="/settings"
-              style={styles.dropdownItem}
+              <FaBell />
+              {total_count > 0 && (
+                <Badge style={styles.badge}>
+                  {total_count}
+                </Badge>
+              )}
+            </div>
+            {isNotificationsOpen && (
+              <div
+                style={styles.customDropdown}
+                className="dropdown-menu show"
+              >
+                {notifications.map((notification) => (
+                  <a
+                    key={notification.id}
+                    href="#"
+                    className="dropdown-item"
+                    style={styles.dropdownItem}
+                  >
+                    {notification.text}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Profile Icon */}
+          <div style={{ position: "relative" }} ref={profileDropdownRef}>
+            <div
+              style={{
+                ...styles.navIcon,
+                ...(isProfileHovered ? styles.navIconHover : {}),
+              }}
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              onMouseEnter={() => setIsProfileHovered(true)}
+              onMouseLeave={() => setIsProfileHovered(false)}
             >
-              <FaCog /> Settings
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item
-              as={Link}
-              to="/logout"
-              style={styles.dropdownItem}
-            >
-              <FaSignOutAlt /> Logout
-            </NavDropdown.Item>
-          </NavDropdown>
+              <FaUserCircle />
+            </div>
+            {isProfileOpen && (
+              <div
+                style={styles.customDropdown}
+                className="dropdown-menu show"
+              >
+                <a
+                  href="#"
+                  className="dropdown-item"
+                  style={styles.dropdownItem}
+                >
+                  <FaUser /> Profile
+                </a>
+                <a
+                  href="#"
+                  className="dropdown-item"
+                  style={styles.dropdownItem}
+                >
+                  <FaCog /> Settings
+                </a>
+                <a
+                  href="#"
+                  className="dropdown-item"
+                  style={styles.dropdownItem}
+                >
+                  <FaSignOutAlt /> Logout
+                </a>
+              </div>
+            )}
+          </div>
         </Nav>
       </Container>
     </Navbar>
@@ -212,184 +280,3 @@ function SocialMediaNavbar({ onFilterChange }) {
 }
 
 export default SocialMediaNavbar;
-
-// import React, { useState, useRef } from "react";
-// import {
-//   Navbar,
-//   Nav,
-//   Container,
-//   NavDropdown,
-//   Form,
-//   FormControl,
-//   Badge,
-// } from "react-bootstrap";
-// import { Link } from "react-router-dom";
-// import {
-//   FaBell,
-//   FaEnvelope,
-//   FaUserCircle,
-//   FaSignOutAlt,
-//   FaCog,
-// } from "react-icons/fa";
-// import useOnClickOutside from "../../util/useOnClickOutside";
-// import ButtonSearchFormDetail from "../searchForm/ButtonSearchFormDetail";
-
-// const styles = {
-//   navIcon: {
-//     fontSize: "1.5rem",
-//     position: "relative",
-//     marginRight: "15px",
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     width: "40px",
-//     height: "40px",
-//     borderRadius: "50%",
-//     color: "#fff",
-//     backgroundColor: "#6c757d",
-//   },
-//   badge: {
-//     position: "absolute",
-//     top: "0",
-//     right: "0",
-//     transform: "translate(50%, -50%)",
-//     backgroundColor: "#dc3545",
-//     color: "#fff",
-//     border: "2px solid #fff",
-//   },
-//   navProfile: {
-//     display: "flex",
-//     alignItems: "center",
-//     cursor: "pointer",
-//     position: "relative",
-//   },
-//   searchBar: {
-//     maxWidth: "500px",
-//     flex: "1 1 auto",
-//   },
-// };
-
-// const notifications = [
-//   { id: 1, text: "Notification 1", time: "1hr" },
-//   { id: 2, text: "Notification 2", time: "30 mins" },
-// ];
-
-// const messages = [
-//   { id: 1, text: "Message 1" },
-//   { id: 2, text: "Message 2" },
-// ];
-
-// function SocialMediaNavbar({ onFilterChange }) {
-//   const messageDropdownRef = useRef(null);
-//   const notificationDropdownRef = useRef(null);
-//   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-//   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-
-//   useOnClickOutside(messageDropdownRef, () => setIsMessagesOpen(false));
-//   useOnClickOutside(notificationDropdownRef, () =>
-//     setIsNotificationsOpen(false)
-//   );
-
-//   return (
-//     <Navbar bg="light" expand="lg" className="shadow-sm p-3 rounded">
-//       <Container fluid>
-//         <Navbar.Brand as={Link} to="/" className="me-auto">
-//           <img
-//             src="/logo.png"
-//             width="30"
-//             height="30"
-//             className="d-inline-block align-top"
-//             alt="education"
-//           />{" "}
-//           MySocial
-//         </Navbar.Brand>
-//         <div style={{ display: "flex", alignItems: "center" }}>
-//           <Form className="d-flex mx-2" style={styles.searchBar}>
-//             <FormControl
-//               type="search"
-//               placeholder="Search"
-//               className="me-auto"
-//               aria-label="Search"
-//             />
-//           </Form>
-//           <ButtonSearchFormDetail onFilterChange={onFilterChange} />
-//         </div>
-//         <Nav className="ms-auto">
-//           <div style={{ position: "relative" }} ref={messageDropdownRef}>
-//             <div
-//               style={styles.navIcon}
-//               onClick={() => setIsMessagesOpen(!isMessagesOpen)}
-//             >
-//               <FaEnvelope />
-//               <Badge pill style={styles.badge}>
-//                 {messages.length}
-//               </Badge>
-//             </div>
-//             {isMessagesOpen && (
-//               <div style={styles.customDropdown}>
-//                 {messages.map((message) => (
-//                   <div key={message.id} style={styles.dropdownItem}>
-//                     {message.text}
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-//           <div style={{ position: "relative" }} ref={notificationDropdownRef}>
-//             <div
-//               style={styles.navIcon}
-//               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-//             >
-//               <FaBell />
-//               <Badge pill style={styles.badge}>
-//                 {notifications.length}
-//               </Badge>
-//             </div>
-//             {isNotificationsOpen && (
-//               <div style={styles.customDropdown}>
-//                 {notifications.map((notification) => (
-//                   <div key={notification.id} style={styles.dropdownItem}>
-//                     {notification.text}
-//                     <small className="text-muted">{notification.time}</small>
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-//           <NavDropdown
-//             title={<FaUserCircle style={{ fontSize: "1.5rem" }} />}
-//             id="nav-dropdown-profile"
-//             align="end"
-//             className="no-arrow"
-//             style={styles.navProfile}
-//           >
-//             <NavDropdown.Item
-//               as={Link}
-//               to="/profile"
-//               style={styles.dropdownItem}
-//             >
-//               <FaUserCircle /> My Profile
-//             </NavDropdown.Item>
-//             <NavDropdown.Item
-//               as={Link}
-//               to="/settings"
-//               style={styles.dropdownItem}
-//             >
-//               <FaCog /> Settings
-//             </NavDropdown.Item>
-//             <NavDropdown.Divider />
-//             <NavDropdown.Item
-//               as={Link}
-//               to="/logout"
-//               style={styles.dropdownItem}
-//             >
-//               <FaSignOutAlt /> Logout
-//             </NavDropdown.Item>
-//           </NavDropdown>
-//         </Nav>
-//       </Container>
-//     </Navbar>
-//   );
-// }
-
-// export default SocialMediaNavbar;

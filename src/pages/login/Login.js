@@ -8,11 +8,13 @@ import { loginAPI } from "../../api/authApi";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import initializeCriticalData from "../../hooks/initializeCriticalData";
-// import initializeCriticalData from "../../initializeCriticalData"; // Importer la fonction d'initialisation
+import loginStyle from './login.css';
+import loginImage from './img/Mobile login-cuate.png'; // Importation de l'image
 
+// Schéma de validation du formulaire
 const LoginSchema = Yup.object().shape({
-  identifier: Yup.string().email("Invalid email").required("Email Required"),
-  password: Yup.string().required("Password Required"),
+  identifier: Yup.string().email("Email invalide").required("Email requis"),
+  password: Yup.string().required("Mot de passe requis"),
 });
 
 const Login = () => {
@@ -23,7 +25,6 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       const response = await loginAPI(values);
-      console.log(response);
 
       if (response && response.jwt) {
         localStorage.setItem("token", response.jwt);
@@ -35,7 +36,7 @@ const Login = () => {
         await initializeCriticalData(response.jwt);
 
         // Rediriger vers le tableau de bord
-        // window.location.href = `/dashboard/`;
+        navigate('/dashboard/');
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {
@@ -53,15 +54,18 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <link rel="stylesheet" type="text/css" href="/css/login.css" />
+        <link rel="stylesheet" type="text/css" href="./login.css" />
       </Helmet>
       <Layout fullcontent={true} backgroundColorIdentification={true}>
         <ToastContainer />
         <div className="main-login-container">
-          <Row className="justify-content-center">
+          <Row className="w-100 no-gutters">
+            {/* Colonne pour l'image */}
             <Col md={6} className="image-login">
-              <div className="background-image"></div>
+              <img src={loginImage} alt="Login Illustration" className="image-style w-100" />
             </Col>
+            
+            {/* Colonne pour le formulaire */}
             <Col md={6} id="login-box">
               <Formik
                 initialValues={{ identifier: "", password: "" }}
@@ -77,12 +81,9 @@ const Login = () => {
                   handleSubmit,
                 }) => (
                   <Form onSubmit={handleSubmit} className="mt-5">
-                    <h2 className="text-center custom-heading">Login</h2>
-                    <Form.Group
-                      className="mb-3 mt-5"
-                      controlId="formBasicEmail"
-                    >
-                      <Form.Label className="ms-4">Email address</Form.Label>
+                    <h2 className="text-center custom-heading">Connexion</h2>
+                    <Form.Group className="mb-3 mt-5" controlId="formBasicEmail">
+                      <Form.Label className="ms-4">Adresse e-mail</Form.Label>
                       <Form.Control
                         type="email"
                         name="identifier"
@@ -101,7 +102,7 @@ const Login = () => {
                       </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword">
-                      <Form.Label className="ms-4">Password</Form.Label>
+                      <Form.Label className="ms-4">Mot de passe</Form.Label>
                       <Form.Control
                         type="password"
                         name="password"
@@ -124,14 +125,14 @@ const Login = () => {
                         variant="primary"
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-50 button-Login btn-color mt-5"
+                        className="w-50 button-Login btn-color mt-5 mb-2"
                       >
-                        Login
+                        {"Se\u00A0connecter"}
                       </Button>
                       <div className="text-center mt-2 forgot">
                         <p>
-                          Having trouble logging in?&nbsp;
-                          <Link to={"/"}>Forgot your password?</Link>
+                        Vous avez des difficultés à vous connecter ?&nbsp;
+                          <Link to={"/"}>Mot de passe oublié ?</Link>
                         </p>
                       </div>
                     </Form.Group>

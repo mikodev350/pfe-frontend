@@ -1,0 +1,30 @@
+pages :
+- home dashbord 
+- profile
+- chat 
+- setings
+- contact us [ ha ndirha drka ]
+- notification
+
+- dashbord student :
+   ressource
+      list ressources
+      add ressource
+      afficahge page de ressource
+   parcour :
+      list parcours 
+      add parcour
+      add module
+   communaute (nsit wch fiha)
+      
+  
+- dashbord teacher :
+   list demandes
+   suivi pedagogique :
+      list etud 
+      devoir
+      quiz
+
+
+
+   

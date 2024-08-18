@@ -1,0 +1,128 @@
+/* Conteneur principal pour le formulaire d'inscription */
+.main-signup-container {
+  display: flex;
+  align-items: center; /* Centrer verticalement */
+  justify-content: center; /* Centrer horizontalement */
+  height: auto;
+  overflow: hidden;
+  margin:0px 40px 0px 0px ;
+  background-color: #fff;
+}
+.row {
+  width: 100%;
+}
+.image-signup {
+  display: flex;
+  align-items: center;
+  background-color: #e2e7f9; /* Bleu pour la colonne de l'image */
+  padding: 20px;
+  color: #fff; /* Texte blanc */
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px); /* Déplace l'image vers le haut */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.background-image {
+  animation: float 3s ease-in-out infinite; /* Applique l'animation */
+}
+.image-signup .background-image {
+  max-width: 105%;
+  height: auto;
+  display: block;
+  padding-right: 30px;
+}
+.d-flex {
+  gap: 20px;
+}
+.custom-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #000000; /* Bleu pour le texte du titre */
+}
+input:focus {
+  outline: none !important;
+  border: 2px solid #10266f !important;
+}
+
+/* Boîte du formulaire d'inscription */
+#signup-box {
+  padding: 0px 40px 20px 40px;
+  background-color: #fff;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+.custom-heading-s {
+  color: #10266f;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+/* Progrès du formulaire d'inscription */
+.progress-bar {
+  height: auto;
+  border-radius: 30px;
+  background-color: #10266f !important;
+}
+
+/* Boutons personnalisés */
+.btn-secondary {
+  border-radius: 5px;
+  background-color: #e2e7f9 !important;
+  border: none;
+}
+.btn-primary {
+  border-radius: 5px;
+  background-color: #10266f !important;
+  border: none;
+}
+.btn-secondary:hover {
+  color: #000000d4 !important;
+}
+/* Styles des champs invalides */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+/* Règles de style pour écrans moyens */
+@media (max-width: 768px) {
+  .main-signup-container {
+    flex-direction: column; /* Disposer les éléments verticalement */
+    margin: 0px;
+  }
+
+  .image-signup {
+    order: 2; /* Placer l'image après le formulaire */
+    margin-top: 20px; /* Ajouter un espace au-dessus de l'image */
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 0px;
+    box-shadow: none;
+  }
+
+  #signup-box {
+    order: 1; /* Placer le formulaire avant l'image */
+    border-radius: 30px;
+    margin-top: -45px;
+  }
+  .image-signup .background-image {
+    max-width: 120%;
+    margin-top: -30px;
+  }
+  .custom-heading {
+    display: none; /* Cacher le titre sur les petits écrans */
+  }
+}

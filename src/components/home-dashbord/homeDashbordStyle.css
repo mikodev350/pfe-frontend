@@ -1,0 +1,127 @@
+/* HomeDashboard.css */
+
+.card{
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+.custom-calendar {
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-day {
+    font-weight: bold;
+    color: #10266f;
+}
+
+.custom-day:hover {
+    background-color: #1e80c9;
+    color: white;
+    border-radius: 30px;
+}
+
+.react-datepicker__header {
+    background-color: white;
+}
+
+.react-datepicker__current-month {
+    color: #1e80c9;
+}
+
+.react-datepicker__day-name {
+    color: #10266f;
+}
+
+.react-datepicker__day {
+    border-radius: 30px;
+}
+
+.react-datepicker__day--selected {
+    background-color: #1e80c9; 
+    color: white;
+}
+
+.custom-card {
+    display: flex;
+    align-items: center;
+    color: #10266f;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    
+}
+
+.custom-card-content {
+    background-color: #cae6fa; 
+    flex: 1;
+    padding: 0px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+}
+
+.custom-image {
+    flex: 0 0 30%;
+    width: 200px;
+    height: auto;
+    object-fit: cover;
+    margin-top: -50px;
+}
+
+.custom-card-column {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.custom-card-column-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: fit-content;
+}
+
+.custom-calendar-wrapper {
+    flex: 1;
+}
+.card-title{
+    margin-left: 20px;
+    color: #10266f !important;
+}
+.notes-wrapper {
+    flex: 1;
+}
+
+.note-textarea {
+    resize: none;
+}
+
+/* #e2e7f9  */
+.notes-wrapper .form-control {
+    border-radius: 20px !important; /* Ajustez la valeur pour définir le border-radius souhaité */
+    border-color: #cfd8f8 !important;
+    background-color:#cae6fa !important;
+}
+
+@media (max-width: 768px) {
+    .custom-image {
+        flex: 0 0 40%;
+    }
+    
+    /* Réorganiser les colonnes dans l'ordre souhaité pour les téléphones */
+    .welcome-column {
+        order: 1; /* Met la colonne "Welcome" en premier */
+    }
+    
+    .calendar-column {
+        order: 2; /* Met la colonne "Calendrier" après "Welcome" */
+    }
+    
+    .notes-column {
+        order: 3; /* Met la colonne "Notes" après le calendrier */
+    }
+}

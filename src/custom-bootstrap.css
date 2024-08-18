@@ -4,7 +4,11 @@ input.react-datepicker-ignore-onclickoutside,
 input.date-inputs,
 .Img-brd,
 .accordion-item {
-    border-radius: 15px !important;
+    /* bdlt hna  */
+    border-radius: 50px !important;
+}
+main{
+    background-color: white !important;
 }
 
 .form-control,
@@ -16,29 +20,39 @@ input.date-inputs,
 }
 
 .btn {
-    border-radius: 15px !important;
+    /* bdlt hna  */
+    border-radius: 50px !important;
     height: 54px !important;
 }
 
 .btn-primary {
-    border: none !important;
-    background-color: var(--primary-color) !important;
+    border: none ;
+    background-color: var(--primary-color) ;
 }
+.btn-yellow {
+    border: none ;
+    background-color: #eea129;
+    color: white;
+}
+.btn-yellow:hover{
+    background-color: #eea129;
 
+}
 .btn-outline-primary {
     border-color: var(--primary-color) !important;
 }
 
 .btn-secondary {
-    border: none !important;
-    color: #7D7D7D !important;
-    background-color: #DBDBDB !important;
+    border: none ;
+    color: #7D7D7D;
+    background-color: #DBDBDB ;
 }
 
 .btn,
 .InputSearch {
     max-width: 240px !important;
-    width: 100% !important;
+    /* bdlt hnaaaa */
+    width: 50% !important;
 }
 
 /* *:focus {
@@ -250,7 +264,8 @@ select.form-select {
 
 input:focus {
     outline: none !important;
-    border: 2px solid #2684ff !important;
+    /* BDLT */
+    border: 2px solid #2684ff ;
 }
 
 /*select otion section deseigne  */
