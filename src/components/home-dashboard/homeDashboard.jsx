@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import "react-datepicker/dist/react-datepicker.css";
-import "./homeDashbordStyle.css";
+import "./homeDashboardStyle.css";
 import helloimg from "./Hello-cuate.png";
 
 const HomeDashboard = () => {

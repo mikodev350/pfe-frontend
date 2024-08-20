@@ -1,18 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "react-bootstrap";
-import TableHeader from "../table/TableHeader";
-import TableBody from "../table/TableBody";
-import TableCell from "../table/TableCell";
+import { Card, Container, Row, Col } from "react-bootstrap";
 import PaginationComponent from "../pagination/Pagination";
-import TableRow from "../table/TableRow";
-import TableIconeParcours from "../table/TableIconeParcours";
 import { useQuery, useQueryClient } from "react-query";
-import { fetchParcours, deletePathway, createPathway, updatePathway } from "../../api/ApiParcour";
+import { fetchParcours, deletePathway, updatePathway } from "../../api/ApiParcour";
 import db from "../../database/database";
 import { format, parseISO } from "date-fns";
+import CardIconeParcours from "../table/CardIconeParcours";
+import styled from "styled-components";
 
-const header = ["#", "Nom", "Date", "Options"];
+const GradientCard = styled(Card)`
+  border-radius: 15px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e0e5ec, #f7f9fc); /* Dégradé clair */
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.05), -8px -8px 16px rgba(255, 255, 255, 0.7);
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
 
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.8);
+  }
+`;
+
+const CardBodyStyled = styled(Card.Body)`
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CardDetails = styled.div`
+  flex: 1;
+  margin-right: 15px;
+`;
+
+const TitleStyled = styled.h5`
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333; /* Titre sombre */
+`;
+
+const TextStyled = styled.p`
+  margin: 5px 0;
+  color: #555; /* Texte en gris moyen pour un bon contraste */
+  font-size: 0.95rem;
+`;
 export const ParcoursTable = ({ searchValue, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
@@ -24,11 +56,9 @@ export const ParcoursTable = ({ searchValue, token }) => {
     {
       keepPreviousData: true,
       onSuccess: async (data) => {
-        // Store the fetched data in IndexedDB
         await db.parcours.bulkPut(data.data);
       },
       onError: async () => {
-        // Load data from IndexedDB in case of error
         const localData = await db.parcours
           .filter((parcour) => parcour.nom.includes(searchValue))
           .offset((currentPage - 1) * pageSize)
@@ -43,22 +73,6 @@ export const ParcoursTable = ({ searchValue, token }) => {
     refetch();
   }, [currentPage, searchValue, token, refetch]);
 
-  useEffect(() => {
-    const handleOnline = async () => {
-      await refetch();
-    };
-
-    window.addEventListener('online', handleOnline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [token, queryClient, refetch]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
   const handleDelete = async (id) => {
     try {
       const response = await deletePathway(id, token);
@@ -70,23 +84,10 @@ export const ParcoursTable = ({ searchValue, token }) => {
     }
   };
 
-  const handleCreate = async (newPathway) => {
-    try {
-      const response = await createPathway(newPathway, token);
-      if (response.status === "success" || response.status === "offline") {
-        setCurrentPage(1); // Reset to the first page to show the newly added item
-        refetch();
-      }
-    } catch (error) {
-      console.error("Error creating pathway:", error);
-    }
-  };
-
   const handleUpdate = async (id, updatedPathway) => {
     try {
       const response = await updatePathway(id, updatedPathway, token);
       if (response.status === "success" || response.status === "offline") {
-        // Update the local cache with the new data
         queryClient.setQueryData(["parcours", currentPage, searchValue], (oldData) => {
           const newData = oldData.data.map((item) => (item.id === id ? response.data : item));
           return { ...oldData, data: newData };
@@ -106,45 +107,31 @@ export const ParcoursTable = ({ searchValue, token }) => {
   }
 
   return (
-    <>
-      <Table responsive className="text-center table-dashboard">
-        <TableHeader header={header} />
-        <TableBody>
-          {data.data.map((item, index) => (
-            <TableRow key={item.id}>
-              <TableCell
-                item={index + 1 + (currentPage - 1) * pageSize}
-                dataLabel={header[0]}
-                className="border-table-right"
-              />
-              <TableCell item={item.nom} dataLabel={header[1]} />
-              <TableCell
-                item={
-                  item.createdAt
-                    ? format(parseISO(item.createdAt), "dd-MM-yyyy")
-                    : "N/A"
-                }
-                dataLabel={header[2]}
-              />
-              <TableIconeParcours
-                parcoursId={item.id || ""}
-                parcoursName={item.nom || ""}
-                dataLabel={header[3]}
-                className="border-table-left"
-                onDelete={() => handleDelete(item.id)}
-                onUpdate={(updatedPathway) => handleUpdate(item.id, updatedPathway)}
-              />
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="d-flex justify-content-center">
-        <PaginationComponent
-          totalPages={data.totalPages}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
-    </>
+    <Container>
+      <Row>
+        {data.data.map((item) => (
+          <Col key={item.id} xs={12} md={6} lg={4} className="mb-4">
+            <GradientCard>
+              <CardBodyStyled>
+                <CardDetails>
+                  <TitleStyled>{item.nom}</TitleStyled>
+                  <TextStyled>
+                    <strong>Type :</strong> {item.type}
+                    <br />
+                    <strong>Date :</strong> {item.createdAt ? format(parseISO(item.createdAt), "dd-MM-yyyy") : "N/A"}
+                  </TextStyled>
+                </CardDetails>
+                <CardIconeParcours parcoursId={item.id} parcoursName={item.nom} />
+              </CardBodyStyled>
+            </GradientCard>
+          </Col>
+        ))}
+      </Row>
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={data.totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </Container>
   );
 };

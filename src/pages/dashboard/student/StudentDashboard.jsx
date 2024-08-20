@@ -16,10 +16,9 @@ import AddEducation from "../../add-education/AddEducation";
 import AddExperience from "../../add-experience/AddExperience";
 import DashboardProfile from "../../dashboard-profile/DashboardProfile";
 import Profile from "../../Profile/Profile";
-import Communaute from "../../communauté/Communaute";
+import Communaute from "../../Invitation-page/InvitationPage";
 import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPageWithToken";
 import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
-import HomeDashboard from "../../../components/home-dashbord/homeDashbord";
 import { useQueryClient } from 'react-query'; // Ou le client de requête que vous utilisez
 import useSyncOnConnectionRestore from "./../../../hooks/useSyncOnConnectionRestore";
 import GestionDevoir from "../../gestion-devoir/GestionDevoir";
@@ -33,7 +32,7 @@ import Evaluation from "../../quiz/evaluation/Evaluation";
 
 
  
-import HomeDashboard from "../../../components/home-dashboard/HomeDashboard";
+import HomeDashboard from "../../../components/home-dashboard/homeDashboard";
 import AssignmentList from "../../../components/assignment-list/assignmentList";
 import AssignmentDetail from "../../../components/assignment-detail/assignmentDetail";
 import AssignmentSubmit from "../../../components/assignment-submit/AssignmentSubmit";
@@ -49,14 +48,15 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <Routes>
-        <Route path="homeDashbord" element={<HomeDashboard />} />
+ 
+        {/****************************************************************************************************** */}
+ 
+        <Route path="home"  element={<HomeDashboard />} />
         {/* ***************************************************************************************************** */}
  
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
-        {/* ***************************************************************************************************** */}
-
         {/****************************************************************************************************** */}
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
@@ -89,7 +89,6 @@ export default function StudentDashboard() {
           element={<AddExperience />}
         />
         {/* ***************************************************************************************************** */}
-
         <Route path="communaute" element={<Communaute />} />
         <Route
           path="/resources/access/:token"
@@ -126,6 +125,7 @@ export default function StudentDashboard() {
         {/* ************************************************************************************************* */}
         {/* Route pour afficher la liste des étudiants et des groupes */}
         <Route path="/etudiants" element={<ListeEtudiants />} />
+        
         <Route path="/progression/:type/:id" element={<Progression />} />
 
         {/* Route pour afficher les détails d'un étudiant individuel */}

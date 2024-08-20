@@ -30,16 +30,21 @@ export const fetchPendingInvitations = async () => {
     }, 1000);
   });
 };
-export const fetchInvitations = async () => {
+export const fetchInvitations = async (type = "AMIS") => {
   const token = getToken();
   const response = await axios.get(`${API_BASE_URL}/pending-relations`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    params: {
+      type, // Ajout d'un paramètre pour filtrer par type d'invitation
+    },
   });
+
   console.log("====================================");
-  console.log(response.data);
+  console.log(`Fetched ${type} invitations:`, response.data);
   console.log("====================================");
+
   return response.data;
 };
 export const acceptInvitation = async (token) => {

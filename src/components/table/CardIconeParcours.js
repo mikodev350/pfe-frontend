@@ -8,12 +8,27 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "react-query";
 import { deletePathway } from "../../api/ApiParcour";
 import { getToken } from "../../util/authUtils";
+import styled from "styled-components";
 
-export default function TableIconeParcours({
-  parcoursId,
-  parcoursName,
-  dataLabel,
-}) {
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+const StyledLink = styled(Link)`
+  color: black;
+  padding: 5px;
+  text-decoration: none;
+`;
+
+const IconButton = styled.span`
+  color: black;
+  padding: 5px;
+  cursor: pointer;
+`;
+
+export default function CardIconeParcours({ parcoursId, parcoursName }) {
   const token = getToken();
   const queryClient = useQueryClient();
 
@@ -49,35 +64,48 @@ export default function TableIconeParcours({
   };
 
   return (
-    <td data-label={dataLabel} style={{ alignItems: "center" }}>
+    <IconContainer>
       <OverlayTrigger
         overlay={
           <Tooltip>
-            Accès au <strong>module</strong>.
+            Accéder au <strong>module</strong>.
           </Tooltip>
         }
         placement="top"
-        popperConfig={{
-          modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
-        }}
+        container={document.body}
       >
-        <Link
-          to={`/student/modules/${parcoursId}`}
-          className="icon-option"
-          style={{ paddingLeft: "5px", color: "black" }}
-        >
+        <StyledLink to={`/student/modules/${parcoursId}`}>
           <BiArchive size={24} />
-        </Link>
+        </StyledLink>
       </OverlayTrigger>
 
-      <Link to={`/student/update-parcour/${parcoursId}`}>
-        <span className="icon-option">
+      <OverlayTrigger
+        overlay={
+          <Tooltip>
+            Modifier le <strong>parcours</strong>.
+          </Tooltip>
+        }
+        placement="top"
+        container={document.body}
+      >
+        <StyledLink to={`/student/update-parcour/${parcoursId}`}>
           <BiEdit size={24} />
-        </span>
-      </Link>
-      <span className="icon-option" onClick={handleDelete}>
-        <BiTrash size={24} />
-      </span>
-    </td>
+        </StyledLink>
+      </OverlayTrigger>
+
+      <OverlayTrigger
+        overlay={
+          <Tooltip>
+            Supprimer le <strong>parcours</strong>.
+          </Tooltip>
+        }
+        placement="top"
+        container={document.body}
+      >
+        <IconButton onClick={handleDelete}>
+          <BiTrash size={24} />
+        </IconButton>
+      </OverlayTrigger>
+    </IconContainer>
   );
 }

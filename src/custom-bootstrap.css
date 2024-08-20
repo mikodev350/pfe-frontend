@@ -118,26 +118,16 @@ main{
 
 }
 
-/* header  elements */
-/* nav div.container div.navbar-collapse div.a {
-    border-radius: 15px !important;
-    padding: 10px 15px 10px 15px !important;
-
-} */
-
-
-/* answer label  */
-/* .form-check-label{
-    margin-left: 20px !important;
-    margin-top: 5px !important;
-    margin-bottom: 5px !important;
-} */
-
-
-/* margin-left: 20px !important;
-          margin-top: 5px !important;
-          margin-bottom: 5px !important; */
+/* *************************************************************************************************** */
 /********************************************************************************/
+
+
+
+
+
+
+
+
 
 /********************** Card **********************************/
 
@@ -318,6 +308,11 @@ select:focus {
         font-size: 25px;
         margin-left: 50px;
 }
+
+/* this is for select option  */
+
+
+
 
 /* ***************************** */
 /* Youtube Frame Form */

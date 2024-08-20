@@ -1,21 +1,67 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
-import {
-  fetchModules,
-  updateModule,
-  // syncOfflineChangesModule,
-} from "../../api/apiModule";
+import { fetchModules, updateModule } from "../../api/apiModule";
 import Loader from "../loader/Loader";
-import { Table } from "react-bootstrap";
-import TableHeader from "../table/TableHeader";
-import TableBody from "../table/TableBody";
-import TableCell from "../table/TableCell";
-import TableRow from "../table/TableRow";
-import TableIconeModule from "../table/TableIconeModule";
+import { Card, Container, Row, Col } from "react-bootstrap";
+import CardIconeModule from "../table/CardIconeModule";
 import PaginationComponent from "../pagination/Pagination";
 import { parseISO, format } from "date-fns";
+import styled from "styled-components";
 
-const header = ["#", "Module", "Total de ressources", "Date", "Options"];
+const CustomCard = styled(Card)`
+  border-radius: 15px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #ffffff; /* Fond blanc */
+  position: relative;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      #10266f 0%,
+      #3454d1 100%
+    ); /* Dégradé plus riche */
+    clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+    z-index: 0;
+    transition: all 0.3s ease;
+  }
+
+  &:hover:before {
+    clip-path: polygon(100% 0, 20% 100%, 100% 100%);
+  }
+`;
+
+const CustomCardBody = styled(Card.Body)`
+  padding: 25px;
+  position: relative;
+  z-index: 1;
+  color: #333;
+`;
+
+const ModuleTitle = styled(Card.Title)`
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: inherit; /* Laisse la couleur inchangée */
+`;
+
+const ModuleText = styled.p`
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #555; /* Couleur inchangée */
+`;
 
 const ModuleTable = ({ searchValue, idParcours, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,44 +147,38 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
   }
 
   return (
-    <>
-      <Table responsive className="text-center table-dashboard">
-        <TableHeader header={header} />
-        <TableBody>
-          {data?.data.map((item, index) => (
-            <TableRow key={item.id}>
-              <TableCell
-                item={index + 1 + (currentPage - 1) * pageSize}
-                dataLabel={header[0]}
-                className="border-table-right"
-              />
-              <TableCell item={item.nom} dataLabel={header[1]} />
-              <TableCell item={item.totalResource ?? 0} dataLabel={header[2]} />
-              <TableCell
-                item={
-                  item.createdAt
+    <Container>
+      <Row>
+        {data?.data.map((item) => (
+          <Col key={item.id} xs={12} md={6} lg={4} className="mb-4">
+            <CustomCard>
+              <CustomCardBody>
+                <ModuleTitle>{item.nom}</ModuleTitle>
+                <ModuleText>
+                  <strong>Total de ressources :</strong>{" "}
+                  {item.totalResource ?? 0}
+                  <br />
+                  <strong>Date :</strong>{" "}
+                  {item.createdAt
                     ? format(parseISO(item.createdAt), "dd-MM-yyyy")
-                    : "N/A"
-                }
-                dataLabel={header[3]}
-              />
-              <TableIconeModule
-                moduleId={item.id || ""}
-                moduleName={item.nom || ""}
-                dataLabel={header[4]}
-                className="border-table-left"
-                handleUpdateModule={handleUpdateModule}
-              />
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                    : "N/A"}
+                </ModuleText>
+                <CardIconeModule
+                  moduleId={item.id || ""}
+                  moduleName={item.nom || ""}
+                  handleUpdateModule={handleUpdateModule}
+                />
+              </CustomCardBody>
+            </CustomCard>
+          </Col>
+        ))}
+      </Row>
       <PaginationComponent
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
-    </>
+    </Container>
   );
 };
 

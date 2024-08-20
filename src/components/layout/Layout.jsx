@@ -100,11 +100,13 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       <aside>
         <SideBarMobile />
       </aside>
+      
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
       <main style={{ backgroundColor, minHeight: "100vh" }}>
         <Container>
+          
           {fullcontent ? (
             children
           ) : (

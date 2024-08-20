@@ -10,8 +10,6 @@ import {
   sendFriendRequest,
 } from "../../api/apiFriendRequest";
 
-const userRole = localStorage.getItem("role")?.toUpperCase();
-
 export const ProfileHeader = ({
   id,
   token,
@@ -19,9 +17,10 @@ export const ProfileHeader = ({
   nomComplet,
   isRequestSender,
   isRequestReceiver,
-  isMyProfile,
+  isMyProfile = false,
   relationIsExist,
   isFriends,
+  type,
 }) => {
   const [message, setMessage] = React.useState("");
   const [status, setStatus] = React.useState({
@@ -30,36 +29,45 @@ export const ProfileHeader = ({
     relationIsExist,
     isFriends,
     isMyProfile,
+    coachingRequestSent: false,
+    friendRequestSent: false,
   });
 
   const queryClient = useQueryClient();
+  const userRole = localStorage.getItem("role")?.toUpperCase();
 
-  const handleSendRequest = async () => {
+  const handleSendRequest = async (typeDemande = "AMIS") => {
     try {
-      await sendFriendRequest(id, token);
+      await sendFriendRequest(id, token, { typeDemande });
       queryClient.invalidateQueries(["profile", id ? id : "me"]);
-      setStatus({
-        ...status,
+      setStatus((prevStatus) => ({
+        ...prevStatus,
         isRequestSender: true,
         relationIsExist: true,
-        isFriends: false,
-      });
-      setMessage("Invitation sent!");
+        isFriends: typeDemande === "FRIEND",
+        coachingRequestSent: typeDemande === "COACHING",
+        friendRequestSent: typeDemande === "FRIEND",
+      }));
+      setMessage(
+        typeDemande === "COACHING"
+          ? "Demande de Coaching envoyée !"
+          : "Invitation envoyée !"
+      );
     } catch (error) {
-      setMessage("Error sending invitation: " + error.message);
+      setMessage("Erreur lors de l'envoi de la demande : " + error.message);
     }
   };
 
   const handleCancelRequest = async () => {
     try {
       Swal.fire({
-        title: "Do you want to remove the relation?",
+        title: "Voulez-vous retirer la relation ?",
         showCancelButton: true,
-        confirmButtonText: "Remove Relation",
+        confirmButtonText: "Retirer la relation",
       }).then(async (result) => {
         if (result.isConfirmed) {
           await cancelFriendRequest(id, token);
-          Swal.fire("Removed!", "", "success");
+          Swal.fire("Retiré !", "", "success");
           queryClient.invalidateQueries(["profile", id ? id : "me"]);
           setStatus({
             ...status,
@@ -67,13 +75,15 @@ export const ProfileHeader = ({
             isRequestReceiver: false,
             relationIsExist: false,
             isFriends: false,
+            coachingRequestSent: false,
+            friendRequestSent: false,
           });
         } else if (result.isDenied) {
-          Swal.fire("Changes are not saved", "", "info");
+          Swal.fire("Aucune modification", "", "info");
         }
       });
     } catch (error) {
-      setMessage("Error removing relation: " + error.message);
+      setMessage("Erreur lors du retrait de la relation : " + error.message);
     }
   };
 
@@ -89,8 +99,63 @@ export const ProfileHeader = ({
         isFriends: true,
       });
     } catch (error) {
-      setMessage("Error accepting invitation: " + error.message);
+      setMessage("Erreur lors de l'acceptation de l'invitation : " + error.message);
     }
+  };
+
+  const renderButtons = () => {
+    if (userRole === "TEACHER" && type === "STUDENT") {
+      // Affiche seulement "Demande de Coaching" si le rôle est TEACHER et le type est STUDENT
+      return (
+        !status.coachingRequestSent && (
+          <Button
+            variant="outline-light"
+            className="mt-2 custom-light-button"
+            onClick={() => handleSendRequest("COACHING")}
+          >
+            Demande de Coaching
+          </Button>
+        )
+      );
+    } else if (userRole === "TEACHER" && type === "TEACHER") {
+      // Affiche les deux boutons si les deux sont TEACHER
+      return (
+        <>
+          {!status.friendRequestSent && (
+            <Button
+              variant="outline-light"
+              onClick={() => handleSendRequest("AMIS")}
+              className="custom-light-button"
+            >
+              <MdPersonAddAlt size={19} /> Add Friend
+            </Button>
+          )}
+          {!status.coachingRequestSent && (
+            <Button
+              variant="outline-light"
+              className="mt-2 custom-light-button"
+              onClick={() => handleSendRequest("COACHING")}
+            >
+              Demande de Coaching
+            </Button>
+          )}
+        </>
+      );
+    } else if (userRole === "STUDENT" && type === "STUDENT") {
+      // Affiche seulement "Add Friend" si les deux sont STUDENT
+      return (
+        !status.friendRequestSent && (
+          <Button
+            variant="outline-light"
+            onClick={() => handleSendRequest("AMIS")}
+            className="custom-light-button"
+          >
+            <MdPersonAddAlt size={19} /> Add Friend
+          </Button>
+        )
+      );
+    }
+    return null;
   };
 
   return (
@@ -180,13 +245,7 @@ export const ProfileHeader = ({
                 </Button>
               )
             ) : (
-              <Button
-                variant="outline-light"
-                onClick={handleSendRequest}
-                className="custom-light-button"
-              >
-                <MdPersonAddAlt size={19} /> Add Friend
-              </Button>
+              renderButtons()
             )}
           </>
         )}

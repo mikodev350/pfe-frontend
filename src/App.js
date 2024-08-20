@@ -19,6 +19,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./custom-bootstrap.css";
 
 import Notification from "./components/Notifications";
+import TeacherDashboard from "./pages/dashboard/teacher/TeacherDashboard";
 
 function App() {
   // useSyncOnConnectionRestore();
@@ -35,7 +36,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/student/*" element={<StudentDashboard />} />
-          <Route path="/dashbord" element={<mainDashbord/>} />
+          <Route path="/teacher/*" element={<TeacherDashboard />} />
+          <Route path="/dashbord" element={<mainDashbord />} />
           <Route path="/chat" element={<ChatApp />} />
           <Route path="/settings/*" element={<Settings />} />
           <Route path="/quiz" element={<Quiz />} />

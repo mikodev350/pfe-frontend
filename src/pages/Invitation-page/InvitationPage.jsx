@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -13,6 +13,7 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { useQuery, useMutation } from "react-query";
 import Swal from "sweetalert2";
 import { useQueryClient } from "react-query";
+import { useLocation } from "react-router-dom";
 import {
   acceptFriendRequest,
   cancelFriendRequest,
@@ -56,23 +57,30 @@ const styles = {
   },
 };
 
-const Communaute = () => {
+const InvitationPage = () => {
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
+  const location = useLocation();
+
+  // Determine the type of invitations based on the route
+  const invitationType = location.pathname.includes("coaching") ? "COACHING" : "AMIS";
 
   // Fetch invitations using react-query
-  const { data: invitations, isLoading } = useQuery("invitations", fetchInvitations);
+  const { data: invitations, isLoading } = useQuery(
+    ["invitations", invitationType],
+    () => fetchInvitations(invitationType)
+  );
 
   // Accept invitation mutation
   const acceptInvitationMutation = useMutation(
     (id) => acceptFriendRequest(id, getToken()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("invitations");
-        setMessage("Invitation acceptée !");
+        queryClient.invalidateQueries(["invitations", invitationType]);
+        setMessage(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} acceptée !`);
       },
       onError: (error) => {
-        setMessage("Erreur lors de l'acceptation de l'invitation: " + error.message);
+        setMessage(`Erreur lors de l'acceptation de ${invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"}: ${error.message}`);
       },
     }
   );
@@ -82,11 +90,11 @@ const Communaute = () => {
     (id) => cancelFriendRequest(id, getToken()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("invitations");
-        setMessage("Invitation refusée !");
+        queryClient.invalidateQueries(["invitations", invitationType]);
+        setMessage(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} refusée !`);
       },
       onError: (error) => {
-        setMessage("Erreur lors du refus de l'invitation: " + error.message);
+        setMessage(`Erreur lors du refus de ${invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"}: ${error.message}`);
       },
     }
   );
@@ -97,13 +105,13 @@ const Communaute = () => {
 
   const handleCancelRequest = (id) => {
     Swal.fire({
-      title: "Êtes-vous sûr de vouloir refuser cette invitation?",
+      title: `Êtes-vous sûr de vouloir refuser cette ${invitationType === "AMIS" ? "invitation" : "demande de coaching"}?`,
       showCancelButton: true,
       confirmButtonText: "Refuser",
     }).then((result) => {
       if (result.isConfirmed) {
         cancelInvitationMutation.mutate(id);
-        Swal.fire("Invitation refusée!", "", "success");
+        Swal.fire(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} refusée!`, "", "success");
       }
     });
   };
@@ -112,7 +120,9 @@ const Communaute = () => {
 
   return (
     <Container style={styles.container}>
-      <h1 className="my-4 text-center">Invitations Communautaires</h1>
+      <h1 className="my-4 text-center">
+        {invitationType === "AMIS" ? "Invitations Communautaires" : "Demandes de Coaching"}
+      </h1>
       {message && <Alert variant="info">{message}</Alert>}
       <Row>
         {invitations?.map((invitation) => (
@@ -169,4 +179,4 @@ const Communaute = () => {
   );
 };
 
-export default Communaute;
+export default InvitationPage;

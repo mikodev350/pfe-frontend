@@ -1,16 +1,19 @@
 import axios from "axios";
 import { API_BASE_URL } from "../constants/constante";
 
-export const sendFriendRequest = async (recipientId, token) => {
+export const sendFriendRequest = async (recipientId, token, options = {}) => {
+  const { typeDemande = "FRIEND" } = options;
+
   const response = await axios.post(
     `${API_BASE_URL}/relation`,
-    { recipientId },
+    { recipientId, typeDemande },
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }
   );
+
   return response.data;
 };
 export const cancelFriendRequest = async (recipientId, token) => {

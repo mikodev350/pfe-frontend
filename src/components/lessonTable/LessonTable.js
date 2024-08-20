@@ -7,18 +7,68 @@ import {
   syncOfflineChangesLesson,
 } from "../../api/apiLesson";
 import Loader from "../loader/Loader";
-import { Table } from "react-bootstrap";
-import TableHeader from "../table/TableHeader";
-import TableBody from "../table/TableBody";
-import TableCell from "../table/TableCell";
+import { Card, Container, Row, Col } from "react-bootstrap";
 import PaginationComponent from "../pagination/Pagination";
-import TableRow from "../table/TableRow";
 import { parseISO, format } from "date-fns";
-import { BiEdit, BiTrash } from "react-icons/bi";
+import styled from "styled-components";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { BiEdit, BiTrash } from "react-icons/bi";
 
 const header = ["#", "Leçon", "Date", "Options"];
+const LessonCard = styled(Card)`
+  border-radius: 15px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const LessonCardBody = styled(Card.Body)`
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const LessonDetails = styled.div`
+  flex: 1;
+`;
+
+const LessonTitle = styled.h5`
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+`;
+
+const LessonText = styled.p`
+  margin: 5px 0;
+  color: #666;
+  font-size: 0.95rem;
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  font-size: 1.2rem;
+
+  .icon {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    color: #777;
+
+    &:hover {
+      transform: scale(1.2);
+      color: #4a90e2;
+    }
+  }
+`;
 
 const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,42 +194,39 @@ const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
   console.log("Data fetched: ", data?.data);
 
   return (
-    <>
-      <Table responsive className="text-center table-dashboard">
-        <TableHeader header={header} />
-        <TableBody>
-          {data?.data.map((item, index) => (
-            <TableRow key={item.id}>
-              <TableCell
-                item={index + 1 + (currentPage - 1) * pageSize}
-                dataLabel={header[0]}
-                className="border-table-right"
-              />
-              <TableCell item={item.nom} dataLabel={header[1]} />
-              <TableCell
-                item={
-                  item.createdAt
-                    ? format(parseISO(item.createdAt), "dd-MM-yyyy")
-                    : "N/A"
-                }
-                dataLabel={header[2]}
-              />
-              <TableCell dataLabel={header[3]}>
-                <BiEdit size={24} onClick={() => onEditLesson(item)} />
-                <BiTrash size={24} onClick={() => handleDelete(item.id)} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="d-flex justify-content-center">
-        <PaginationComponent
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
-    </>
+    <Container>
+      <Row>
+        {data?.data.map((item, index) => (
+          <Col key={item.id} xs={12} md={6} lg={4} className="mb-4">
+            <LessonCard>
+              <LessonCardBody>
+                <LessonDetails>
+                  <LessonTitle>{item.nom}</LessonTitle>
+                  <LessonText>
+                    <strong>Date :</strong>{" "}
+                    {item.createdAt
+                      ? format(parseISO(item.createdAt), "dd-MM-yyyy")
+                      : "N/A"}
+                  </LessonText>
+                </LessonDetails>
+                <IconContainer>
+                  <BiEdit className="icon" onClick={() => onEditLesson(item)} />
+                  <BiTrash
+                    className="icon"
+                    onClick={() => handleDelete(item.id)}
+                  />
+                </IconContainer>
+              </LessonCardBody>
+            </LessonCard>
+          </Col>
+        ))}
+      </Row>
+      <PaginationComponent
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+      />
+    </Container>
   );
 };
 

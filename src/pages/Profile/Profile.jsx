@@ -24,6 +24,10 @@ export default function Profile() {
 
   if (isLoading) return <div>Loading...</div>;
 
+  console.log('====================================');
+    console.log("profile");
+  console.log(profile);
+  console.log('====================================');
 
   return (
     <>
@@ -46,6 +50,7 @@ export default function Profile() {
         isMyProfile={profile?.isMyProfile}
         relationIsExist={profile?.relationIsExist}
         isFriends={profile?.isFriends}
+        type={profile?.type}
       />
       <Bio
         bio={profile?.profil?.bio}
