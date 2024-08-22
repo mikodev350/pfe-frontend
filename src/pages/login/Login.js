@@ -8,8 +8,8 @@ import { loginAPI } from "../../api/authApi";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import initializeCriticalData from "../../hooks/initializeCriticalData";
-import loginStyle from './login.css';
-import loginImage from './img/Mobile login-cuate.png'; // Importation de l'image
+import loginStyle from "./login.css";
+import loginImage from "./img/Mobile login-cuate.png"; // Importation de l'image
 
 // Schéma de validation du formulaire
 const LoginSchema = Yup.object().shape({
@@ -30,12 +30,20 @@ const Login = () => {
         localStorage.setItem("token", response.jwt);
         localStorage.setItem("userId", response.user.id);
         localStorage.setItem("username", response.user.username);
-        localStorage.setItem("role", response.type);
+        localStorage.setItem("role", response.user.type);
+
+        // DASHEBOARD_STUDENT;
         // Initialiser les données critiques après la connexion
+
+        if (response.user.type.toUpperCase() === "TEACHER") {
+          localStorage.setItem("currentRoute", "DASHEBOARD_TEACHER");
+        } else if (response.user.type.toUpperCase() === "STUDENT") {
+          localStorage.setItem("currentRoute", "DASHEBOARD_STUDENT");
+        }
         await initializeCriticalData(response.jwt);
 
         // Rediriger vers le tableau de bord
-        navigate('/dashboard/');
+        navigate("/dashboard/home");
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {
@@ -61,9 +69,13 @@ const Login = () => {
           <Row className="w-100 no-gutters">
             {/* Colonne pour l'image */}
             <Col md={6} className="image-login">
-              <img src={loginImage} alt="Login Illustration" className="image-style w-100" />
+              <img
+                src={loginImage}
+                alt="Login Illustration"
+                className="image-style w-100"
+              />
             </Col>
-            
+
             {/* Colonne pour le formulaire */}
             <Col md={6} id="login-box">
               <Formik
@@ -81,7 +93,10 @@ const Login = () => {
                 }) => (
                   <Form onSubmit={handleSubmit} className="mt-5">
                     <h2 className="text-center custom-heading">Connexion</h2>
-                    <Form.Group className="mb-3 mt-5" controlId="formBasicEmail">
+                    <Form.Group
+                      className="mb-3 mt-5"
+                      controlId="formBasicEmail"
+                    >
                       <Form.Label className="ms-4">Adresse e-mail</Form.Label>
                       <Form.Control
                         type="email"
@@ -130,7 +145,7 @@ const Login = () => {
                       </Button>
                       <div className="text-center mt-2 forgot">
                         <p>
-                        Vous avez des difficultés à vous connecter ?&nbsp;
+                          Vous avez des difficultés à vous connecter ?&nbsp;
                           <Link to={"/"}>Mot de passe oublié ?</Link>
                         </p>
                       </div>

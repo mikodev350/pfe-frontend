@@ -17,11 +17,9 @@ import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
-// import CustomNavbar from "../../pages/home/other-header";
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const location = useLocation();
-  const currentRoute = location.pathname.split("/")[1].toUpperCase();
 
   const dispatch = useDispatch();
   const { role, type } = useSelector((state) => state.role);
@@ -49,33 +47,22 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       dispatch(fetchAdvancedSearch(params));
     }
   };
-
-  useEffect(() => {
-    let newType;
+useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    let newType = type;
     let newRole = role;
 
-    switch (currentRoute) {
-      case "STUDENT":
+    if (storedRole) {
+      if (storedRole === "STUDENT") {
         newType = "DASHEBOARD_STUDENT";
         newRole = "STUDENT";
-        break;
-      case "TEACHER":
+      } else if (storedRole === "TEACHER") {
         newType = "DASHEBOARD_TEACHER";
         newRole = "TEACHER";
-        break;
-      case "SETTINGS":
-        newType = "SETTINGS";
-        break;
-      default:
-        const storedRole = localStorage.getItem("role");
-        if (storedRole === "STUDENT") {
-          newType = "DASHEBOARD_STUDENT";
-        } else if (storedRole === "TEACHER") {
-          newType = "DASHEBOARD_TEACHER";
-        } else {
-          newType = "DEFAULT";
-        }
-        break;
+      }
+    } else {
+      newType = "DEFAULT";
+      newRole = "";
     }
 
     if (newType !== type) {
@@ -90,7 +77,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       dispatch(clearResults());
       setPrevLocation(location.pathname);
     }
-  }, [currentRoute, location.pathname, prevLocation, dispatch, role, type]);
+  }, [location.pathname, prevLocation, dispatch, role, type]);
 
   const backgroundColor = backgroundColorIdentification ? "white" : "#F1F1F1";
 

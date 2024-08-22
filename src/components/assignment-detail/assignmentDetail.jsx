@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { FiTrash2, FiImage } from 'react-icons/fi';
-import { fetchOneDevoir } from './../../api/apiDevoir';
+import { fetchDevoirById } from './../../api/apiDevoir'; // Import the updated function
 import { getToken } from '../../util/authUtils';
 import { uploadFile } from './../../api/apiUpload';
 import { checkDevoir, putDevoir } from './../../api/apiReponseStudent'; // Import the functions
@@ -19,7 +19,8 @@ const AssignmentDetail = () => {
     useEffect(() => {
         const fetchAssignment = async () => {
             try {
-                const data = await fetchOneDevoir(id, token);
+                // Remplacez 'devoir' par 'assignation' selon le contexte
+                const data = await fetchDevoirById(id, token, 'assignation'); 
                 setAssignment(data);
 
                 // Check if the student has already completed the devoir

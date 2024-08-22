@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { fetchStudents, fetchGroups, createGroup, updateGroup, deleteGroup } from '../../api/apiStudent';
 import { Col, Row } from 'react-bootstrap';
-import SearchForm from '../../components/searchForm/SearchForm';
+import SearchForm from '../searchForm/SearchForm';
 import { getToken } from '../../util/authUtils';
 import DevoirModal from '../DevoirModalSend/DevoirModal';
 import QuizModal from '../quiz-modal/QuizModal';
@@ -105,7 +105,7 @@ const styles = {
   },
 };
 
-const ListeEtudiants = () => {
+const SuiviPedagogique = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -420,23 +420,27 @@ const ListeEtudiants = () => {
       </Modal>
 
       {/* Modal pour assigner un devoir */}
-      <DevoirModal 
+      {(showAssignmentModal && assignmentType === 'Devoir') &&
+       <DevoirModal 
         show={showAssignmentModal && assignmentType === 'Devoir'} 
         handleClose={handleCloseAssignmentModal} 
         selectedStudentOrGroup={selectedStudentOrGroup}
         assignmentType={assignmentType} 
         groupId={selectedStudentOrGroup?.id} 
-      />
-
-      {/* Modal pour assigner un quiz */}
-      <QuizModal 
+      /> }
+     
+       {(showAssignmentModal && assignmentType === 'Quiz') &&
+        <QuizModal 
         show={showAssignmentModal && assignmentType === 'Quiz'} 
         handleClose={handleCloseAssignmentModal} 
         selectedStudentOrGroup={selectedStudentOrGroup}
         groupId={selectedStudentOrGroup?.id} 
-      />
+      /> }
+
+      {/* Modal pour assigner un quiz */}
+     
     </div>
   );
 };
 
-export default ListeEtudiants;
+export default SuiviPedagogique;

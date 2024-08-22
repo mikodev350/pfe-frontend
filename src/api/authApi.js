@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../constants/constante";
 import { toast } from "react-toastify";
 
 // update the role
-export const updateRole = async (type) => {
+export const updateRole = async (role) => {
   try {
     const token = localStorage.getItem("token");
 
@@ -13,7 +13,7 @@ export const updateRole = async (type) => {
 
     const response = await axios.put(
       `${API_BASE_URL}/user-custom/update-role`,
-      { type },
+      { role },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,9 +56,9 @@ export async function register(userData) {
       `${API_BASE_URL}/auth/local/register`,
       userData
     );
-    console.log("====================================");
-    console.log(response);
-    console.log("====================================");
+
+    await updateRole(userData.type);
+
     localStorage.setItem("token", response.data.jwt);
     localStorage.setItem("role", response.data.user.type.toUpperCase());
     return { ...response.data };

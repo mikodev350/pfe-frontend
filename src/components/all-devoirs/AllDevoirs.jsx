@@ -55,7 +55,7 @@ const AllDevoirs = ({ onEdit, onAdd }) => {  // Ajoutez la prop onAdd pour gére
     <div className="p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <Button variant="success" onClick={onAdd}>
-            <Link to="/student/devoirs/nouveau" >
+            <Link to="/dashboard/devoirs/nouveau" >
           Ajouter un Devoir
           </Link>
         </Button>

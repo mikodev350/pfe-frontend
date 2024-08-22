@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "../../../components/layout/Layout";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Resource from "../../resource/Resource";
 import AddResource from "../../add-resource/AddResource";
 import ResourceDetail from "../../resourceDetail/resourceDetail";
@@ -19,11 +19,10 @@ import Profile from "../../Profile/Profile";
 import InvitationPage from "../../Invitation-page/InvitationPage";
 import ResourcePreviewPageWithToken from "../../resourceDetail/ResourcePreviewPageWithToken";
 import ResourcePreviewPageWithId from "../../resourceDetail/ResourcePreviewPageWithId";
-import { useQueryClient } from "react-query"; // Ou le client de requête que vous utilisez
+import { useQueryClient } from "react-query";
 import useSyncOnConnectionRestore from "./../../../hooks/useSyncOnConnectionRestore";
 import GestionDevoir from "../../gestion-devoir/GestionDevoir";
 import Devoir from "../../devoir/Devoir";
-import ListeEtudiants from "../../../components/liste-etudiants/ListeEtudiants";
 import Progression from "../../../components/progression/Progression";
 
 import Quiz from "../../quiz/quiz/Quiz";
@@ -38,41 +37,35 @@ import AllAssignationsDevoir from "../../../components/all-assignations-devoir/A
 import CommunauteList from "../../../components/communaute-List/CommunauteList";
 import ListeDesEnseignants from "../../../components/communaute-proffesseur/ListeDesEnseignants";
 import AmisList from "../../../components/communaute-List/CommunauteList";
+import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
 
-function TeacherDashboard() {
-  const queryClient = useQueryClient(); // Si vous utilisez react-query, par exemple
+function Dashboard() {
+  const queryClient = useQueryClient();
   useSyncOnConnectionRestore(queryClient);
+
+  const role = localStorage.getItem("role"); // Get the role from localStorage
 
   return (
     <Layout>
       <Routes>
-        {/****************************************************************************************************** */}
+        {/* Routes common to all users */}
         <Route path="home" element={<HomeDashboard />} />
-        {/* ***************************************************************************************************** */}
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />
         <Route path="find-profil/:id" element={<Profile />} />
-        {/****************************************************************************************************** */}
         <Route path="new-resource" element={<AddResource />} />
         <Route path="update-resource/:id" element={<UpdateResource />} />
         <Route path="new-parcour" element={<AddPathwayForm />} />
-        {/****************************************************************************************************** */}
-
         <Route
           path="update-parcour/:pathwayId"
           element={<UpdatePathwayForm />}
         />
-        {/* ***************************************************************************************************** */}
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
-        {/* ***************************************************************************************************** */}
         <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
         <Route path="custom-profile" element={<CreateProfile />} />
-        {/* ***************************************************************************************************** */}
-
         <Route path="edit-profile" element={<DashboardProfile />} />
-
         <Route path="add-education" element={<AddEducation />} />
         <Route
           path="update-education/:educationId"
@@ -83,19 +76,13 @@ function TeacherDashboard() {
           path="update-experience/:experienceId"
           element={<AddExperience />}
         />
-        {/* ***************************************************************************************************** */}
         <Route path="/communaute/invitations" element={<InvitationPage />} />
-        <Route
-          path="/communaute/coaching"
-          element={<InvitationPage type="COACHING" />}
-        />
 
         <Route path="/communaute/amis" element={<AmisList />} />
         <Route
           path="/communaute/enseignants"
           element={<ListeDesEnseignants />}
         />
-
         <Route
           path="/resources/access/:token"
           element={<ResourcePreviewPageWithToken />}
@@ -104,45 +91,48 @@ function TeacherDashboard() {
           path="/resource-preview/:id"
           element={<ResourcePreviewPageWithId />}
         />
-        {/* ***************************************************************************************************** */}
-
-        {/* THIS GONNA BE FOR THE TEACHHERRRRR */}
-
-        {/* Devoirrr  */}
-
-        <Route path="/devoirs/nouveau" element={<GestionDevoir />} />
-        <Route path="/devoirs/modifier/:id" element={<GestionDevoir />} />
-        <Route path="/devoirs" element={<Devoir />} />
-
-        {/* ***************************************************************************************************** */}
-
-        <Route path="/quiz" element={<Quiz />} />
+        {/* Conditional Routes based on Role */}
+        {role === "TEACHER" && (
+          <>
+            {/* Teacher-Specific Routes */}
+            <Route path="/devoirs/nouveau" element={<GestionDevoir />} />
+            <Route path="/devoirs/modifier/:id" element={<GestionDevoir />} />
+            <Route path="/devoirs" element={<Devoir />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/quizzes" element={<Quizzes />} />
+            <Route path="/suivi-pedagogique" element={<SuiviPedagogique />} />
+            <Route path="/progression/:type/:id" element={<Progression />} />
+            <Route
+              path="/devoir/correction"
+              element={<AllAssignationsDevoir />}
+            />
+          </>
+        )}
+        {/* {role === "STUDENT" && (
+          <>
+            <Route
+              path="/communaute/mentorat"
+              element={<InvitationPage type="COACHING" />}
+            />
+          </>
+        )} */}
+        {/* <Route
+          path="/communaute/mentorat"
+          element={<InvitationPage type="COACHING" />}
+        /> */}
+        <Route
+          path="/communaute/coaching"
+          element={<InvitationPage type="COACHING" />}
+        />
         <Route path="/evaluation/quiz" element={<Evaluation />} />
-        <Route path="/quizzes" element={<Quizzes />} />
-
-        {/* LISTE ETUDIANT / GROUOPPPEE  */}
-
-        {/* ************************************************************************************************* */}
-        {/* Route pour afficher la liste des étudiants et des groupes */}
-        <Route path="/etudiants" element={<ListeEtudiants />} />
-
-        <Route path="/progression/:type/:id" element={<Progression />} />
-
-        {/* Route pour afficher les détails d'un étudiant individuel */}
-        {/* <Route path="/etudiant/:id" element={<DetailsEtudiant />} /> */}
-
-        {/* Route pour gérer un groupe d'étudiants */}
-        {/* <Route path="/groupe/:id" element={<GestionGroupe />} /> */}
-
-        {/* Coteerr etuidant Assignment */}
-        <Route path="/devoir/correction" element={<AllAssignationsDevoir />} />
-
         <Route path="/assignments" element={<AssignmentList />} />
         <Route path="/assignments/:id" element={<AssignmentDetail />} />
         <Route path="/assignments/:id/submit" element={<AssignmentSubmit />} />
+        {/* Redirect or 404 Route */}
+        <Route path="*" element={<Navigate to="/not-found" />} />
       </Routes>
     </Layout>
   );
 }
 
-export default TeacherDashboard;
+export default Dashboard;

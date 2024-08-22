@@ -69,6 +69,7 @@ const QuizModal = ({ show, handleClose, selectedStudentOrGroup, groupId }) => {
 const fetchAssignationsWithLogic = async (groupId, token) => {
   if (!selectedStudentOrGroup) return [];
 
+  console.log("sdfsdfsefsef")
   const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
   const response = await fetchAssignations(groupId, TypeElement, 'QUIZ', token);
   return response;

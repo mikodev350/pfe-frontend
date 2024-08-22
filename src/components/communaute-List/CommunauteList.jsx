@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { fetchAcceptedInvitationFriend,  } from '../../api/apiInvitation';
+import {
+  cancelFriendRequest,
+} from "../../api/apiFriendRequest";
 import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { FiMessageSquare, FiUserPlus, FiUserMinus } from 'react-icons/fi';
+import { FiMessageSquare, FiUserMinus } from 'react-icons/fi';
+import Swal from 'sweetalert2';
+import { getToken } from '../../util/authUtils';
 
 const styles = {
   card: {
@@ -42,11 +49,6 @@ const styles = {
     color: '#333',
     fontSize: '1rem',
   },
-  status: {
-    color: '#6c757d',
-    marginRight: '20px',
-    fontSize: '0.95rem',
-  },
   actions: {
     display: 'flex',
     alignItems: 'center',
@@ -64,25 +66,41 @@ const styles = {
 };
 
 const AmisList = () => {
-  const [friends, setFriends] = useState([
-    { name: 'Alice', status: 'En ligne', isFriend: true },
-    { name: 'Bob', status: 'Hors ligne', isFriend: false },
-    { name: 'Charlie', status: 'En ligne', isFriend: true },
-    { name: 'David', status: 'Hors ligne', isFriend: true },
-    { name: 'Eva', status: 'En ligne', isFriend: false },
-  ]);
+  const queryClient = useQueryClient();
+  const token = getToken();
 
-  const handleAddFriend = (index) => {
-    const updatedFriends = [...friends];
-    updatedFriends[index].isFriend = true;
-    setFriends(updatedFriends);
+  const { data: friends, isLoading, isError } = useQuery(
+    ['acceptedRelations', 'AMIS'],
+    () => fetchAcceptedInvitationFriend('AMIS')
+  );
+
+  const cancelFriendRequestMutation = useMutation(
+    (id) => cancelFriendRequest(id, token),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['acceptedRelations', 'AMIS']);
+      },
+      onError: (error) => {
+        Swal.fire('Erreur', `Erreur lors de la suppression: ${error.message}`, 'error');
+      },
+    }
+  );
+
+  const handleRemoveFriend = (friendId) => {
+    Swal.fire({
+      title: 'Êtes-vous sûr de vouloir retirer cet ami?',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, retirer',
+      cancelButtonText: 'Annuler',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelFriendRequestMutation.mutate(friendId);
+      }
+    });
   };
 
-  const handleRemoveFriend = (index) => {
-    const updatedFriends = [...friends];
-    updatedFriends[index].isFriend = false;
-    setFriends(updatedFriends);
-  };
+  if (isLoading) return <div>Chargement...</div>;
+  if (isError) return <div>Erreur lors du chargement des données.</div>;
 
   return (
     <div style={{ padding: '20px' }}>
@@ -93,48 +111,29 @@ const AmisList = () => {
             <ListGroup.Item
               key={index}
               style={styles.listItem}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.03)';
-                e.currentTarget.style.boxShadow = '0px 8px 16px rgba(0, 0, 0, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1.0)';
-                e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.05)';
-              }}
             >
               <div style={styles.iconContainer}>
-                <span>{friend.name.charAt(0)}</span>
+                <span>{friend.destinataire.username.charAt(0)}</span>
               </div>
-              <div style={styles.name}>{friend.name}</div>
-              <div style={styles.status}>{friend.status}</div>
+              <div style={styles.name}>{friend.destinataire.username}</div>
               <div style={styles.actions}>
                 <Button
                   variant="link"
                   style={styles.button}
-                  onClick={() => alert(`Message à ${friend.name}`)}
+                  onClick={() => alert(`Message à ${friend.destinataire.username}`)}
                   title="Envoyer un message"
                 >
                   <FiMessageSquare size={20} />
                 </Button>
-                {friend.isFriend ? (
-                  <Button
-                    variant="link"
-                    style={{ ...styles.button, color: '#dc3545' }}
-                    onClick={() => handleRemoveFriend(index)}
-                    title="Retirer de la liste d'amis"
-                  >
-                    <FiUserMinus size={20} />
-                  </Button>
-                ) : (
-                  <Button
-                    variant="link"
-                    style={{ ...styles.button, color: '#28a745' }}
-                    onClick={() => handleAddFriend(index)}
-                    title="Ajouter à la liste d'amis"
-                  >
-                    <FiUserPlus size={20} />
-                  </Button>
-                )}
+                <Button
+                  variant="link"
+                  style={{ ...styles.button, color: '#dc3545' }}
+                  onClick={() => handleRemoveFriend(friend.destinataire.id)}
+                  title="Retirer de la liste d'amis"
+                  disabled={cancelFriendRequestMutation.isLoading}
+                >
+                  <FiUserMinus size={20} />
+                </Button>
               </div>
             </ListGroup.Item>
           ))}

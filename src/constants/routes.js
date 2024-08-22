@@ -8,6 +8,8 @@ import {
   FaEnvelopeOpenText,
   FaUserFriends,
   FaHandshake,
+  FaChalkboardTeacher,
+  FaTasks,
 } from "react-icons/fa"; // Ajout des icônes manquantes
 import { FaPeopleGroup } from "react-icons/fa6";
 
@@ -83,106 +85,128 @@ let PageRouteSettings = [
 const PageRouteDashbordStudent = [
   {
     name: "tableau de bord",
-    route: "/student/homeDashbord",
+    route: "/dashboard/home",
     icon: AiFillHome,
   },
   {
     name: "Mon Profile",
-    route: "/student/my-profile",
-    icon: BiUser, // Utilisation de BiUser pour représenter le profil
-  },
-  {
-    name: "mon parcours",
-    route: "/student/parcours",
-    icon: FaBook, // Utilisation de BiBook pour représenter le parcours
-  },
-  {
-    name: "mes resource",
-    route: "/student/resources",
-    icon: BiArchive, // Utilisation de BiArchive pour représenter les ressources
-  },
-  {
-    name: "Évaluations",
-    icon: FaClipboardList, // Utilisation de FaClipboardList pour représenter la section Évaluations
-    subRoutes: [
-      {
-        name: "Devoirs",
-        route: "/student/devoirs",
-        icon: FaClipboardList, // Utilisation de FaClipboardList pour représenter les devoirs
-      },
-      {
-        name: "Quiz",
-        route: "/student/quiz",
-        icon: FaQuestionCircle, // Utilisation de FaQuestionCircle pour représenter les quiz
-      },
-    ],
-  },
-  {
-    name: "communauté",
-    route: "/student/communaute",
-    icon: FaPeopleGroup, // Utilisation de BiGroup pour représenter la communauté
-  },
-];
-const PageRouteDashbordTeacher = [
-  {
-    name: "tableau de bord",
-    route: "/teacher/homeDashbord",
-    icon: AiFillHome,
-  },
-  {
-    name: "Mon Profile",
-    route: "/teacher/my-profile",
+    route: "/dashboard/my-profile",
     icon: BiUser,
   },
   {
     name: "mon parcours",
-    route: "/teacher/parcours",
+    route: "/dashboard/parcours",
     icon: FaBook,
   },
   {
     name: "mes resource",
-    route: "/teacher/resources",
+    route: "/dashboard/resources",
     icon: BiArchive,
   },
+  {
+    name: "Mes Activités",
+    route: "/dashboard/assignments",
+    icon: FaTasks,
+  },
+  {
+    name: "Mentorat",
+    route: "/dashboard/communaute/coaching",
+    icon: FaChalkboardTeacher,
+  },
+  {
+    name: "Communauté",
+    icon: FaUsers,
+    subRoutes: [
+      {
+        name: "Invitations",
+        route: "/dashboard/communaute/invitations",
+        icon: FaEnvelopeOpenText,
+      },
+      {
+        name: "Liste d'Amis",
+        route: "/dashboard/communaute/amis",
+        icon: FaUserFriends,
+      },
+      {
+        name: "Liste de professeur",
+        route: "/dashboard/communaute/enseignants",
+        icon: FaHandshake,
+      },
+    ],
+  },
+];
+
+const PageRouteDashbordTeacher = [
+  {
+    name: "tableau de bord",
+    route: "/dashboard/homeDashbord",
+    icon: AiFillHome,
+  },
+  {
+    name: "Mon Profile",
+    route: "/dashboard/my-profile",
+    icon: BiUser,
+  },
+  {
+    name: "mon parcours",
+    route: "/dashboard/parcours",
+    icon: FaBook,
+  },
+  {
+    name: "mes resource",
+    route: "/dashboard/resources",
+    icon: BiArchive,
+  },
+  {
+    name: "suivi pedagogique",
+    route: "/dashboard/suivi-pedagogique",
+    icon: FaChalkboardTeacher,
+  },
+
   {
     name: "Évaluations",
     icon: FaClipboardList,
     subRoutes: [
       {
         name: "Devoirs",
-        route: "/teacher/devoirs",
+        route: "/dashboard/devoirs",
         icon: FaClipboardList,
       },
       {
         name: "Quiz",
-        route: "/teacher/quizzes",
+        route: "/dashboard/quizzes",
         icon: FaQuestionCircle,
       },
     ],
   },
   {
     name: "coaching",
-    route: "/teacher/communaute/coaching",
+    route: "/dashboard/communaute/coaching",
     icon: FaPeopleGroup,
   },
   {
+    name: "Mes Activités",
+    route: "/dashboard/assignments",
+    icon: FaTasks,
+  },
+  {
     name: "Communauté",
-    icon: FaUsers, // Utilisation de FaUsers pour représenter la communauté
+    icon: FaUsers,
     subRoutes: [
       {
         name: "Invitations",
-        route: "/teacher/communaute/invitations",
-        icon: FaEnvelopeOpenText, // Utilisation de FaEnvelopeOpenText pour représenter les invitations
+        route: "/dashboard/communaute/invitations",
+        icon: FaEnvelopeOpenText,
       },
       {
         name: "Liste d'Amis",
-        route: "/teacher/communaute/amis",
-        icon: FaUserFriends, // Utilisation de FaUserFriends pour représenter la liste d'amis
+        route: "/dashboard/communaute/amis",
+        icon: FaUserFriends,
       },
       {
         name: "Liste de professeur",
-        route: "/teacher/communaute/enseignants",
-        icon: FaHandshake, // Utilisation de FaHandshake pour représenter les collaborations
+        route: "/dashboard/communaute/enseignants",
+        icon: FaHandshake,
       },
     ],
   },

@@ -1,11 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Navbar,
-  Nav,
-  Container,
-  Badge,
-  NavbarBrand,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, Badge, NavbarBrand } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import {
   FaBell,
@@ -85,21 +79,42 @@ const styles = {
     position: "absolute",
     backgroundColor: "#fff",
     boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-    padding: "8px",
-    borderRadius: "5px",
-    width: "250px",
+    padding: "10px",
+    borderRadius: "10px",
+    width: "300px",
     zIndex: 1000,
     right: 0,
+    maxHeight: "400px", // Augmente la hauteur maximale
+    overflowY: "auto", // Active le défilement vertical
+    border: "1px solid #e0e0e0", // Ajoute une bordure légère
   },
   dropdownItem: {
-    padding: "8px 5px",
+    padding: "10px",
     textDecoration: "none",
     color: "#10266f",
     display: "flex",
     alignItems: "center",
     fontSize: "0.9rem",
-    borderRadius: "4px",
-    margin: "2px 0",
+    borderRadius: "8px",
+    margin: "5px 0",
+    backgroundColor: "#f9f9f9",
+    transition: "background-color 0.3s ease",
+  },
+  dropdownItemHover: {
+    backgroundColor: "#e6f2fb", // Change la couleur au survol
+  },
+  notificationIcon: {
+    marginRight: "10px",
+    fontSize: "1.2rem",
+    color: "#1e80c9",
+  },
+  notificationText: {
+    flex: 1,
+  },
+  notificationTime: {
+    fontSize: "0.8rem",
+    color: "#a0a0a0",
+    marginLeft: "10px",
   },
   fixedNavbar: {
     position: "fixed",
@@ -110,7 +125,6 @@ const styles = {
     backgroundColor: "transparent", // Set background to transparent
     boxShadow: "none", // Remove any box shadow
   },
-
 };
 
 const messages = [
@@ -122,6 +136,12 @@ function SocialMediaNavbar({ onFilterChange }) {
   const { notifications, total_count, total_new_messages } = useAppSelector(
     (state) => state.notification
   );
+
+  console.log("====================================");
+  console.log("notifications");
+  console.log(notifications);
+
+  console.log("====================================");
 
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
@@ -142,7 +162,11 @@ function SocialMediaNavbar({ onFilterChange }) {
   useOnClickOutside(profileDropdownRef, () => setIsProfileOpen(false));
 
   return (
-    <Navbar  expand="lg" className="pt-2 pb-1 rounded" style={{ ...styles.fixedNavbar, backgroundColor: "white" }}>
+    <Navbar
+      expand="lg"
+      className="pt-2 pb-1 rounded"
+      style={{ ...styles.fixedNavbar, backgroundColor: "white" }}
+    >
       <Container fluid>
         <Navbar.Brand as={Link} to="/" className="me-auto">
           <img
@@ -170,16 +194,11 @@ function SocialMediaNavbar({ onFilterChange }) {
             >
               <FaEnvelope />
               {total_new_messages > 0 && (
-                <Badge style={styles.badge}>
-                  {total_new_messages}
-                </Badge>
+                <Badge style={styles.badge}>{total_new_messages}</Badge>
               )}
             </div>
             {isMessagesOpen && (
-              <div
-                style={styles.customDropdown}
-                className="dropdown-menu show"
-              >
+              <div style={styles.customDropdown} className="dropdown-menu show">
                 {messages.map((message) => (
                   <a
                     key={message.id}
@@ -194,7 +213,6 @@ function SocialMediaNavbar({ onFilterChange }) {
             )}
           </div>
 
-          {/* Notification Icon with count */}
           <div style={{ position: "relative" }} ref={notificationDropdownRef}>
             <div
               style={{
@@ -207,30 +225,45 @@ function SocialMediaNavbar({ onFilterChange }) {
             >
               <FaBell />
               {total_count > 0 && (
-                <Badge style={styles.badge}>
-                  {total_count}
-                </Badge>
+                <Badge style={styles.badge}>{total_count}</Badge>
               )}
             </div>
             {isNotificationsOpen && (
-              <div
-                style={styles.customDropdown}
-                className="dropdown-menu show"
-              >
+              <div style={styles.customDropdown}>
                 {notifications.map((notification) => (
-                  <a
+                  <Link
+                    to={
+                      "/" +
+                      "dashboard" +
+                      notification.redirect_url +
+                      `?notif_id=${notification.id}`
+                    }
                     key={notification.id}
-                    href="#"
-                    className="dropdown-item"
                     style={styles.dropdownItem}
+                    className="dropdown-item"
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor =
+                        styles.dropdownItemHover.backgroundColor)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor =
+                        styles.dropdownItem.backgroundColor)
+                    }
                   >
-                    {notification.text}
-                  </a>
+                    <FaEnvelope style={styles.notificationIcon} />
+                    <span style={styles.notificationText}>
+                      {notification?.expediteur?.username +
+                        " " +
+                        notification?.notifText}
+                    </span>
+                    <small style={styles.notificationTime}>
+                      {notification.time}
+                    </small>
+                  </Link>
                 ))}
               </div>
             )}
           </div>
-
           {/* Profile Icon */}
           <div style={{ position: "relative" }} ref={profileDropdownRef}>
             <div
@@ -245,10 +278,7 @@ function SocialMediaNavbar({ onFilterChange }) {
               <FaUserCircle />
             </div>
             {isProfileOpen && (
-              <div
-                style={styles.customDropdown}
-                className="dropdown-menu show"
-              >
+              <div style={styles.customDropdown} className="dropdown-menu show">
                 <a
                   href="#"
                   className="dropdown-item"

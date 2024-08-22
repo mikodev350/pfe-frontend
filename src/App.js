@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Co
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/sign-up/SignUp";
-import StudentDashboard from "./pages/dashboard/student/StudentDashboard";
 import "./components/table/Tables.css";
 import Quiz from "./pages/quiz/quiz/Quiz";
 import Profile from "./pages/Profile/Profile";
@@ -19,7 +18,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./custom-bootstrap.css";
 
 import Notification from "./components/Notifications";
-import TeacherDashboard from "./pages/dashboard/teacher/TeacherDashboard";
+import Dashboard from "./pages/dashboard/dashboard/Dashboard";
+// import Dashboard from "./pages/dashboard/dashboard";
 
 function App() {
   // useSyncOnConnectionRestore();
@@ -35,9 +35,8 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
-          <Route path="/student/*" element={<StudentDashboard />} />
-          <Route path="/teacher/*" element={<TeacherDashboard />} />
-          <Route path="/dashbord" element={<mainDashbord />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
+
           <Route path="/chat" element={<ChatApp />} />
           <Route path="/settings/*" element={<Settings />} />
           <Route path="/quiz" element={<Quiz />} />

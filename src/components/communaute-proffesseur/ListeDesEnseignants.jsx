@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { fetchAcceptedInvitationFriend,  } from '../../api/apiInvitation';
+import {
+  cancelFriendRequest,
+} from "../../api/apiFriendRequest";
 import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { FiMessageSquare, FiUserPlus, FiUserMinus } from 'react-icons/fi';
+import { FiMessageSquare, FiUserMinus } from 'react-icons/fi';
+import Swal from 'sweetalert2';
+import { getToken } from '../../util/authUtils';
 
 const styles = {
   card: {
@@ -42,11 +49,6 @@ const styles = {
     color: '#333',
     fontSize: '1rem',
   },
-  status: {
-    color: '#6c757d',
-    marginRight: '20px',
-    fontSize: '0.95rem',
-  },
   actions: {
     display: 'flex',
     alignItems: 'center',
@@ -63,78 +65,75 @@ const styles = {
   },
 };
 
-const ListeDesEnseignants = () => {
-  const [professors, setProfessors] = useState([
-    { name: 'Prof. Alice', status: 'En ligne', isContact: true },
-    { name: 'Prof. Bob', status: 'Hors ligne', isContact: false },
-    { name: 'Prof. Charlie', status: 'En ligne', isContact: true },
-    { name: 'Prof. David', status: 'Hors ligne', isContact: true },
-    { name: 'Prof. Eva', status: 'En ligne', isContact: false },
-  ]);
+const TeacherList = () => {
+  const queryClient = useQueryClient();
+  const token = getToken();
 
-  const handleAddContact = (index) => {
-    const updatedProfessors = [...professors];
-    updatedProfessors[index].isContact = true;
-    setProfessors(updatedProfessors);
+  const { data: teachers, isLoading, isError } = useQuery(
+    ['acceptedRelations', 'COACHING'],
+    () => fetchAcceptedInvitationFriend('COACHING')
+  );
+
+  const cancelCoachingRequestMutation = useMutation(
+    (id) => cancelFriendRequest(id, token),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['acceptedRelations', 'COACHING']);
+      },
+      onError: (error) => {
+        Swal.fire('Erreur', `Erreur lors de la suppression: ${error.message}`, 'error');
+      },
+    }
+  );
+
+  const handleRemoveTeacher = (teacherId) => {
+    Swal.fire({
+      title: 'Êtes-vous sûr de vouloir retirer ce professeur?',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, retirer',
+      cancelButtonText: 'Annuler',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cancelCoachingRequestMutation.mutate(teacherId);
+      }
+    });
   };
 
-  const handleRemoveContact = (index) => {
-    const updatedProfessors = [...professors];
-    updatedProfessors[index].isContact = false;
-    setProfessors(updatedProfessors);
-  };
+  if (isLoading) return <div>Chargement...</div>;
+  if (isError) return <div>Erreur lors du chargement des données.</div>;
 
   return (
     <div style={{ padding: '20px' }}>
       <Card style={styles.card}>
         <h3>Liste des Professeurs</h3>
         <ListGroup variant="flush">
-          {professors.map((prof, index) => (
+          {teachers.map((teacher, index) => (
             <ListGroup.Item
               key={index}
               style={styles.listItem}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.03)';
-                e.currentTarget.style.boxShadow = '0px 8px 16px rgba(0, 0, 0, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1.0)';
-                e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.05)';
-              }}
             >
               <div style={styles.iconContainer}>
-                <span>{prof.name.charAt(6)}</span>
+                <span>{teacher.destinataire.username.charAt(0)}</span>
               </div>
-              <div style={styles.name}>{prof.name}</div>
-              <div style={styles.status}>{prof.status}</div>
+              <div style={styles.name}>{teacher.destinataire.username}</div>
               <div style={styles.actions}>
                 <Button
                   variant="link"
                   style={styles.button}
-                  onClick={() => alert(`Message à ${prof.name}`)}
+                  onClick={() => alert(`Message à ${teacher.destinataire.username}`)}
                   title="Envoyer un message"
                 >
                   <FiMessageSquare size={20} />
                 </Button>
-                {prof.isContact ? (
-                  <Button
-                    variant="link"
-                    style={{ ...styles.button, color: '#dc3545' }}
-                    onClick={() => handleRemoveContact(index)}
-                    title="Retirer de la liste de contacts"
-                  >
-                    <FiUserMinus size={20} />
-                  </Button>
-                ) : (
-                  <Button
-                    variant="link"
-                    style={{ ...styles.button, color: '#28a745' }}
-                    onClick={() => handleAddContact(index)}
-                    title="Ajouter à la liste de contacts"
-                  >
-                    <FiUserPlus size={20} />
-                  </Button>
-                )}
+                <Button
+                  variant="link"
+                  style={{ ...styles.button, color: '#dc3545' }}
+                  onClick={() => handleRemoveTeacher(teacher.destinataire.id)}
+                  title="Retirer de la liste des professeurs"
+                  disabled={cancelCoachingRequestMutation.isLoading}
+                >
+                  <FiUserMinus size={20} />
+                </Button>
               </div>
             </ListGroup.Item>
           ))}
@@ -144,4 +143,4 @@ const ListeDesEnseignants = () => {
   );
 };
 
-export default ListeDesEnseignants;
+export default TeacherList;

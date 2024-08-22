@@ -47,14 +47,23 @@ export const deleteDevoir = async (id, token) => {
   return response.data;
 };
 
-export const fetchDevoirById = async (id, token) => {
-  console.log(token);
-  const response = await axios.get(`${API_BASE_URL}/devoirs/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
+export const fetchDevoirById = async (id, token, type = "devoir") => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/devoirs/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { type }, // Ajout du paramètre type dans la requête
+    });
+
+    console.log("response.data");
+    console.log(response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération du devoir:", error);
+    throw error;
+  }
 };
 
 export const fetchForModelDevoirs = async (token) => {
@@ -107,7 +116,9 @@ export const fetchAssignations = async (
     TypeElement: TypeElement,
     etudantId: IdEtudiant,
   };
+  console.log("params");
 
+  console.log(params);
   const token = getToken();
   const response = await axios.get(`${API_BASE_URL}/assignations`, {
     headers: {

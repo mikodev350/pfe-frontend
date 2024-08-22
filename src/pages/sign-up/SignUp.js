@@ -10,7 +10,7 @@ import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import "react-toastify/dist/ReactToastify.css";
 import "./SignUpStyle.css";
-import signImage from './Sign up-rafiki (1).png';
+import signImage from "./Sign up-rafiki (1).png";
 
 const SignUpSchema = Yup.object().shape({
   username: Yup.string().required("Nom d'utilisateur requis"),
@@ -58,16 +58,16 @@ const SignUp = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      alert("i am herreeee");
       const response = await register(values);
       if (response) {
         const token = localStorage.getItem("token");
         if (token) {
-          if (values.type === "STUDENT") {
-            navigate("/student/parcour");
-          } else {
-            navigate("/teacher/parcour");
-          }
+          navigate("/dasboard/home");
+          // if (values.type === "STUDENT") {
+          //   navigate("/student/parcour");
+          // } else {
+          //   navigate("/teacher/parcour");
+          // }
         } else {
           toast.error("Token is missing, please login again.", {
             position: "top-right",
@@ -105,7 +105,11 @@ const SignUp = () => {
         <div className="main-signup-container mt-0">
           <Row className="justify-content-center">
             <Col md={6} className="image-signup p-0">
-            <img src={signImage} alt="Login Illustration" className="background-image w-150" />
+              <img
+                src={signImage}
+                alt="Login Illustration"
+                className="background-image w-150"
+              />
             </Col>
             <Col md={6} id="signup-box">
               <Formik

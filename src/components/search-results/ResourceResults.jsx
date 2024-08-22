@@ -49,7 +49,7 @@ const ResourceResults = ({ results }) => {
         </span>
       </Link>` */}
               <div className="d-flex justify-content-between p-3">
-                <Badge as={Link} to={`/student/resource-preview/${result.id}`} bg="info" className="me-2">
+                <Badge as={Link} to={`/dashboard/resource-preview/${result.id}`} bg="info" className="me-2">
                   View Resource
                 </Badge>
               </div>

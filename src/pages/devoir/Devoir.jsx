@@ -6,7 +6,7 @@ const Devoir = () => {
   const navigate = useNavigate();
 
   const handleEdit = (devoir) => {
-    navigate(`/student/devoirs/modifier/${devoir.id}`);
+    navigate(`/dashboard/devoirs/modifier/${devoir.id}`);
   };
 
   return (

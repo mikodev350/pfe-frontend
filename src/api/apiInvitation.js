@@ -59,3 +59,17 @@ export const acceptInvitation = async (token) => {
     }, 1000);
   });
 };
+
+export const fetchAcceptedInvitationFriend = async (type) => {
+  const token = getToken();
+
+  const response = await axios.get(`${API_BASE_URL}/relations/accepted`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      type, // Le type de relation (AMIS ou COACHING)
+    },
+  });
+  return response.data;
+};

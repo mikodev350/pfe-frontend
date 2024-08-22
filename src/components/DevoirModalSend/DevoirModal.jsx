@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import Select from 'react-select';
-import { useQuery } from 'react-query';
-import { fetchForModelDevoirs, createAssignation, deleteAssignation, fetchAssignations } from '../../api/apiDevoir';
-import { useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { FiTrash2, FiEdit } from 'react-icons/fi'; // Import de l'icône d'édition
+import { Link } from 'react-router-dom';
+import {
+  fetchForModelDevoirs,
+  createAssignation,
+  deleteAssignation,
+  fetchAssignations,
+} from '../../api/apiDevoir';
 import { getToken } from '../../util/authUtils';
-import { FiTrash2 } from 'react-icons/fi';
 
 const styles = {
   modalTitle: {
@@ -28,6 +33,13 @@ const styles = {
     color: '#dc3545',
     cursor: 'pointer',
   },
+  editButton: {
+    background: 'none',
+    border: 'none',
+    color: '#007bff',
+    cursor: 'pointer',
+    marginRight: '10px',
+  },
   addButton: {
     marginTop: '15px',
     backgroundColor: '#007bff',
@@ -40,29 +52,24 @@ const styles = {
 };
 
 const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType, groupId }) => {
-  const [selectedAssignments, setSelectedAssignments] = useState([]);
-  const [showSelect, setShowSelect] = useState(false);
+  const [selectedAssignments, setSelectedAssignments] = React.useState([]);
+  const [showSelect, setShowSelect] = React.useState(false);
   const queryClient = useQueryClient();
   const token = React.useMemo(() => getToken(), []);
 
-  // Récupérer les devoirs ou quiz disponibles selon le type d'assignation
   const {
     data: assignmentOptions,
     isLoading: isLoadingAssignments,
     error: errorAssignments,
   } = useQuery([assignmentType, token], () => fetchForModelDevoirs(token, assignmentType), {
-    select: (response) => response.data.map(assignment => ({ value: assignment.id, label: assignment.titre })),
+    select: (response) => response.data.map((assignment) => ({ value: assignment.id, label: assignment.titre })),
   });
 
-  const fetchAssignationsWithLogic = async (groupId, assignmentType, token) => {
-      if (!selectedStudentOrGroup) return [];
-
+  const fetchAssignationsWithLogicForDevoir = async (groupId, assignmentType, token) => {
+    if (!selectedStudentOrGroup) return [];
     const TypeElement = selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL";
+  
     const response = await fetchAssignations(groupId, TypeElement, assignmentType, token);
-    console.log("response  of devoirrr ");
-    console.log(response);
-    
-    
     return response;
   };
 
@@ -72,11 +79,15 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
     error: errorAssignations,
   } = useQuery(
     ['assignations', groupId, assignmentType],
-    () => fetchAssignationsWithLogic(groupId, assignmentType, token)
+    () => fetchAssignationsWithLogicForDevoir(groupId, "DEVOIR", token)
   );
+    console.log("assignations");
+
+  console.log(assignations);
+  
 
   const mutation = useMutation(
-    ({ entityData, token }) => createAssignation(entityData, token,"DEVOIR"), {
+    ({ entityData, token }) => createAssignation(entityData, token, "DEVOIR"), {
       onSuccess: () => {
         queryClient.invalidateQueries([assignmentType]);
         handleClose();
@@ -152,14 +163,26 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
                       <strong>{assignment.titre}</strong>
                       <div>{assignment.date}</div>
                     </div>
-                    <Button
-                      variant="link"
-                      style={styles.deleteButton}
-                      onClick={() => handleDelete(assignment.id)}
-                      title="Supprimer"
-                    >
-                      <FiTrash2 size={20} />
-                    </Button>
+                    <div>
+                      
+                      {/* Bouton pour aller à la page de correction */}
+                      <Link
+      to={`/dashboard/devoir/correction?${selectedStudentOrGroup.membres ? `group=${groupId}` : `etudiant=${selectedStudentOrGroup.id}`}&devoir=${assignment.devoirId}`}
+      style={styles.editButton}
+      title="Corriger"
+    >
+      <FiEdit size={20} />
+    </Link>
+                      {/* Bouton de suppression */}
+                      <Button
+                        variant="link"
+                        style={styles.deleteButton}
+                        onClick={() => handleDelete(assignment.id)}
+                        title="Supprimer"
+                      >
+                        <FiTrash2 size={20} />
+                      </Button>
+                    </div>
                   </ListGroup.Item>
                 ))
               ) : (

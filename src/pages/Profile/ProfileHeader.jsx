@@ -113,7 +113,7 @@ export const ProfileHeader = ({
             className="mt-2 custom-light-button"
             onClick={() => handleSendRequest("COACHING")}
           >
-            Demande de Coaching
+            Demande de Coach
           </Button>
         )
       );
@@ -151,6 +151,19 @@ export const ProfileHeader = ({
             className="custom-light-button"
           >
             <MdPersonAddAlt size={19} /> Add Friend
+          </Button>
+        )
+      );
+    } else if (userRole === "STUDENT" && type === "TEACHER") {
+      // Affiche seulement "Demande de Coaching" si le rôle est STUDENT et le type est TEACHER
+      return (
+        !status.coachingRequestSent && (
+          <Button
+            variant="outline-light"
+            className="mt-2 custom-light-button"
+            onClick={() => handleSendRequest("COACHING")}
+          >
+            Demande de Coaching
           </Button>
         )
       );

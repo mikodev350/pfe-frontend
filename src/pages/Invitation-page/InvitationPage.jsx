@@ -62,8 +62,12 @@ const InvitationPage = () => {
   const queryClient = useQueryClient();
   const location = useLocation();
 
+  const userRole = localStorage.getItem("role");
+
   // Determine the type of invitations based on the route
-  const invitationType = location.pathname.includes("coaching") ? "COACHING" : "AMIS";
+  const invitationType = location.pathname.includes("coaching")
+    ? "COACHING"
+    : "AMIS";
 
   // Fetch invitations using react-query
   const { data: invitations, isLoading } = useQuery(
@@ -77,10 +81,16 @@ const InvitationPage = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["invitations", invitationType]);
-        setMessage(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} acceptée !`);
+        setMessage(
+          `${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} acceptée !`
+        );
       },
       onError: (error) => {
-        setMessage(`Erreur lors de l'acceptation de ${invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"}: ${error.message}`);
+        setMessage(
+          `Erreur lors de l'acceptation de ${
+            invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"
+          }: ${error.message}`
+        );
       },
     }
   );
@@ -91,10 +101,18 @@ const InvitationPage = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["invitations", invitationType]);
-        setMessage(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} refusée !`);
+        setMessage(
+          `${
+            invitationType === "AMIS" ? "Invitation" : "Demande de coaching"
+          } refusée !`
+        );
       },
       onError: (error) => {
-        setMessage(`Erreur lors du refus de ${invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"}: ${error.message}`);
+        setMessage(
+          `Erreur lors du refus de ${
+            invitationType === "AMIS" ? "l'invitation" : "la demande de coaching"
+          }: ${error.message}`
+        );
       },
     }
   );
@@ -105,15 +123,30 @@ const InvitationPage = () => {
 
   const handleCancelRequest = (id) => {
     Swal.fire({
-      title: `Êtes-vous sûr de vouloir refuser cette ${invitationType === "AMIS" ? "invitation" : "demande de coaching"}?`,
+      title: `Êtes-vous sûr de vouloir refuser cette ${
+        invitationType === "AMIS" ? "invitation" : "demande de coaching"
+      }?`,
       showCancelButton: true,
       confirmButtonText: "Refuser",
     }).then((result) => {
       if (result.isConfirmed) {
         cancelInvitationMutation.mutate(id);
-        Swal.fire(`${invitationType === "AMIS" ? "Invitation" : "Demande de coaching"} refusée!`, "", "success");
+        Swal.fire(
+          `${
+            invitationType === "AMIS" ? "Invitation" : "Demande de coaching"
+          } refusée!`,
+          "",
+          "success"
+        );
       }
     });
+  };
+
+  const getInvitationText = (expediteur) => {
+    if (invitationType === "COACHING" && userRole === "STUDENT") {
+      return `Invitation de ${expediteur.username} pour devenir votre mentor`;
+    }
+    return `Demande de coaching de ${expediteur.username}`;
   };
 
   if (isLoading) return <div>Chargement...</div>;
@@ -121,7 +154,9 @@ const InvitationPage = () => {
   return (
     <Container style={styles.container}>
       <h1 className="my-4 text-center">
-        {invitationType === "AMIS" ? "Invitations Communautaires" : "Demandes de Coaching"}
+        {invitationType === "AMIS"
+          ? "Invitations Communautaires"
+          : "Demandes de Coaching"}
       </h1>
       {message && <Alert variant="info">{message}</Alert>}
       <Row>
@@ -151,14 +186,17 @@ const InvitationPage = () => {
                   {invitation.expediteur.username}
                 </Card.Title>
                 <Card.Text style={styles.cardText}>
-                  {invitation.expediteur.email}
+                  {getInvitationText(invitation.expediteur)}
                 </Card.Text>
                 <Button
                   variant="outline-primary"
                   className="me-2"
                   style={styles.button}
                   onClick={() => handleAcceptRequest(invitation.expediteur.id)}
-                  disabled={acceptInvitationMutation.isLoading || cancelInvitationMutation.isLoading}
+                  disabled={
+                    acceptInvitationMutation.isLoading ||
+                    cancelInvitationMutation.isLoading
+                  }
                 >
                   <FaCheck /> Accepter
                 </Button>
@@ -166,7 +204,10 @@ const InvitationPage = () => {
                   variant="outline-danger"
                   style={styles.button}
                   onClick={() => handleCancelRequest(invitation.expediteur.id)}
-                  disabled={acceptInvitationMutation.isLoading || cancelInvitationMutation.isLoading}
+                  disabled={
+                    acceptInvitationMutation.isLoading ||
+                    cancelInvitationMutation.isLoading
+                  }
                 >
                   <FaTimes /> Refuser
                 </Button>

@@ -56,6 +56,9 @@ const styles = {
     statusBadgePending: {
         backgroundColor: '#dc3545', // Rouge pour "non fait"
     },
+    statusBadgeModifiable: {
+        backgroundColor: '#ffc107', // Jaune pour "Fait, peut toujours être modifié"
+    },
 };
 
 function AssignmentList() {
@@ -76,48 +79,84 @@ function AssignmentList() {
         fetchAssignments();
     }, []);
 
-    const devoirs = assignments.filter(assignment => assignment.type === 'DEVOIR');
-    const quiz = assignments.filter(assignment => assignment.type === 'QUIZ');
+    const getStatusBadgeStyle = (status) => {
+        switch (status) {
+            case "Fait":
+                return styles.statusBadgeDone;
+            case "Fait, peut toujours être modifié":
+                return styles.statusBadgeModifiable;
+            default:
+                return styles.statusBadgePending;
+        }
+    };
 
     const renderAssignments = (assignments) => {
-        return assignments.map((assignment) => (
-            <div
-                key={assignment.id}
-                style={{
-                    ...styles.assignmentItem,
-                    ...(hovered === assignment.id ? styles.assignmentItemHover : {}),
-                }}
-                onMouseEnter={() => setHovered(assignment.id)}
-                onMouseLeave={() => setHovered(null)}
-            >
-                <div style={styles.responsiveItem}>
-                    <Link 
-                        to={`/assignments/${assignment.id}`} 
-                        style={styles.assignmentLink}
-                    >
-                        <strong>{assignment.titre}</strong>
-                        <span 
-                            style={{
-                                ...styles.statusBadge,
-                                ...(assignment.status === 'Soumis' ? styles.statusBadgeDone : styles.statusBadgePending),
-                            }}
-                        >
-                            {assignment.status === 'Soumis' ? 'Fait' : 'Non fait'}
-                        </span>
-                    </Link>
-                    <small style={{ color: '#6c757d' }}>Date limite: {assignment.date}</small>
+        return assignments.map((assignment) => {
+            const link =
+                assignment.type === 'QUIZ'
+                    ? `/dashboard/evaluation/quiz?id=${assignment.id}`
+                    : `/dashboard/assignments/${assignment.id}`;
+
+            const isCompleted = assignment.status === "Fait";
+
+            return (
+                <div
+                    key={assignment.id}
+                    style={{
+                        ...styles.assignmentItem,
+                        ...(hovered === assignment.id ? styles.assignmentItemHover : {}),
+                    }}
+                    onMouseEnter={() => setHovered(assignment.id)}
+                    onMouseLeave={() => setHovered(null)}
+                >
+                    <div style={styles.responsiveItem}>
+                        {!isCompleted ? (
+                            <Link 
+                                to={link} 
+                                style={styles.assignmentLink}
+                            >
+                                <strong>{assignment.titre}</strong>
+                                <span 
+                                    style={{
+                                        ...styles.statusBadge,
+                                        ...getStatusBadgeStyle(assignment.status),
+                                    }}
+                                >
+                                    {assignment.status}
+                                </span>
+                            </Link>
+                        ) : (
+                            <div style={styles.assignmentLink}>
+                                <strong>{assignment.titre}</strong>
+                                <span 
+                                    style={{
+                                        ...styles.statusBadge,
+                                        ...getStatusBadgeStyle(assignment.status),
+                                    }}
+                                >
+                                    {assignment.status}
+                                </span>
+                            </div>
+                        )}
+                        <small style={{ color: '#6c757d' }}>Date limite: {assignment.date}</small>
+                    </div>
+                    <div style={styles.responsiveAlignment}>
+                        {!isCompleted && (
+                            <Link 
+                                to={link} 
+                                style={hovered === assignment.id ? styles.assignmentLinkHover : {}}
+                            >
+                                Voir les détails
+                            </Link>
+                        )}
+                    </div>
                 </div>
-                <div style={styles.responsiveAlignment}>
-                    <Link 
-                        to={`/assignments/${assignment.id}`} 
-                        style={hovered === assignment.id ? styles.assignmentLinkHover : {}}
-                    >
-                        Voir les détails
-                    </Link>
-                </div>
-            </div>
-        ));
+            );
+        });
     };
+
+    const devoirs = assignments.filter(assignment => assignment.type === 'DEVOIR');
+    const quiz = assignments.filter(assignment => assignment.type === 'QUIZ');
 
     return (
         <div className="assignment-list" style={{ padding: '20px' }}>
