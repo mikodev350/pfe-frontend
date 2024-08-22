@@ -38,6 +38,7 @@ import CommunauteList from "../../../components/communaute-List/CommunauteList";
 import ListeDesEnseignants from "../../../components/communaute-proffesseur/ListeDesEnseignants";
 import AmisList from "../../../components/communaute-List/CommunauteList";
 import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
+import Note from "../../../components/result/Note";
 
 function Dashboard() {
   const queryClient = useQueryClient();
@@ -108,6 +109,7 @@ function Dashboard() {
             />
           </>
         )}
+
         {/* {role === "STUDENT" && (
           <>
             <Route
@@ -120,6 +122,8 @@ function Dashboard() {
           path="/communaute/mentorat"
           element={<InvitationPage type="COACHING" />}
         /> */}
+        <Route path="/notes" element={<Note />} />
+
         <Route
           path="/communaute/coaching"
           element={<InvitationPage type="COACHING" />}

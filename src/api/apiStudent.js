@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "../util/authUtils";
 
 const API_BASE_URL = "http://localhost:1337/api";
 
@@ -102,6 +103,62 @@ export const deleteGroup = async (id, token) => {
     return { message: "Group deleted successfully" };
   } catch (error) {
     console.error("Failed to delete group:", error);
+    throw error;
+  }
+};
+
+/***************************************************************************************/
+/*******************fetchee notesss for teacher aand studentt ********************/
+export const fetchNotes = async () => {
+  const token = getToken();
+  try {
+    const response = await fetch(
+      "http://localhost:1337/api/assignations-custom/notes",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajoute le token si nécessaire
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des notes");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Erreur dans fetchNotes:", error);
+    throw error;
+  }
+};
+
+/**************************************************************************************/
+export const fetchRecentAssignments = async () => {
+  try {
+    const token = getToken();
+
+    const response = await fetch(
+      "http://localhost:1337/api/assignations-custom/recent",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajoutez le token si nécessaire
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Erreur lors de la récupération des assignations récentes"
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Erreur dans fetchRecentAssignments:", error);
     throw error;
   }
 };

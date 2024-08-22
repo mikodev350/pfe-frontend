@@ -3,6 +3,7 @@ import { AiFillHome } from "react-icons/ai";
 import {
   FaBook,
   FaClipboardList,
+  FaChartBar,
   FaQuestionCircle,
   FaUsers,
   FaEnvelopeOpenText,
@@ -114,6 +115,11 @@ const PageRouteDashbordStudent = [
     icon: FaChalkboardTeacher,
   },
   {
+    name: "Notes",
+    route: "/dashboard/notes",
+    icon: FaChartBar, // Nouvelle icône pour la route Notes
+  },
+  {
     name: "Communauté",
     icon: FaUsers,
     subRoutes: [
@@ -139,7 +145,7 @@ const PageRouteDashbordStudent = [
 const PageRouteDashbordTeacher = [
   {
     name: "tableau de bord",
-    route: "/dashboard/homeDashbord",
+    route: "/dashboard/home",
     icon: AiFillHome,
   },
   {
@@ -162,7 +168,11 @@ const PageRouteDashbordTeacher = [
     route: "/dashboard/suivi-pedagogique",
     icon: FaChalkboardTeacher,
   },
-
+  {
+    name: "Notes",
+    route: "/dashboard/notes",
+    icon: FaChartBar, // Nouvelle icône pour la route Notes
+  },
   {
     name: "Évaluations",
     icon: FaClipboardList,
