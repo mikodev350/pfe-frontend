@@ -42,12 +42,12 @@ export default function TableIconeResource({ id, dataLabel }) {
 
   return (
     <td data-label={dataLabel} style={{ alignItems: "center" }}>
-      <Link to={`/student/resource-preview/${id}`}>
+      <Link to={`/dashboard/resource-preview/${id}`}>
         <span className="icon-option">
           <BiDetail size={23} />
         </span>
       </Link>
-      <Link to={`/student/update-resource/${id}`}>
+      <Link to={`/dashboard/update-resource/${id}`}>
         <span className="icon-option">
           <BiEdit size={24} />
         </span>
