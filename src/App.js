@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Correctly import BrowserRouter and Routes
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom"; // Correctly import BrowserRouter and Routes
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/sign-up/SignUp";
@@ -20,7 +25,14 @@ import "./custom-bootstrap.css";
 import Notification from "./components/Notifications";
 import Dashboard from "./pages/dashboard/dashboard/Dashboard";
 // import Dashboard from "./pages/dashboard/dashboard";
-
+function PrivateRoute({ element: Component }) {
+  const token = window.localStorage.getItem("token");
+  return token ? <Component /> : <Navigate to="/login" replace />;
+}
+function OnlyVisitorRoute({ element: Component }) {
+  const token = window.localStorage.getItem("token");
+  return !token ? <Component /> : <Navigate to="/dashboard/home" replace />;
+}
 function App() {
   // useSyncOnConnectionRestore();
 
@@ -31,17 +43,32 @@ function App() {
         <Notification />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/:id" element={<Profile />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/login" element={<OnlyVisitorRoute element={Login} />} />
+          <Route
+            path="/signup"
+            element={<OnlyVisitorRoute element={SignUp} />}
+          />
+          <Route path="/profile" element={<PrivateRoute element={Profile} />} />
+          <Route
+            path="/profile/:id"
+            element={<PrivateRoute element={Profile} />}
+          />
+          <Route
+            path="/dashboard/*"
+            element={<PrivateRoute element={Dashboard} />}
+          />
 
-          <Route path="/chat" element={<ChatApp />} />
-          <Route path="/settings/*" element={<Settings />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/quizzes" element={<Quizzes />} />
-          <Route path="/evaluation" element={<Settings />} />
+          <Route path="/chat" element={<ChatApp element={Dashboard} />} />
+          <Route
+            path="/settings/*"
+            element={<Settings element={Dashboard} />}
+          />
+          <Route path="/quiz" element={<Quiz element={Dashboard} />} />
+          <Route path="/quizzes" element={<Quizzes element={Dashboard} />} />
+          <Route
+            path="/evaluation"
+            element={<Settings element={Dashboard} />}
+          />
         </Routes>
       </Router>
     </>

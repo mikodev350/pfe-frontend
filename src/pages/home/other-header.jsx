@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 // ******* affichier Logo ******
 import AppLogo from "./images/ggg.png";
+import { Link } from "react-router-dom";
 
 // Styled Components
 const Header = styled.header`
@@ -161,7 +162,7 @@ const CustomNavbar = () => {
       <Navbar
         expand="lg"
         className="custom-navbar "
-        style={{ backgroundColor: "rgba(255, 255, 255, 0) !important" }}
+        style={{ backgroundColor: "rgba(255, 255, 255, 0) !important", marginTop: "20px"}}
       >
         <Container>
           <Navbar.Brand
@@ -233,26 +234,22 @@ const CustomNavbar = () => {
                 </Nav.Link>
               </Nav>
               <Nav className="nav_btn">
-                <Nav.Link
-                  as={ScrollLink}
-                  to="SignUp"
-                  smooth={true}
+               <Link to="/signup">
+                <Nav.Item 
                   duration={500}
                   className="header__btn text-center"
                   id="clssone"
                 >
                   S'inscrire
-                </Nav.Link>
-                <Nav.Link
-                  as={ScrollLink}
-                  to="Login"
-                  smooth={true}
+                </Nav.Item></Link> 
+                <Link to="/login">
+                <Nav.Item 
                   duration={500}
                   className="header__btn text-center"
                   id="clsstwo"
                 >
                   {"Se\u00A0connecter"}
-                </Nav.Link>
+                </Nav.Item></Link>
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
