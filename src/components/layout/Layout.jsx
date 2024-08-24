@@ -47,6 +47,20 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       dispatch(fetchAdvancedSearch(params));
     }
   };
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+   React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 useEffect(() => {
     const storedRole = localStorage.getItem("role");
     let newType = type;
@@ -91,7 +105,7 @@ useEffect(() => {
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
-      <main style={{ backgroundColor, minHeight: "100vh" }}>
+      <main style={{ backgroundColor, minHeight: "100vh",paddingLeft: windowWidth < 900 ? "0px" : "220px"}}>
         <Container>
           
           {fullcontent ? (

@@ -4,24 +4,32 @@ import { NavLink } from "react-router-dom";
 import useStorage from "../../../hooks/useStorage";
 import { routesSide } from "../../../constants/routes";
 import styled from "styled-components";
+import Hamburger from "hamburger-react";
+import useOnClickOutside from "../../../util/useOnClickOutside";
 
 const StyledSidebar = styled.div`
   position: fixed;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   top: 50px;
-  width: 60px;
+  width: 220px;
   height: calc(
     100vh - 50px
   ); /* Ajuster la hauteur pour qu'elle corresponde à la hauteur de la fenêtre */
   background-color: #10266f;
   color: #ffffff;
   z-index: 28;
-  transition: width 0.3s ease;
-  overflow-y: auto; /* Activer le défilement vertical */
-  overflow-x: hidden; /* Cacher le défilement horizontal */
+  left: ${(props) => (props.expanded ? "0" : "-260px")};
+  transition: left 0.3s ease;
+  // overflow-y: auto; /* Activer le défilement vertical */
+  //overflow-x: hidden; /* Cacher le défilement horizontal */
+  /* Hide scrollbar for all browsers */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 
-  &.expanded {
-    width: 220px;
+  &::-webkit-scrollbar {
+    /* WebKit browsers like Chrome, Safari */
+    width: 0;
+    height: 0;
   }
 
   .nav-menu {
@@ -69,7 +77,7 @@ const StyledSidebar = styled.div`
       overflow: hidden;
       text-overflow: ellipsis;
       transition: opacity 0.3s ease;
-      opacity: ${(props) => (props.expanded ? 1 : 0)};
+      //opacity: ${(props) => (props.expanded ? 1 : 0)};
       color: #ffffff;
     }
   }
@@ -89,32 +97,75 @@ const StyledSidebar = styled.div`
 `;
 
 const SidebarDesktop = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const sidebar = React.useRef(null);
+
+  const [isExpanded, setIsExpanded] = useState(null);
   const [expandedEvaluations, setExpandedEvaluations] = useState(false);
   const [expandedCollaborations, setExpandedCollaborations] = useState(false); // Ajout de l'état pour "Collaborations"
   const [currentRoute] = useStorage({ key: "type" });
+  useOnClickOutside(sidebar, () => {
+    if (windowWidth < 900) {
+      setIsExpanded(false);
+    }
+  });
+  // if (
+  //   typeof currentRoute === "string" &&
+  //   routesSide.hasOwnProperty(currentRoute)
+  // ) {
+  const menus = routesSide[currentRoute];
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
 
-  if (
-    typeof currentRoute === "string" &&
-    routesSide.hasOwnProperty(currentRoute)
-  ) {
-    const menus = routesSide[currentRoute];
+    window.addEventListener("resize", handleResize);
 
-    const handleMouseEnter = () => setIsExpanded(true);
-    const handleMouseLeave = () => setIsExpanded(false);
-    const toggleEvaluations = () =>
-      setExpandedEvaluations(!expandedEvaluations);
-    const toggleCollaborations = () =>
-      setExpandedCollaborations(!expandedCollaborations); // Fonction de basculement pour "Collaborations"
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  React.useEffect(() => {
+    if (windowWidth < 900) {
+      setIsExpanded(false);
+    } else {
+      setIsExpanded(true);
+    }
+  }, [windowWidth]);
 
-    return (
+  const toggleEvaluations = () => setExpandedEvaluations(!expandedEvaluations);
+  const toggleCollaborations = () =>
+    setExpandedCollaborations(!expandedCollaborations); // Fonction de basculement pour "Collaborations"
+  if (isExpanded === null) return null;
+  return (
+    <div
+      style={{
+        position: "relative",
+      }}
+      ref={sidebar}
+    >
       <StyledSidebar
-        className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        className={`sidebar-container ${isExpanded ? "expanded" : ""}`}
+        // onMouseEnter={handleMouseEnter}
+
         expanded={isExpanded}
       >
-        <Nav className="flex-column nav-menu mt-5 ">
+        {windowWidth < 900 && (
+          <div
+            style={{
+              position: "absolute",
+              left: "260px",
+              top: "10px",
+              zIndex: 12220,
+            }}
+          >
+            <Hamburger toggled={isExpanded} toggle={setIsExpanded} />
+          </div>
+        )}
+
+        <div className="flex-column nav-menu mt-5 ">
           {menus.map((menu, key) => (
             <React.Fragment key={key}>
               {menu.name === "Évaluations" ? (
@@ -188,12 +239,11 @@ const SidebarDesktop = () => {
               )}
             </React.Fragment>
           ))}
-        </Nav>
+        </div>
       </StyledSidebar>
-    );
-  }
-
-  return null;
+    </div>
+  );
+  // }
 };
 
 export default SidebarDesktop;

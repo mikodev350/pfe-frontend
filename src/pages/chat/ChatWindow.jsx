@@ -7,7 +7,12 @@ import { v4 as uuidv4 } from "uuid";
 import WriterMessage from "../../components/common/conversation/WriterMessage";
 import styled from "styled-components";
 import { useQuery, useQueryClient } from "react-query";
-import { addMessage, fetchConversation, removeParticipant, fetchFriends } from "../../api/apiConversation";
+import {
+  addMessage,
+  fetchConversation,
+  removeParticipant,
+  fetchFriends,
+} from "../../api/apiConversation";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import UploadedImage from "../../components/common/conversation/UploadedImage";
@@ -34,10 +39,8 @@ const AvatarWithName = (participants, type, id, title, imageUrl) => {
 
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);
-    const {
-      username,
-      profil: { photoProfil: { url } = {} } = {},
-    } = usersFiltered[0];
+    const { username, profil: { photoProfil: { url } = {} } = {} } =
+      usersFiltered[0];
     displayName = username;
     displayImage = url ? API_BASE_URL + url : displayImage;
   }
@@ -53,12 +56,19 @@ const AvatarWithName = (participants, type, id, title, imageUrl) => {
   );
 };
 
-const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
+const ChatWindow = ({
+  id,
+  friend,
+  onSendMessage,
+  currentUserId,
+  onBackToList,
+}) => {
   const [searchParams] = useSearchParams();
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showAddParticipantModal, setShowAddParticipantModal] = useState(false);
-  const [showRemoveParticipantModal, setShowRemoveParticipantModal] = useState(false);
+  const [showRemoveParticipantModal, setShowRemoveParticipantModal] =
+    useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [friendsOptions, setFriendsOptions] = useState([]);
   const messageEndRef = useRef(null);
@@ -97,15 +107,17 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
     loadFriends();
   }, []);
 
-  const { isLoading, data, error } = useQuery(
-    ["conversation", searchParams.get("id")],
-    () => fetchConversation({ id: searchParams.get("id") })
+  const { isLoading, data, error } = useQuery(["conversation", id], () =>
+    fetchConversation({ id: id })
   );
 
   const handleRemoveParticipant = async () => {
     try {
-      await removeParticipant({ conversationId: searchParams.get("id"), userId: selectedUser.value });
-      queryClient.invalidateQueries(["conversation", searchParams.get("id")]);
+      await removeParticipant({
+        conversationId: id,
+        userId: selectedUser.value,
+      });
+      queryClient.invalidateQueries(["conversation", id]);
       setShowRemoveParticipantModal(false);
       setSelectedUser(null);
     } catch (error) {
@@ -139,22 +151,19 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         status: "PENDING",
       };
 
-      let data = await queryClient.getQueryData([
-        "conversation",
-        searchParams.get("id"),
-      ]);
+      let data = await queryClient.getQueryData(["conversation", id]);
       data = {
         ...data,
         messages: [...data.messages, newMessages],
       };
-      queryClient.setQueryData(["conversation", searchParams.get("id")], {
+      queryClient.setQueryData(["conversation", id], {
         ...data,
       });
 
       const result = await addMessage({
         data: {
           ...form,
-          id: searchParams.get("id"),
+          id: id,
           fakeId: newMessages.id,
         },
       });
@@ -165,7 +174,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         return item;
       });
 
-      queryClient.setQueryData(["conversation", searchParams.get("id")], {
+      queryClient.setQueryData(["conversation", id], {
         ...data,
       });
     } else if (body.type === "IMAGES" || body.type === "FILES") {
@@ -187,15 +196,12 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         status: "PENDING",
       }));
 
-      let data = await queryClient.getQueryData([
-        "conversation",
-        searchParams.get("id"),
-      ]);
+      let data = await queryClient.getQueryData(["conversation", id]);
       data = {
         ...data,
         messages: [...data.messages, ...newMessages],
       };
-      queryClient.setQueryData(["conversation", searchParams.get("id")], {
+      queryClient.setQueryData(["conversation", id], {
         ...data,
       });
     } else if (body.type === "VOICE") {
@@ -212,43 +218,40 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         createdAt: new Date(),
         status: "PENDING",
       };
-      let data = await queryClient.getQueryData([
-        "conversation",
-        searchParams.get("id"),
-      ]);
+      let data = await queryClient.getQueryData(["conversation", id]);
       data = {
         ...data,
         messages: [...data.messages, newMessages],
       };
-      queryClient.setQueryData(["conversation", searchParams.get("id")], {
+      queryClient.setQueryData(["conversation", id], {
         ...data,
       });
     }
   };
 
-  const setUploaded = useCallback(async (targetItem) => {
-    let data = await queryClient.getQueryData([
-      "conversation",
-      searchParams.get("id"),
-    ]);
-    if (!data) {
-      console.error("No data found for conversation");
-      return;
-    }
-    data = {
-      ...data,
-      messages: data.messages.map((item) => {
-        if (item.id === targetItem.id) {
-          item.status = "success";
-          item.attachement = targetItem.attachement;
-        }
-        return item;
-      }),
-    };
-    queryClient.setQueryData(["conversation", searchParams.get("id")], {
-      ...data,
-    });
-  }, [queryClient, searchParams]);
+  const setUploaded = useCallback(
+    async (targetItem) => {
+      let data = await queryClient.getQueryData(["conversation", id]);
+      if (!data) {
+        console.error("No data found for conversation");
+        return;
+      }
+      data = {
+        ...data,
+        messages: data.messages.map((item) => {
+          if (item.id === targetItem.id) {
+            item.status = "success";
+            item.attachement = targetItem.attachement;
+          }
+          return item;
+        }),
+      };
+      queryClient.setQueryData(["conversation", id], {
+        ...data,
+      });
+    },
+    [queryClient, searchParams]
+  );
 
   const { socket } = useSelector((state) => state.socket);
 
@@ -259,10 +262,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   useEffect(() => {
     if (socket) {
       socket?.on("newMessage", async ({ message }) => {
-        let data = await queryClient.getQueryData([
-          "conversation",
-          searchParams.get("id"),
-        ]);
+        let data = await queryClient.getQueryData(["conversation", id]);
         if (!data) {
           console.error("No data found for conversation");
           return;
@@ -272,7 +272,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
           messages: [...data.messages, message],
         };
 
-        queryClient.setQueryData(["conversation", searchParams.get("id")], {
+        queryClient.setQueryData(["conversation", id], {
           ...data,
         });
         if (scrollableContainerRef.current) {
@@ -291,17 +291,30 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error...</div>;
 
-  const isAdmin = data?.type === "GROUP" && data?.admin?.id === data?.currentUserId;
+  const isAdmin =
+    data?.type === "GROUP" && data?.admin?.id === data?.currentUserId;
 
   return (
     <Container>
       <StyledCard>
         <StyledCardHeader>
-          {AvatarWithName(data?.participants, data?.type, data?.currentUserId, data?.titre, data?.imageUrl)}
+          {AvatarWithName(
+            data?.participants,
+            data?.type,
+            data?.currentUserId,
+            data?.titre,
+            data?.imageUrl
+          )}
           {data?.type === "GROUP" && isAdmin && (
             <IconContainer>
-              <FaUserPlus style={{ cursor: "pointer" }} onClick={() => setShowAddParticipantModal(true)} />
-              <FaUserMinus style={{ cursor: "pointer", marginLeft: "10px" }} onClick={() => setShowRemoveParticipantModal(true)} />
+              <FaUserPlus
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowAddParticipantModal(true)}
+              />
+              <FaUserMinus
+                style={{ cursor: "pointer", marginLeft: "10px" }}
+                onClick={() => setShowRemoveParticipantModal(true)}
+              />
             </IconContainer>
           )}
         </StyledCardHeader>
@@ -311,8 +324,7 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
             style={{
               minHeight: "350px",
               overflowY: "auto",
-              height: `${window.innerHeight - 450}px`,
-              maxHeight: "400px",
+              maxHeight: window.innerWidth > 900 ? "400px" : "80vh",
             }}
           >
             {data?.messages?.map((message, index) => (
@@ -321,7 +333,8 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
                   <img
                     src={
                       message?.expediteur?.profil?.photoProfil?.url
-                        ? API_BASE_URL + message?.expediteur?.profil?.photoProfil?.url
+                        ? API_BASE_URL +
+                          message?.expediteur?.profil?.photoProfil?.url
                         : "https://avatars.hsoubcdn.com/default?s=128"
                     }
                     alt=""
@@ -371,7 +384,11 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
           <Modal.Title>Image Preview</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Image src={selectedImage} alt="Enlarged content" style={{ width: "100%" }} />
+          <Image
+            src={selectedImage}
+            alt="Enlarged content"
+            style={{ width: "100%" }}
+          />
         </Modal.Body>
       </Modal>
       <AddParticipantModal
@@ -380,7 +397,11 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
         conversationId={searchParams.get("id")}
         currentParticipants={data?.participants}
       />
-      <Modal show={showRemoveParticipantModal} onHide={() => setShowRemoveParticipantModal(false)} centered>
+      <Modal
+        show={showRemoveParticipantModal}
+        onHide={() => setShowRemoveParticipantModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Remove Participant</Modal.Title>
         </Modal.Header>
@@ -388,9 +409,9 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
           <Form.Group controlId="formParticipants">
             <Form.Label>Select Participant</Form.Label>
             <Select
-              options={data?.participants.map(participant => ({
+              options={data?.participants.map((participant) => ({
                 value: participant.id,
-                label: participant.username
+                label: participant.username,
               }))}
               value={selectedUser}
               onChange={setSelectedUser}
@@ -399,7 +420,10 @@ const ChatWindow = ({ friend, onSendMessage, currentUserId, onBackToList }) => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowRemoveParticipantModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowRemoveParticipantModal(false)}
+          >
             Close
           </Button>
           <Button variant="danger" onClick={handleRemoveParticipant}>
@@ -429,7 +453,11 @@ async function uploadToStrapi(file) {
       Authorization: `Bearer ${getToken()}`,
     },
   };
-  const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, options);
+  const response = await axios.post(
+    `${process.env.REACT_APP_API_BASE_URL}/upload/`,
+    formData,
+    options
+  );
   console.log("File uploaded successfully:", response);
   return response;
 }
@@ -452,13 +480,18 @@ function PreUploadItem({ item, setUploaded, conversationId, onClick }) {
     };
     if (item.type === "VOICE") {
       const result = await uploadBlobUrlToStrapi(item.file);
-      axios.post(`${API_BASE_URL}/api/conversation/${conversationId}`, {
-          data: {
-            file: result.data[0],
-            type: item.type,
-            fakeId: item.id,
+      axios
+        .post(
+          `${API_BASE_URL}/api/conversation/${conversationId}`,
+          {
+            data: {
+              file: result.data[0],
+              type: item.type,
+              fakeId: item.id,
+            },
           },
-        }, config)
+          config
+        )
         .then((response) => {
           setUploaded({
             id: item.id,
@@ -486,14 +519,23 @@ function PreUploadItem({ item, setUploaded, conversationId, onClick }) {
           setProgress(percentageProgress);
         },
       };
-      const result = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/upload/`, formData, options);
-      axios.post(`${process.env.REACT_APP_API_BASE_URL}/conversation/${conversationId}`, {
-          data: {
-            file: result.data[0],
-            type: item.type,
-            fakeId: item.id,
+      const result = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/upload/`,
+        formData,
+        options
+      );
+      axios
+        .post(
+          `${process.env.REACT_APP_API_BASE_URL}/conversation/${conversationId}`,
+          {
+            data: {
+              file: result.data[0],
+              type: item.type,
+              fakeId: item.id,
+            },
           },
-        }, config)
+          config
+        )
         .then((response) => {
           setStatus("UPLOADED");
           setUploaded({
@@ -509,23 +551,68 @@ function PreUploadItem({ item, setUploaded, conversationId, onClick }) {
   }, [item, conversationId, setUploaded]);
 
   useEffect(() => {
-    if (item.status === "PENDING" && (item.type === "FILES" || item.type === "VOICE" || item.type === "IMAGES")) {
+    if (
+      item.status === "PENDING" &&
+      (item.type === "FILES" || item.type === "VOICE" || item.type === "IMAGES")
+    ) {
       init();
     }
   }, [item, init]);
 
-  if (item.type === "FILES") return <UploadedFile file={item.attachement} progress={progress} status={status} source={source} />;
+  if (item.type === "FILES")
+    return (
+      <UploadedFile
+        file={item.attachement}
+        progress={progress}
+        status={status}
+        source={source}
+      />
+    );
   if (item.type === "TEXT") return <ItemText>{item?.contenu}</ItemText>;
-  if (item.type === "IMAGES") return (
-    <div onClick={() => onClick(item.status === "PENDING" ? item?.blobURL : process.env.REACT_APP_UPLOAD + item?.attachement?.url)}>
-      <UploadedImage url={item.status === "PENDING" ? item?.blobURL : process.env.REACT_APP_UPLOAD + item?.attachement?.url} />
-    </div>
-  );
-  if (item.type === "VOICE") return (
-    <div style={{ display: "flex", alignItems: "center", backgroundColor: "#dee1e6", borderRadius: 15, padding: "0px 20px" }}>
-      <audio className="audio-player audio-player-message " controls src={item.status === "pending" ? item?.file : process.env.REACT_APP_UPLOAD + item?.attachement?.url} type="audio/ogg" style={{ marginLeft: 10 }} />
-    </div>
-  );
+  if (item.type === "IMAGES")
+    return (
+      <div
+        onClick={() =>
+          onClick(
+            item.status === "PENDING"
+              ? item?.blobURL
+              : process.env.REACT_APP_UPLOAD + item?.attachement?.url
+          )
+        }
+      >
+        <UploadedImage
+          url={
+            item.status === "PENDING"
+              ? item?.blobURL
+              : process.env.REACT_APP_UPLOAD + item?.attachement?.url
+          }
+        />
+      </div>
+    );
+  if (item.type === "VOICE")
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#dee1e6",
+          borderRadius: 15,
+          padding: "0px 20px",
+        }}
+      >
+        <audio
+          className="audio-player audio-player-message "
+          controls
+          src={
+            item.status === "pending"
+              ? item?.file
+              : process.env.REACT_APP_UPLOAD + item?.attachement?.url
+          }
+          type="audio/ogg"
+          style={{ marginLeft: 10 }}
+        />
+      </div>
+    );
   return null;
 }
 
@@ -579,7 +666,6 @@ const StyledCard = styled(Card)`
     align-items: center;
     font-size: 1.2rem; /* Increase the font size */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
   }
 `;
 
@@ -588,8 +674,7 @@ const StyledCardHeader = styled(Card.Header)`
   justify-content: space-between;
   align-items: center;
   font-size: 1.5rem; /* Increase the font size */
-    height: 60px;
-
+  height: 60px;
 `;
 
 const IconContainer = styled.div`
