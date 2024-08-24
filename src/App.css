@@ -12,18 +12,24 @@ body {
   font-size: 16px;
 } */
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo&display=swap");
+/* body * {
+  outline: 1px solid green;
+} */
+html,
 body {
-  font-family: 'Cairo', sans-serif;
-  background-color: #F1F1F1;
+  font-family: "Cairo", sans-serif;
+  background-color: #f1f1f1;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 :root {
   --primary-color: #007bd4;
   /* --secondary-color: #007bd4 ; */
-  --body-color: #F1F1F1;
+  --body-color: #f1f1f1;
   --input-border-color: #d7d7d721;
 }
 
@@ -39,12 +45,12 @@ main {
 }
 
 .rc-side-bar {
-  display: block
+  display: block;
 }
 
 @media only screen and (max-width: 570px) {
   .rc-side-bar {
-    display: none !important
+    display: none !important;
   }
 }
 
@@ -81,7 +87,7 @@ main {
   border-radius: 8px;
 }
 
-.Bagrond-Profils{
+.Bagrond-Profils {
   background-color: var(--primary-color);
 }
 /* Header with background color and rounded image */
@@ -145,12 +151,14 @@ main {
 }
 
 /* Styling for Experience and Education */
-.experience h3, .education h3 {
+.experience h3,
+.education h3 {
   font-weight: bold;
   margin-top: 10px;
 }
 
-.experience p, .education p {
+.experience p,
+.education p {
   font-size: 14px;
   color: #666;
 }
@@ -190,7 +198,6 @@ main {
   background: #ccc;
   margin: 1.5rem 0;
 }
-
 
 .skills-container {
   text-align: center;
@@ -242,15 +249,15 @@ main {
   margin-bottom: 1rem;
 }
 
-.profile-exp>div,
-.profile-edu>div {
+.profile-exp > div,
+.profile-edu > div {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: #ccc 1px dotted;
 }
 
-.profile-exp>div:last-child,
-.profile-edu>div:last-child {
+.profile-exp > div:last-child,
+.profile-edu > div:last-child {
   border: 0;
 }
 
@@ -258,8 +265,8 @@ main {
 .profile-edu p {
   margin: 0.5rem 0;
 }
-.nonBorder{
-  border:none  !important;
+.nonBorder {
+  border: none !important;
 }
 /* .profile-exp>div:last-child,
 .profile-edu> */
@@ -318,7 +325,7 @@ div .btn-outline-light {
   /* Border color */
 }
 
-div .btn-outline-light:hover{
+div .btn-outline-light:hover {
   background-color: white !important;
   /* New background color */
   color: black !important;
@@ -446,21 +453,21 @@ div .btn-outline-light:hover{
 }
 
 .image-preview button {
-  position: absolute!important;
-  top: -10px!important;
-  right: -20px!important;
-  background: rgba(255, 0, 0, 0.8)!important;
-  border: none!important;
+  position: absolute !important;
+  top: -10px !important;
+  right: -20px !important;
+  background: rgba(255, 0, 0, 0.8) !important;
+  border: none !important;
   border-radius: 50% !important;
   color: white !important;
-  width: 40px!important;
-  height: 40px!important;
-  display: flex!important;
-  align-items: center!important;
-  justify-content: center!important;
-  font-size: 16px!important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
   /* Taille de la police pour le "X" */
-  font-weight: bold!important;
+  font-weight: bold !important;
   /* Gras pour le "X" */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   cursor: pointer;
@@ -468,9 +475,8 @@ div .btn-outline-light:hover{
 
 .image-preview button:hover {
   background: rgba(255, 0, 0, 1);
-    color: white !important;
+  color: white !important;
 }
-
 
 .image-preview button svg {
   width: 20px !important;
