@@ -121,16 +121,13 @@ const Conversation = () => {
         <link rel="stylesheet" type="text/css" href="/css/chatStyle.css" />
       </Helmet>
       <Layout>
-        <StyledContainer>
-          <Row>
-            <Col md={8}>
-              <ChatWindow id={id} />
-            </Col>
-          </Row>
+        <>
+          <ChatWindow id={id} />
+
           {/* <ToggleButton onClick={() => setShowSidebar(!showSidebar)}>
             {showSidebar ? "Hide" : "Show"} Sidebar
           </ToggleButton> */}
-        </StyledContainer>
+        </>
       </Layout>
     </>
   );

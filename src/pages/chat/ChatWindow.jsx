@@ -324,8 +324,7 @@ const ChatWindow = ({
             style={{
               minHeight: "350px",
               overflowY: "auto",
-              height: `${window.innerHeight - 450}px`,
-              maxHeight: "400px",
+              maxHeight: window.innerWidth > 900 ? "400px" : "80vh",
             }}
           >
             {data?.messages?.map((message, index) => (
