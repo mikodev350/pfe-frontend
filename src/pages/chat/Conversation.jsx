@@ -12,7 +12,7 @@ import {
 import ChatWindow from "./ChatWindow"; // Ensure the path to ChatWindow is correct
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import CreateModelGroupe from "../../components/create-groupe/Create-model-groupe"; // Ensure the path to CreateModelGroupe is correct
@@ -72,9 +72,8 @@ const AvatarWithName = (participants, type, id, title) => {
   );
 };
 
-const ChatApp = () => {
-  const [searchParams] = useSearchParams();
-  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+const Conversation = () => {
+  const { id } = useParams(); // Access the :id parameter
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -124,69 +123,20 @@ const ChatApp = () => {
       <Layout>
         <StyledContainer>
           <Row>
-            <Col md={4}>
-              <CreateModelGroupe
-                show={showCreateGroupModal}
-                handleClose={() => setShowCreateGroupModal(false)}
-              />
-              <StyledTabs defaultActiveKey="private">
-                <StyledTab eventKey="private" title="Private">
-                  <StyledListGroup>
-                    {dataPrivate?.conversations?.map((item) => (
-                      <StyledListGroupItem
-                        key={item.id}
-                        onClick={() => handleShowConversation(item.id)}
-                      >
-                        {AvatarWithName(
-                          item.participants,
-                          item.type,
-                          dataPrivate?.currentUserId
-                        )}
-                      </StyledListGroupItem>
-                    ))}
-                  </StyledListGroup>
-                </StyledTab>
-                <StyledTab eventKey="group" title="Group">
-                  <StyledListGroup>
-                    {dataGroup?.conversations?.map((item) => (
-                      <StyledListGroupItem
-                        key={item.id}
-                        onClick={() => handleShowConversation(item.id)}
-                      >
-                        {AvatarWithName(
-                          item.participants,
-                          item.type,
-                          dataGroup?.currentUserId,
-                          item.titre // Pass the title for group conversations
-                        )}
-                      </StyledListGroupItem>
-                    ))}
-                  </StyledListGroup>
-                </StyledTab>
-              </StyledTabs>
+            <Col md={8}>
+              <ChatWindow id={id} />
             </Col>
-            {windowWidth > 900 && (
-              <Col md={8}>
-                {selectedConversation ? (
-                  <ChatWindow id={searchParams.get("id")} />
-                ) : (
-                  <PlaceholderText>
-                    Select a conversation to start chatting
-                  </PlaceholderText>
-                )}
-              </Col>
-            )}
           </Row>
-          <ToggleButton onClick={() => setShowSidebar(!showSidebar)}>
+          {/* <ToggleButton onClick={() => setShowSidebar(!showSidebar)}>
             {showSidebar ? "Hide" : "Show"} Sidebar
-          </ToggleButton>
+          </ToggleButton> */}
         </StyledContainer>
       </Layout>
     </>
   );
 };
 
-export default ChatApp;
+export default Conversation;
 
 const StyledContainer = styled(Container)`
   margin-top: 20px;

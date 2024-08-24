@@ -12,6 +12,7 @@ import "./components/table/Tables.css";
 import Quiz from "./pages/quiz/quiz/Quiz";
 import Profile from "./pages/Profile/Profile";
 import ChatApp from "./pages/chat/chatApp";
+import Conversation from "./pages/chat/Conversation";
 import Settings from "./pages/settings/settings";
 import Socket from "./components/Socket/Socket";
 import Quizzes from "./pages/quiz/quiz/Quizzes";
@@ -58,16 +59,20 @@ function App() {
             element={<PrivateRoute element={Dashboard} />}
           />
 
-          <Route path="/chat" element={<ChatApp element={Dashboard} />} />
+          <Route path="/chat" element={<PrivateRoute element={ChatApp} />} />
+          <Route
+            path="/chat/:id"
+            element={<PrivateRoute element={Conversation} />}
+          />
           <Route
             path="/settings/*"
-            element={<Settings element={Dashboard} />}
+            element={<PrivateRoute element={Settings} />}
           />
-          <Route path="/quiz" element={<Quiz element={Dashboard} />} />
-          <Route path="/quizzes" element={<Quizzes element={Dashboard} />} />
+          <Route path="/quiz" element={<PrivateRoute element={Quiz} />} />
+          <Route path="/quizzes" element={<PrivateRoute element={Quizzes} />} />
           <Route
             path="/evaluation"
-            element={<Settings element={Dashboard} />}
+            element={<PrivateRoute element={Settings} />}
           />
         </Routes>
       </Router>

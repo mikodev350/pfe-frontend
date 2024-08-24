@@ -105,7 +105,11 @@ const SidebarDesktop = () => {
   const [expandedEvaluations, setExpandedEvaluations] = useState(false);
   const [expandedCollaborations, setExpandedCollaborations] = useState(false); // Ajout de l'état pour "Collaborations"
   const [currentRoute] = useStorage({ key: "type" });
-  useOnClickOutside(sidebar, () => setIsExpanded(false));
+  useOnClickOutside(sidebar, () => {
+    if (windowWidth < 900) {
+      setIsExpanded(false);
+    }
+  });
   // if (
   //   typeof currentRoute === "string" &&
   //   routesSide.hasOwnProperty(currentRoute)
@@ -236,7 +240,7 @@ const SidebarDesktop = () => {
             </React.Fragment>
           ))}
         </div>
-      </StyledSidebar>{" "}
+      </StyledSidebar>
     </div>
   );
   // }
