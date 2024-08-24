@@ -39,6 +39,7 @@ import ListeDesEnseignants from "../../../components/communaute-proffesseur/List
 import AmisList from "../../../components/communaute-List/CommunauteList";
 import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
 import Note from "../../../components/result/Note";
+import Notifications from "../../notifications/Notifications";
 
 function Dashboard() {
   const queryClient = useQueryClient();
@@ -50,6 +51,7 @@ function Dashboard() {
     <Layout>
       <Routes>
         {/* Routes common to all users */}
+        <Route path="notifications" element={<Notifications/>} />
         <Route path="home" element={<HomeDashboard />} />
         <Route path="resources" element={<Resource />} />
         <Route path="my-profile" element={<Profile />} />

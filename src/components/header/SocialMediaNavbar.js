@@ -137,12 +137,6 @@ function SocialMediaNavbar({ onFilterChange }) {
     (state) => state.notification
   );
 
-  console.log("====================================");
-  console.log("notifications");
-  console.log(notifications);
-
-  console.log("====================================");
-
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
@@ -192,6 +186,7 @@ function SocialMediaNavbar({ onFilterChange }) {
       }
     }
   };
+
   return (
     <Navbar
       expand="lg"
