@@ -161,7 +161,11 @@ const SidebarDesktop = () => {
               zIndex: 12220,
             }}
           >
-            <Hamburger toggled={isExpanded} toggle={setIsExpanded} />
+            <Hamburger
+              toggled={isExpanded}
+              toggle={setIsExpanded}
+              color="#10266F"
+            />
           </div>
         )}
 
