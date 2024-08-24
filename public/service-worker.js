@@ -1,14 +1,21 @@
 const CACHE_NAME = "dynamic-cache-v1";
 
-const URLS_TO_CACHE = ["*"];
+const URLS_TO_CACHE = [
+  "/",
+  "/index.html",
+  "static/js/bundle.js",
+  // Add more URLs as needed
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(URLS_TO_CACHE);
-    })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(URLS_TO_CACHE);
+      })
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 // self.addEventListener("install", (event) => {
 //   // Skip the waiting phase
@@ -36,6 +43,8 @@ self.addEventListener("fetch", (event) => {
     caches
       .match(event.request)
       .then((cachedResponse) => {
+        console.log(cachedResponse);
+
         // If the request is found in the cache, return it
         if (cachedResponse) {
           return cachedResponse;
@@ -43,6 +52,7 @@ self.addEventListener("fetch", (event) => {
 
         // Otherwise, fetch the request from the network
         return fetch(event.request).then((networkResponse) => {
+          console.log(networkResponse);
           // Cache the fetched response dynamically
           return caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, networkResponse.clone());

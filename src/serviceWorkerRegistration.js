@@ -18,17 +18,7 @@ export function register(config) {
     window.addEventListener("load", () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
-      if (isLocalhost) {
-        checkValidServiceWorker(swUrl, config);
-
-        navigator.serviceWorker.ready.then(() => {
-          console.log(
-            "This web app is being served cache-first by a service worker. To learn more, visit https://cra.link/PWA"
-          );
-        });
-      } else {
-        registerValidSW(swUrl, config);
-      }
+      registerValidSW(swUrl, config);
     });
   }
 }
