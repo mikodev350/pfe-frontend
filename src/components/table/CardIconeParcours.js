@@ -74,7 +74,7 @@ export default function CardIconeParcours({ parcoursId, parcoursName }) {
         placement="top"
         container={document.body}
       >
-        <StyledLink to={`/student/modules/${parcoursId}`}>
+        <StyledLink to={`/dashboard/modules/${parcoursId}`}>
           <BiArchive size={24} />
         </StyledLink>
       </OverlayTrigger>
@@ -88,7 +88,7 @@ export default function CardIconeParcours({ parcoursId, parcoursName }) {
         placement="top"
         container={document.body}
       >
-        <StyledLink to={`/student/update-parcour/${parcoursId}`}>
+        <StyledLink to={`/dashboard/update-parcour/${parcoursId}`}>
           <BiEdit size={24} />
         </StyledLink>
       </OverlayTrigger>

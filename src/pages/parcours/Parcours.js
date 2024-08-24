@@ -18,7 +18,7 @@ const Parcours = () => {
       <Row>
         <Col xs={12} md={12} lg={8}>
           <Row style={{ marginTop: "10px" }}>
-            <Link to={`/student/new-parcour`}>
+            <Link to={`/dasboard/new-parcour`}>
               <Button variant="primary" className="button-dashboard btn-color">
                 <span className="button-span-size btn-write-white">
                   Add resource
