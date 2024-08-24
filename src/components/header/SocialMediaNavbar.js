@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Navbar, Nav, Container, Badge, NavbarBrand } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaBell,
   FaEnvelope,
@@ -16,14 +16,14 @@ import AppLogo from "./GGG.png"; // Import du logo
 
 const styles = {
   navIcon: {
-    fontSize: "1.5rem",
+    fontSize: "1.2rem",
     position: "relative",
     marginRight: "15px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: "45px",
-    height: "45px",
+    width: "40px",
+    height: "40px",
     borderRadius: "30%",
     color: "#10266f",
     backgroundColor: "#cae6fa",
@@ -81,7 +81,7 @@ const styles = {
     boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
     padding: "10px",
     borderRadius: "10px",
-    width: "300px",
+    width: "250px",
     zIndex: 1000,
     right: 0,
     maxHeight: "400px", // Augmente la hauteur maximale
@@ -161,6 +161,37 @@ function SocialMediaNavbar({ onFilterChange }) {
   );
   useOnClickOutside(profileDropdownRef, () => setIsProfileOpen(false));
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  const navigate = useNavigate();
+
+  const handleOpenDropDown = (type) => {
+    if (windowWidth < 600) {
+      if (type === "messages") {
+        navigate("/chat");
+      } else if (type === "notifications") {
+        navigate("/notifications");
+      }
+    } else {
+      if (type === "messages") {
+        setIsMessagesOpen(!isMessagesOpen);
+      } else if (type === "notifications") {
+        setIsNotificationsOpen(!isNotificationsOpen);
+      }
+    }
+  };
   return (
     <Navbar
       expand="lg"
@@ -171,16 +202,21 @@ function SocialMediaNavbar({ onFilterChange }) {
         <Navbar.Brand as={Link} to="/" className="me-auto">
           <img
             src={AppLogo}
-            width="120"
-            height="60"
+            width="100"
+            height="40"
             className="d-inline-block align-top"
             alt="education"
           />
         </Navbar.Brand>
-        <div style={styles.searchBarContainer}>
+        <Nav
+          style={{
+            minWidth: "200px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          }}
+        >
           <ButtonSearchFormDetail onFilterChange={onFilterChange} />
-        </div>
-        <Nav className="ms-auto">
+
           {/* Message Icon with count */}
           <div style={{ position: "relative" }} ref={messageDropdownRef}>
             <div
@@ -188,7 +224,7 @@ function SocialMediaNavbar({ onFilterChange }) {
                 ...styles.navIcon,
                 ...(isMessageHovered ? styles.navIconHover : {}),
               }}
-              onClick={() => setIsMessagesOpen(!isMessagesOpen)}
+              onClick={() => handleOpenDropDown("messages")}
               onMouseEnter={() => setIsMessageHovered(true)}
               onMouseLeave={() => setIsMessageHovered(false)}
             >
@@ -219,7 +255,7 @@ function SocialMediaNavbar({ onFilterChange }) {
                 ...styles.navIcon,
                 ...(isNotificationHovered ? styles.navIconHover : {}),
               }}
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+              onClick={() => handleOpenDropDown("notifications")}
               onMouseEnter={() => setIsNotificationHovered(true)}
               onMouseLeave={() => setIsNotificationHovered(false)}
             >
