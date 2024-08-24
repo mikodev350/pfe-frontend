@@ -10,6 +10,7 @@ import { getToken } from "../../util/authUtils";
 import { useParams, Link } from "react-router-dom";
 
 export default function Profile() {
+  alert("i AM HERREEEEEEE !!!!!!!!!!!!!!!!!!!!!")
   const { id } = useParams();
   const token = React.useMemo(() => getToken(), []);
   const localUserId = localStorage.getItem('userId'); // Retrieve the user ID from localStorage
