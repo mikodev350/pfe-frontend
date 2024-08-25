@@ -1,18 +1,20 @@
 import React from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { ProfileHeader } from "./ProfileHeader";
 import { Bio } from "./Bio";
 import Experience from "./Experience";
 import Education from "./Education";
-import { Container, Row, Col, Button } from "react-bootstrap";
 import { fetchMyProfile, fetchUserProfile } from "../../api/apiProfile";
 import { getToken } from "../../util/authUtils";
 import { useParams, Link } from "react-router-dom";
 
+import "./Profile.css";
+
 export default function Profile() {
   const { id } = useParams();
   const token = React.useMemo(() => getToken(), []);
-  const localUserId = localStorage.getItem('userId'); // Retrieve the user ID from localStorage
+  const localUserId = localStorage.getItem("userId");
 
   const { data: profile, isLoading } = useQuery(
     ["profile", id ? id : "me"],
@@ -24,22 +26,8 @@ export default function Profile() {
 
   if (isLoading) return <div>Loading...</div>;
 
-  console.log('====================================');
-    console.log("profile");
-  console.log(profile);
-  console.log('====================================');
-
   return (
     <>
-      <Row>
-        <Col className="mt-3 d-flex justify-content-end">
-          {profile.isMyProfile && (
-            <Link to={"/student/edit-profile"}>
-              <Button variant="primary">Edit Profile</Button>
-            </Link>
-          )}
-        </Col>
-      </Row>
       <ProfileHeader
         id={id}
         token={token}
@@ -57,16 +45,20 @@ export default function Profile() {
         nomComplet={profile?.username}
         competences={profile?.profil?.competences}
       />
-      <Container>
-        <Row>
-          <Col sm={6}>
-            <Experience experiences={profile?.experiences} />
-          </Col>
-          <Col sm={6}>
-            <Education educations={profile?.educations} />
-          </Col>
-        </Row>
-      </Container>
+
+<Container>
+      <Row>
+        <Col lg={6} md={12} className="mb-4">
+          <Experience experiences={profile?.experiences} />
+        </Col>
+        <Col lg={6} md={12} className="mb-4">
+          <Education educations={profile?.educations} />
+        </Col>
+      </Row>
+    </Container>
+
+
+
     </>
   );
 }

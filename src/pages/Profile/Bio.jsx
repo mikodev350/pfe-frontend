@@ -10,7 +10,7 @@ export const Skills = ({ competencesSkills }) => {
 
   return (
     <div className="skills-container">
-      <h3 className="text-primary">Compétences</h3>
+<h3 style={{ color: '#122A73' }}>Compétences</h3>
       <ul className="skills-list">
         {competencesSkills.map((competencesSkill, index) => (
           <li key={index}>
@@ -28,7 +28,7 @@ export const Skills = ({ competencesSkills }) => {
 export const Bio = ({bio,nomComplet ,competences}) => {
   return (
         <Container className="text-center container-profile">
-      <h2 className="text-primary">{nomComplet} Bio</h2>
+      <h2 style={{ color: '#122A73' }}>{nomComplet} Bio</h2>
       <p>{bio}</p>
       <div className="line"></div>
      <Skills competencesSkills={competences} />

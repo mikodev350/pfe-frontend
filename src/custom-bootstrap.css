@@ -23,7 +23,7 @@ main{
 .btn {
     /* bdlt hna  */
     border-radius: 50px !important;
-    height: 54px !important;
+    /* height: 20px !important; */
 }
 
 .btn-primary {

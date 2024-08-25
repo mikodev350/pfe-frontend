@@ -87,7 +87,6 @@ const HomeDashboard = () => {
   };
 
   return (
-    <Container className="dashboard-container">
       <Row>
         <Col md={9}>
           {/* Welcome Card */}
@@ -170,7 +169,6 @@ const HomeDashboard = () => {
           </Card>
         </Col>
       </Row>
-    </Container>
   );
 };
 

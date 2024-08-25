@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Table, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { deleteEducation, deleteExperience, getEducations, getExperiences } from '../../api/apiProfile';
-import { getToken } from '../../util/authUtils';
+import { Container, Row, Col, Table } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import './DashboardProfile.css'; // Assurez-vous d'importer le fichier CSS
+import styled from 'styled-components';
+import { deleteEducation, deleteExperience, getEducations, getExperiences } from '../../api/apiProfile';
+import { Link } from 'react-router-dom';
+import { getToken } from '../../util/authUtils';
 
 const DashboardProfile = () => {
   const [educations, setEducations] = useState([]);
@@ -53,99 +53,151 @@ const DashboardProfile = () => {
 
   return (
     <Container className="container-dashboard">
-      <h1 className="mt-5 mb-4 text-center">Mon profil</h1>
+      <h1 className="mb-4 text-center">Mon profil</h1>
       <Row className="mb-4 justify-content-center">
         <Col className="text-center mb-2" xs={12} md={3}>
-          <Link to="/student/add-experience">
-            <Button variant="outline-primary" className="custom-btn w-100">Ajouter Expérience</Button>
-          </Link>
+          <StyledLink to="/dashboard/add-experience">
+            Ajouter Expérience
+          </StyledLink>
         </Col>
         <Col className="text-center mb-2" xs={12} md={3}>
-          <Link to="/student/add-education">
-            <Button variant="outline-primary" className="custom-btn w-100">Ajouter Éducation</Button>
-          </Link>
+          <StyledLink to="/dashboard/add-education">
+            Ajouter Éducation
+          </StyledLink>
         </Col>
         <Col className="text-center mb-2" xs={12} md={3}>
-          <Link to="/student/custom-profile">
-            <Button variant="outline-primary" className="custom-btn w-100">Gérer Profil</Button>
-          </Link>
+          <StyledLink to="/dashboard/custom-profile">
+            Gérer Profil
+          </StyledLink>
         </Col>
       </Row>
       <Row>
         <Col md={12} className="mb-4">
           <h2 className="table-title">Expériences Professionnelles</h2>
-          <Table striped bordered hover responsive>
+          <StyledTable striped bordered hover responsive>
             <thead className="table-header">
               <tr>
-                <th>Entreprise</th>
-                <th>Titre du Poste</th>
-                <th>Années</th>
-                <th>Action</th>
+                <StyledTh>Entreprise</StyledTh>
+                <StyledTh>Titre du Poste</StyledTh>
+                <StyledTh>Années</StyledTh>
+                <StyledTh>Action</StyledTh>
               </tr>
             </thead>
             <tbody>
               {experiences.map((exp, index) => (
                 <tr key={index}>
-                  <td className="table-cell">{exp.entreprise}</td>
-                  <td className="table-cell">{exp.titrePoste}</td>
-                  <td className="table-cell">{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</td>
-                  <td className="table-cell">
+                  <StyledTd>{exp.entreprise}</StyledTd>
+                  <StyledTd>{exp.titrePoste}</StyledTd>
+                  <StyledTd>{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</StyledTd>
+                  <StyledTd>
                     <div className="d-flex justify-content-center">
-                      <Link to={`/student/update-experience/${exp.id}`}>
-                        <Button variant="outline-warning"  className="edit-btn">
-                          <FaEdit className="icon" /> Modifier
-                        </Button>
-                      </Link>
-                      <Button variant="outline-danger"  className="delete-btn" onClick={() => handleDeleteExperience(exp.id)}>
-                        <FaTrashAlt className="icon" /> Supprimer
-                      </Button>
+                      <StyledLink to={`/dashboard/update-experience/${exp.id}`} variant="success">
+                        <FaEdit /> Modifier
+                      </StyledLink>
+                      <CustomButton variant="danger" onClick={() => handleDeleteExperience(exp.id)}>
+                        <FaTrashAlt /> Supprimer
+                      </CustomButton>
                     </div>
-                  </td>
+                  </StyledTd>
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </StyledTable>
         </Col>
         <Col md={12} className="mb-4">
           <h2 className="table-title">Formations Académiques</h2>
-          <Table striped bordered hover responsive>
+          <StyledTable striped bordered hover responsive>
             <thead className="table-header">
               <tr>
-                <th>École</th>
-                <th>Diplôme</th>
-                <th>Années</th>
-                <th>Action</th>
+                <StyledTh>École</StyledTh>
+                <StyledTh>Diplôme</StyledTh>
+                <StyledTh>Années</StyledTh>
+                <StyledTh>Action</StyledTh>
               </tr>
             </thead>
             <tbody>
               {educations.map((edu, index) => (
                 <tr key={index}>
-                  <td className="table-cell">{edu.ecole}</td>
-                  <td className="table-cell">{edu.diplome}</td>
-                  <td className="table-cell">{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</td>
-                  <td className="table-cell">
+                  <StyledTd>{edu.ecole}</StyledTd>
+                  <StyledTd>{edu.diplome}</StyledTd>
+                  <StyledTd>{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</StyledTd>
+                  <StyledTd>
                     <div className="d-flex justify-content-center">
-                      <Link to={`/student/update-education/${edu.id}`}>
-                        <Button variant="outline-warning" size="sm" className="edit-btn">
-                          <FaEdit className="icon" /> Modifier
-                        </Button>
-                      </Link>
-                      <Button variant="outline-danger" size="sm" className="delete-btn" onClick={() => handleDeleteEducation(edu.id)}>
-                        <FaTrashAlt className="icon" /> Supprimer
-                      </Button>
+                      <StyledLink to={`/dashboard/update-education/${edu.id}`} variant="success">
+                        <FaEdit /> Modifier
+                      </StyledLink>
+                      <CustomButton variant="danger" onClick={() => handleDeleteEducation(edu.id)}>
+                        <FaTrashAlt /> Supprimer
+                      </CustomButton>
                     </div>
-                  </td>
+                  </StyledTd>
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </StyledTable>
         </Col>
       </Row>
       <Row className="justify-content-center">
-        <Button variant="outline-danger"  className="delete-account-btn mt-4">Supprimer Mon Compte</Button>
+        <CustomButton variant="danger" className="mt-4">Supprimer Mon Compte</CustomButton>
       </Row>
     </Container>
   );
 };
 
 export default DashboardProfile;
+
+const StyledLink = styled(Link)`
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 50px;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  transition: background-color 0.3s, color 0.3s;
+
+  &:hover {
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#43a047' : '#0a1d4b'};
+    color: white;
+  }
+`;
+
+const CustomButton = styled.button`
+  padding: 5px 15px;
+  border-radius: 50px;
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0 5px;
+  transition: background-color 0.3s, color 0.3s;
+
+  &:hover {
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#43a047' : '#0a1d4b'};
+    color: white;
+  }
+`;
+
+const StyledTable = styled(Table)`
+  th,
+  td {
+    color: #10266f;
+    border-color: #2f2f2f;
+  }
+`;
+
+const StyledTh = styled.th`
+  background-color: #2f2f2f;
+  color: #ffffff;
+`;
+
+const StyledTd = styled.td`
+  color: #2f2f2f;
+`;
