@@ -30,6 +30,51 @@ const StyledCard = styled.div`
   margin-top: 20px;
 `;
 
+// Primary Button Style
+ const StyledPrimaryButton = styled.button`
+  background: linear-gradient(135deg, rgba(13, 71, 161, 1), rgba(21, 101, 192, 1));
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 12px 28px; /* Increased size */
+  border-radius: 50px;
+  font-size: 1.1rem; /* Increased font size */
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(10, 55, 123, 1), rgba(18, 80, 153, 1));
+    transform: translateY(-2px); /* Slight lift on hover */
+  }
+`;
+
+// Secondary Button Style
+const StyledSecondaryButton = styled.button`
+  background: #B0BEC5;
+  border: none;
+  color: #37474F;
+  font-weight: bold;
+  padding: 12px 28px; /* Increased size */
+  border-radius: 50px;
+  font-size: 1.1rem; /* Increased font size */
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background: #90A4AE;
+    transform: translateY(-2px); /* Slight lift on hover */
+  }
+`;
+
+
+const StyledButton = styled(Button)`
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-weight: bold;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
 const AddExperience = () => {
   const token = React.useMemo(() => getToken(), []);
   const { experienceId } = useParams();
@@ -196,13 +241,16 @@ const AddExperience = () => {
             </Form.Control.Feedback>
           </Form.Group>
 
-          <div className="d-flex justify-content-between">
+          <div className="d-flex justify-content-center">
             
-  <div className="d-flex justify-content-between">
-                  <Button variant="secondary" onClick={() => navigate('/student/edit-profile')}>Retour</Button>
-                                  <Button type="submit" variant="primary">{experienceId ? 'Mettre à jour' : 'Envoyer'}</Button>
-
-                </div>
+          <div className="d-flex justify-content-between mt-4">
+            <StyledButton variant="secondary" type="button" onClick={() => window.history.back()}>
+              Retour
+            </StyledButton>
+            <StyledButton type="submit">
+              Envoyer
+            </StyledButton>
+          </div>
           </div>
         </Form>
       </StyledCard>

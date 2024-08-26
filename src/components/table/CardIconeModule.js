@@ -8,6 +8,32 @@ import { useMutation, useQueryClient } from "react-query";
 import { deleteModule } from "../../api/apiModule";
 import { getToken } from "../../util/authUtils";
 
+// Styled Icon Button with Color
+const IconButton = ({ children, onClick, backgroundColor, hoverColor }) => (
+  <div
+    onClick={onClick}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "35px",
+      height: "35px",
+      borderRadius: "8px",
+      backgroundColor: backgroundColor || "#f1f1f1",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+      color: "#ffffff",
+    }}
+    className="icon-button"
+    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverColor)}
+    onMouseLeave={(e) =>
+      (e.currentTarget.style.backgroundColor = backgroundColor)
+    }
+  >
+    {children}
+  </div>
+);
+
 const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState(moduleName);
@@ -56,31 +82,36 @@ const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <OverlayTrigger
           overlay={<Tooltip>Accéder aux leçons</Tooltip>}
           placement="top"
         >
           <Link
             to={`/dashboard/lessons/${moduleId}`}
-            className="icon-option"
-            style={{ color: "black", marginRight: "10px" }}
+            style={{ color: "black" }}
           >
-            <BiDetail size={23} />
+            <IconButton backgroundColor="#007bff" hoverColor="#0056b3">
+              <BiDetail size={23} />
+            </IconButton>
           </Link>
         </OverlayTrigger>
 
-        <BiEdit
-          size={24}
+        <IconButton
           onClick={handleEdit}
-          style={{ cursor: "pointer", marginRight: "10px" }}
-        />
+          backgroundColor="#28a745"
+          hoverColor="#218838"
+        >
+          <BiEdit size={24} />
+        </IconButton>
 
-        <BiTrash
-          size={24}
+        <IconButton
           onClick={handleDelete}
-          style={{ cursor: "pointer" }}
-        />
+          backgroundColor="#dc3545"
+          hoverColor="#c82333"
+        >
+          <BiTrash size={24} />
+        </IconButton>
       </div>
 
       <Modal show={showEditModal} onHide={handleClose}>

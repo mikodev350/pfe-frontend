@@ -3,7 +3,6 @@ import { Container, Row, Col, Image, Button } from 'react-bootstrap';
 
 
 export const Skills = ({ competencesSkills }) => {
-  console.log(competencesSkills)
   if (!competencesSkills || competencesSkills.length === 0) {
     return <p>Aucune compétence disponible</p>;
   }
@@ -26,20 +25,16 @@ export const Skills = ({ competencesSkills }) => {
 
 
 export const Bio = ({bio,nomComplet ,competences}) => {
+
   return (
+
+    
         <Container className="text-center container-profile">
-      <h2 style={{ color: '#122A73' }}>{nomComplet} Bio</h2>
-      <p>{bio}</p>
+       <h2 style={{ color: '#122A73' }}>{nomComplet} Bio</h2>
+      <p style={{ color: '#354F7D' }}>{bio}</p>
       <div className="line"></div>
      <Skills competencesSkills={competences} />
     </Container>
   );
 };
 
-export const SkillSet = () => {
-  return (
-    <Container>
-     
-    </Container>
-  );
-};

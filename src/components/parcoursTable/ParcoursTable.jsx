@@ -8,16 +8,31 @@ import { format, parseISO } from "date-fns";
 import CardIconeParcours from "../table/CardIconeParcours";
 import styled from "styled-components";
 
-const GradientCard = styled(Card)`
-  border-radius: 15px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #e0e5ec, #f7f9fc); /* Dégradé clair */
-  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.05), -8px -8px 16px rgba(255, 255, 255, 0.7);
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+const StyledCard = styled(Card)`
+  border-radius: 20px;
+  background-color: #ffffff !important;
+  border: 1px solid #10266F;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.8);
+    transform: translateY(-10px);
+    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    height: auto; /* Let the height adjust based on content */
+  }
+
+  @media (max-width: 576px) {
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 15px; /* Reduced padding for mobile */
+    width: 100%; /* Take full width on mobile */
   }
 `;
 
@@ -26,6 +41,12 @@ const CardBodyStyled = styled(Card.Body)`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 576px) {
+    padding: 15px; /* Adjust padding on smaller screens */
+    flex-direction: column; /* Stack items vertically on mobile */
+    align-items: flex-start; /* Align items to the start */
+  }
 `;
 
 const CardDetails = styled.div`
@@ -37,14 +58,23 @@ const TitleStyled = styled.h5`
   margin: 0;
   font-size: 1.25rem;
   font-weight: bold;
-  color: #333; /* Titre sombre */
+  color: #10266F !important;
+
+  @media (max-width: 576px) {
+    font-size: 1.1rem; /* Adjust font size on mobile */
+  }
 `;
 
 const TextStyled = styled.p`
   margin: 5px 0;
-  color: #555; /* Texte en gris moyen pour un bon contraste */
+  color: #555;
   font-size: 0.95rem;
+
+  @media (max-width: 576px) {
+    font-size: 0.9rem; /* Adjust font size on mobile */
+  }
 `;
+
 export const ParcoursTable = ({ searchValue, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
@@ -106,12 +136,13 @@ export const ParcoursTable = ({ searchValue, token }) => {
     return <div>Erreur lors de la récupération des données : {error.message}</div>;
   }
 
-  return (
+
+ return (
     <Container>
       <Row>
         {data.data.map((item) => (
           <Col key={item.id} xs={12} md={6} lg={4} className="mb-4">
-            <GradientCard>
+            <StyledCard>
               <CardBodyStyled>
                 <CardDetails>
                   <TitleStyled>{item.nom}</TitleStyled>
@@ -123,7 +154,7 @@ export const ParcoursTable = ({ searchValue, token }) => {
                 </CardDetails>
                 <CardIconeParcours parcoursId={item.id} parcoursName={item.nom} />
               </CardBodyStyled>
-            </GradientCard>
+            </StyledCard>
           </Col>
         ))}
       </Row>

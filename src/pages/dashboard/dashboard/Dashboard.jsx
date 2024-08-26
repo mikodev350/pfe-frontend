@@ -24,11 +24,9 @@ import useSyncOnConnectionRestore from "./../../../hooks/useSyncOnConnectionRest
 import GestionDevoir from "../../gestion-devoir/GestionDevoir";
 import Devoir from "../../devoir/Devoir";
 import Progression from "../../../components/progression/Progression";
-
 import Quiz from "../../quiz/quiz/Quiz";
 import Quizzes from "../../quiz/quiz/Quizzes";
 import Evaluation from "../../quiz/evaluation/Evaluation";
-
 import HomeDashboard from "../../../components/home-dashboard/homeDashboard";
 import AssignmentList from "../../../components/assignment-list/assignmentList";
 import AssignmentDetail from "../../../components/assignment-detail/assignmentDetail";
@@ -41,6 +39,7 @@ import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogiq
 import Note from "../../../components/result/Note";
 import Notifications from "../../notifications/Notifications";
 
+
 function Dashboard() {
   const queryClient = useQueryClient();
   useSyncOnConnectionRestore(queryClient);
@@ -48,7 +47,7 @@ function Dashboard() {
   const role = localStorage.getItem("role"); // Get the role from localStorage
 
   return (
-    <Layout>
+    <Layout fullcontent={false}  backgroundColorIdentification={false}>
       <Routes>
         {/* Routes common to all users */}
         <Route path="notifications" element={<Notifications/>} />

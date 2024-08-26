@@ -24,6 +24,7 @@ export default function Profile() {
     }
   );
 
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -41,7 +42,7 @@ export default function Profile() {
         type={profile?.type}
       />
       <Bio
-        bio={profile?.profil?.bio}
+        bio={profile.profil.bio}
         nomComplet={profile?.username}
         competences={profile?.profil?.competences}
       />

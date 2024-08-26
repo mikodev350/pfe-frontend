@@ -14,18 +14,32 @@ const IconContainer = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  gap: 15px; /* Ajoute de l'espace entre les icônes */
 `;
 
 const StyledLink = styled(Link)`
-  color: black;
+  color: #10266f; /* Same color as the title text */
+  cursor: pointer;
   padding: 5px;
   text-decoration: none;
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1); /* Slightly enlarge the icon on hover */
+    color: #1e88e5; /* New hover color */
+  }
 `;
 
 const IconButton = styled.span`
-  color: black;
+  color: #10266f; /* Same color as the title text */
   padding: 5px;
   cursor: pointer;
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+    color: #1e88e5; /* New hover color */
+  }
 `;
 
 export default function CardIconeParcours({ parcoursId, parcoursName }) {

@@ -11,8 +11,10 @@ import styled from "styled-components";
 const CustomCard = styled(Card)`
   border-radius: 15px;
   overflow: hidden;
+  background-color: white !important;
+  height: 100%; /* Make the card take full height of the container */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #ffffff; /* Fond blanc */
+  background: #ffffff;
   position: relative;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 
@@ -28,11 +30,7 @@ const CustomCard = styled(Card)`
     right: 0;
     width: 60%;
     height: 100%;
-    background: linear-gradient(
-      135deg,
-      #10266f 0%,
-      #3454d1 100%
-    ); /* Dégradé plus riche */
+    background: linear-gradient(135deg, #10266f 0%, #3454d1 100%);
     clip-path: polygon(100% 0, 0% 100%, 100% 100%);
     z-index: 0;
     transition: all 0.3s ease;
@@ -41,6 +39,15 @@ const CustomCard = styled(Card)`
   &:hover:before {
     clip-path: polygon(100% 0, 20% 100%, 100% 100%);
   }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 10px;
+    border-radius: 10px;
+  }
 `;
 
 const CustomCardBody = styled(Card.Body)`
@@ -48,19 +55,33 @@ const CustomCardBody = styled(Card.Body)`
   position: relative;
   z-index: 1;
   color: #333;
+
+  @media (max-width: 576px) {
+    padding: 15px;
+  }
 `;
 
 const ModuleTitle = styled(Card.Title)`
   font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: inherit; /* Laisse la couleur inchangée */
+  color: inherit;
+
+  @media (max-width: 576px) {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
 `;
 
 const ModuleText = styled.p`
   font-size: 1rem;
   margin-bottom: 20px;
-  color: #555; /* Couleur inchangée */
+  color: #555;
+
+  @media (max-width: 576px) {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
 `;
 
 const ModuleTable = ({ searchValue, idParcours, token }) => {

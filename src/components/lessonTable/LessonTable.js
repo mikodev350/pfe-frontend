@@ -15,17 +15,22 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { BiEdit, BiTrash } from "react-icons/bi";
 
-const header = ["#", "Leçon", "Date", "Options"];
+// Updated styled components for a modern look
 const LessonCard = styled(Card)`
   border-radius: 15px;
   overflow: hidden;
-  background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(
+    135deg,
+    #e3f2fd,
+    #bbdefb
+  ); /* Soft blue gradient */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  border: none; /* Remove border for a cleaner look */
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
   }
 `;
 
@@ -42,30 +47,34 @@ const LessonDetails = styled.div`
 
 const LessonTitle = styled.h5`
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
-  color: #333;
+  color: #0d47a1; /* Deep blue for contrast */
 `;
 
 const LessonText = styled.p`
   margin: 5px 0;
-  color: #666;
-  font-size: 0.95rem;
+  color: #424242; /* Dark grey for readability */
+  font-size: 1rem;
 `;
 
 const IconContainer = styled.div`
   display: flex;
   gap: 10px;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 
   .icon {
     cursor: pointer;
-    transition: transform 0.2s ease;
-    color: #777;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #ffffff; /* White background for icons */
+    color: #424242;
+    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 
     &:hover {
-      transform: scale(1.2);
-      color: #4a90e2;
+      transform: scale(1.1);
+      background-color: #0d47a1; /* Blue background on hover */
+      color: #ffffff; /* White icon color on hover */
     }
   }
 `;

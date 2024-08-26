@@ -205,7 +205,7 @@ const AddExperience = () => {
           </Form.Group>
 
           <div className="d-flex justify-content-between mt-4">
-            <StyledButton variant="secondary" onClick={() => navigate('/student/edit-profile')}>Retour</StyledButton>
+            <StyledButton variant="secondary" onClick={() => navigate('/dashboard/edit-profile')}>Retour</StyledButton>
             <StyledButton type="submit" variant="primary">{experienceId ? 'Mettre à jour' : 'Envoyer'}</StyledButton>
           </div>
         </Form>
