@@ -1,12 +1,64 @@
 import React from "react";
 import { Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
-import { FaRegTrashAlt } from "react-icons/fa";
+import { FaArrowLeft, FaRegTrashAlt } from "react-icons/fa";
 import Card from "react-bootstrap/Card";
 import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
 import { getQuiz, postQuiz } from "../../../api/apiQuiz";
 import { v4 as uuidv4 } from "uuid";
 import { useSearchParams } from "react-router-dom";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
+const CardStylled = styled(Card)`
+  background-color: #fff !important;
+  border-radius: 12px;
+  padding: 25px;
+  border: none;
+  margin-bottom: 30px;
+`;
+
+const ButtonStylled = styled(Button)`
+  max-width: 300px !important;
+  width: 100% !important;
+`;
+const GradientButton = styled(Button)`
+  background: linear-gradient(135deg, #10266f, #3949ab);
+  border: 2px solid #10266f; /* Border matching the input */
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 8px; /* Rounded corners to mimic input field */
+  height: 50px; /* Match the height of the input */
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  text-decoration: none !important;
+  transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out,
+    transform 0.2s ease-in-out;
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      #3949ab,
+      #10266f
+    ); /* Darken the gradient on hover */
+    transform: translateY(-3px);
+    border-color: #3949ab; /* Match border with background on hover */
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(16, 38, 111, 0.25); /* Focus outline */
+    outline: none; /* Remove default focus outline */
+  }
+
+  @media (max-width: 576px) {
+    height: 45px; /* Adjust height for mobile */
+    font-size: 1rem; /* Adjust font size for mobile */
+    padding: 8px 16px; /* Adjust padding for mobile */
+    width: 250px;
+  }
+`;
 let placeholderquiz = {
   id: uuidv4(),
   question: "",
@@ -134,11 +186,18 @@ export default function Quiz() {
     });
   };
 
+  const navigate = useNavigate();
+  const handleBackToQuiz = () => {
+    navigate(`/dashboard/quizzes`);
+  };
   return (
     <>
+      <GradientButton onClick={handleBackToQuiz}>
+        <FaArrowLeft /> Back
+      </GradientButton>
       <h2>{id ? "Modifier le QUIZ" : "Ajouter un NOUVEAU QUIZ"}</h2>
       <Form onSubmit={submit} style={{ paddingBottom: "200px" }}>
-        <Card style={{ marginBottom: "50px" }}>
+        <CardStylled style={{ marginBottom: "50px" }}>
           <Card.Body>
             <Row>
               <Col>
@@ -176,7 +235,7 @@ export default function Quiz() {
               <Button variant="success">Enregistrer les modifications</Button>
             )}
           </Card.Body>
-        </Card>
+        </CardStylled>
         <Tabs
           defaultActiveKey="1"
           id="uncontrolled-tab-example"
@@ -189,7 +248,7 @@ export default function Quiz() {
               eventKey={Qindex + 1}
               title={`Question ` + Number(Qindex + 1)}
             >
-              <Card key={Qindex} style={accordionStyles.card}>
+              <CardStylled key={Qindex} style={accordionStyles.card}>
                 <Card.Body>
                   <h4>Question: {Qindex + 1}</h4>
                   <Form.Group
@@ -254,19 +313,24 @@ export default function Quiz() {
                         </div>
                       </Col>
                     ))}
+                    <Col md={12}>
+                      <ButtonStylled
+                        disabled={
+                          item.faussereponse[item.faussereponse.length - 1]
+                            ?.reponse.length === 0
+                        }
+                        onClick={() =>
+                          onHanldeNewNewWrongAsnwer({
+                            questionPosition: item.id,
+                          })
+                        }
+                        style={{ width: "3002px !important" }}
+                      >
+                        Ajouter Mauvaise Réponse
+                      </ButtonStylled>{" "}
+                    </Col>
                   </Row>
-                  <Button
-                    variant="primary"
-                    disabled={
-                      item.faussereponse[item.faussereponse.length - 1]?.reponse
-                        .length === 0
-                    }
-                    onClick={() =>
-                      onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
-                    }
-                  >
-                    Ajouter Mauvaise Réponse
-                  </Button>{" "}
+
                   {id && (
                     <Button
                       variant="success"
@@ -282,12 +346,12 @@ export default function Quiz() {
                     </Button>
                   )}
                 </Card.Body>
-              </Card>
+              </CardStylled>
             </Tab>
           ))}
         </Tabs>
         <Button variant="primary" onClick={onHanldeNewNewQuiz}>
-          Ajouter un Nouveau Quiz
+          Nouveau Question
         </Button>
         {!id && (
           <>

@@ -49,7 +49,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   };
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-   React.useEffect(() => {
+  React.useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -61,7 +61,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-useEffect(() => {
+  useEffect(() => {
     const storedRole = localStorage.getItem("role");
     let newType = type;
     let newRole = role;
@@ -101,13 +101,18 @@ useEffect(() => {
       <aside>
         <SideBarMobile />
       </aside>
-      
+
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
-      <main style={{ backgroundColor, minHeight: "100vh",paddingLeft: windowWidth < 900 ? "0px" : "220px"}}>
+      <main
+        style={{
+          backgroundColor,
+          minHeight: "100vh",
+          paddingLeft: windowWidth < 900 ? "0px" : "220px",
+        }}
+      >
         <Container>
-          
           {fullcontent ? (
             children
           ) : (
