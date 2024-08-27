@@ -3,7 +3,7 @@ import { Container, Col, Row, Button } from "react-bootstrap";
 import SearchForm from "../../components/searchForm/SearchForm";
 import LessonTable from "../../components/lessonTable/LessonTable";
 import ModelLesson from "../../components/modelLesson/ModelLesson";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getToken } from "../../util/authUtils";
 import {
   createLesson,
@@ -12,6 +12,7 @@ import {
 } from "../../api/apiLesson";
 import { useQueryClient } from "react-query";
 import styled from "styled-components";
+import { BiArrowBack } from "react-icons/bi";
 
 // Styled Button with Gradient Background
 const GradientButton = styled(Button)`
@@ -62,7 +63,45 @@ const StyledTitle = styled.h2`
   padding-bottom: 0.5rem;
 `;
 
+const BackButtonContainer = styled.div`
+  width: 120px !important;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  border-radius: 20px !important; /* Rounded corners */
+  cursor: pointer;
+  background-color: #10266f !important; /* Blue background */
+  color: white !important; /* White text color */
+  border: 2px solid #10266f !important; /* Border matching the background */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+
+  svg {
+    font-size: 24px !important;
+    color: white !important; /* White icon color */
+  }
+
+  span {
+    margin-left: 8px;
+    font-weight: 500 !important;
+    font-size: 18px !important;
+    color: white !important; /* White text color */
+  }
+
+  &:hover {
+    background-color: #0056b3 !important; /* Darker blue on hover */
+    border-color: #0056b3 !important;
+  }
+
+  &:active {
+    background-color: #003d80 !important; /* Even darker blue on click */
+    border-color: #003d80 !important;
+  }
+`;
+
 const Lesson = () => {
+  const navigate = useNavigate();
+
   const [searchValue, setSearchValue] = useState("");
   const token = React.useMemo(() => getToken(), []);
   const { idModule } = useParams();
@@ -135,6 +174,10 @@ const Lesson = () => {
   return (
     <Container>
       <StyledTitle>Leçons</StyledTitle>
+      <BackButtonContainer onClick={() => navigate(-1)}>
+        <BiArrowBack />
+        <span>Retour</span>
+      </BackButtonContainer>
       <Row>
         <Col xs={12} md={6}>
           <GradientButton onClick={handleShowAdd}>

@@ -16,6 +16,47 @@ import SearchForm from '../searchForm/SearchForm';
 import { getToken } from '../../util/authUtils';
 import DevoirModal from '../DevoirModalSend/DevoirModal';
 import QuizModal from '../quiz-modal/QuizModal';
+import styled from 'styled-components';
+
+
+const StyledTabs = styled(Tabs)`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px !important;
+  border-bottom: 2px solid #e0e0e0 !important;
+  border-radius: 10px !important;
+
+  .nav-item {
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border-radius: 10px !important;
+
+    .nav-link {
+      border: none !important;
+      border-radius: 10px !important;
+      font-size: 1rem !important;
+      color: #333 !important;
+      padding: 10px 15px !important;
+      transition: color 0.3s ease, background-color 0.3s ease, border-radius 0.3s ease;
+
+      &:hover {
+        background-color: #10266F !important;
+        color: #fff !important;
+        border-radius: 10px !important;
+      }
+
+      &.active {
+        color: #10266F !important;
+        background-color: #fff !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
+        border-bottom: 3px solid #10266F !important;
+      }
+    }
+  }
+`;
+ 
+const ListItem =styles(ListGroup.Item)``
 
 const styles = {
   tabsContainer: {
@@ -214,8 +255,8 @@ const SuiviPedagogique = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={styles.tabsContainer}>
-        <Tabs defaultActiveKey="individuels" id="etudiants-tabs" className="mb-3">
+      <div className="tabs-container">
+        <StyledTabs defaultActiveKey="individuels" id="etudiants-tabs" className="mb-3">
           <Tab eventKey="individuels" title="Étudiants Individuels">
             <Card style={styles.card}>
               <Row style={{ marginBottom: '20px' }}>
@@ -234,7 +275,7 @@ const SuiviPedagogique = () => {
               ) : (
                 <ListGroup variant="flush">
                   {students?.map((student) => (
-                    <ListGroup.Item
+                    <ListItem
                       key={student.id}
                       style={styles.listItem}
                       onMouseEnter={(e) => {
@@ -250,7 +291,6 @@ const SuiviPedagogique = () => {
                         <span>{student.username.charAt(0)}</span>
                       </div>
                       <div style={styles.name}>{student.username}</div>
-                      <div style={styles.detail}>{student.email}</div>
                       <div style={styles.actions}>
                         <Link to="/" style={styles.button} title="Message">
                           <FiMessageSquare size={20} />
@@ -275,7 +315,7 @@ const SuiviPedagogique = () => {
                           <FiBarChart2 size={20} />
                         </Link>
                       </div>
-                    </ListGroup.Item>
+                    </ListItem>
                   ))}
                 </ListGroup>
               )}
@@ -302,9 +342,9 @@ const SuiviPedagogique = () => {
               ) : (
                 <ListGroup variant="flush">
                   {groups?.map((group) => (
-                    <ListGroup.Item
+                    <ListItem
                       key={group.id}
-                      style={styles.listItem}
+                      // style={styles.listItem}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'scale(1.03)';
                         e.currentTarget.style.boxShadow = '0px 8px 16px rgba(0, 0, 0, 0.1)';
@@ -369,13 +409,13 @@ const SuiviPedagogique = () => {
                           <FiTrash2 size={20} />
                         </Button>
                       </div>
-                    </ListGroup.Item>
+                    </ListItem>
                   ))}
                 </ListGroup>
               )}
             </Card>
           </Tab>
-        </Tabs>
+        </StyledTabs>
       </div>
 
       {/* Modal pour créer ou modifier un groupe */}
