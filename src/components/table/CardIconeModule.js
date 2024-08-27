@@ -7,32 +7,27 @@ import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "react-query";
 import { deleteModule } from "../../api/apiModule";
 import { getToken } from "../../util/authUtils";
+import styled from "styled-components";
 
-// Styled Icon Button with Color
-const IconButton = ({ children, onClick, backgroundColor, hoverColor }) => (
-  <div
-    onClick={onClick}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "35px",
-      height: "35px",
-      borderRadius: "8px",
-      backgroundColor: backgroundColor || "#f1f1f1",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-      color: "#ffffff",
-    }}
-    className="icon-button"
-    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverColor)}
-    onMouseLeave={(e) =>
-      (e.currentTarget.style.backgroundColor = backgroundColor)
-    }
-  >
-    {children}
-  </div>
-);
+const StyledIconButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  background-color: #e0e0e0; /* Default gray background */
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  color: #424242; /* Dark grey icon color */
+
+  &:hover,
+  &:focus {
+    background-color: #007bff; /* Blue background on hover/focus */
+    color: #ffffff; /* White icon color on hover/focus */
+    transform: translateY(-3px); /* Slight lift on hover/focus */
+  }
+`;
 
 const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -56,9 +51,7 @@ const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
   );
 
   const handleEdit = () => setShowEditModal(true);
-
   const handleClose = () => setShowEditModal(false);
-
   const handleSave = () => {
     handleUpdateModule(moduleId, newName);
     setShowEditModal(false);
@@ -87,31 +80,28 @@ const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
           overlay={<Tooltip>Accéder aux leçons</Tooltip>}
           placement="top"
         >
-          <Link
-            to={`/dashboard/lessons/${moduleId}`}
-            style={{ color: "black" }}
-          >
-            <IconButton backgroundColor="#007bff" hoverColor="#0056b3">
+          <Link to={`/dashboard/lessons/${moduleId}`}>
+            <StyledIconButton backgroundColor="#007bff" hoverColor="#0056b3">
               <BiDetail size={23} />
-            </IconButton>
+            </StyledIconButton>
           </Link>
         </OverlayTrigger>
 
-        <IconButton
+        <StyledIconButton
           onClick={handleEdit}
           backgroundColor="#28a745"
           hoverColor="#218838"
         >
           <BiEdit size={24} />
-        </IconButton>
+        </StyledIconButton>
 
-        <IconButton
+        <StyledIconButton
           onClick={handleDelete}
           backgroundColor="#dc3545"
           hoverColor="#c82333"
         >
           <BiTrash size={24} />
-        </IconButton>
+        </StyledIconButton>
       </div>
 
       <Modal show={showEditModal} onHide={handleClose}>

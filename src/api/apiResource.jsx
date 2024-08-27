@@ -158,6 +158,10 @@ const handleConflict = (localData, remoteData) => {
 export const saveResource = async (resourceData, token) => {
   try {
     const userId = localStorage.getItem("userId");
+
+    console.log('====================================');
+    console.log(userId);
+    console.log('====================================');
     let parcoursData = [];
     let modulesData = [];
     let lessonsData = [];
@@ -220,7 +224,7 @@ export const saveResource = async (resourceData, token) => {
       return { status: "offline", data: newData };
     } else {
       // Save resource to server if online
-      const response = await axios.post(`${API_BASE_URL}/resources`, newData, {
+      const response = await axios.post(`${API_BASE_URL}/resources`, { ...newData, userId }, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

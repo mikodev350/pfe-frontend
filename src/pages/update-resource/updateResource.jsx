@@ -9,15 +9,127 @@ import AudioPlayer from "../../components/audioPlayer/AudioPlayer";
 import { FiImage, FiTrash2, FiVolume2, FiFile, FiVideo, FiLink, FiBook } from "react-icons/fi";
 import { getToken } from "../../util/authUtils";
 import { uploadFile } from "../../api/apiUpload";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getResourceById, updateResource, addFileInToIndexedDB, syncOfflineChangesResource } from "../../api/apiResource";
 import { useQueryClient } from "react-query";
 
+import styled from "styled-components";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
+
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+/**************************************************************************************************/
+// Styled components
+const StyledContainer = styled.div`
+  padding: 20px;
+  background-color: #ffffff; /* White background */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+`;
+
+const FormTitle = styled.h2`
+  color: #10266F; /* Dark blue main color */
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-align: center;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+`;
+
+const LargeButton = styled(Button)`
+  padding: 15px 20px !important;
+  font-size: 1.2rem !important;
+  border-radius: 35px !important;
+  margin: 0 10px !important;
+  flex: 1 !important;
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+    margin: 10px 0 !important;
+    font-size: 1.5rem !important;
+  }
+`;
+
+const LargeButtonGroup = styled.div`
+  display: flex !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  margin-top: 20px !important;
+  width: 100% !important;
+
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+`;
+
+const ImagePreviewContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+`;
+
+const ImageCard = styled.div`
+  position: relative;
+  width: 150px;
+  height: 100px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 0, 0, 1);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: white;
+  }
+`;
+
+/***************************************************************************************************/  
 const formatOptions = [
   { value: 'cours', label: 'Cours' },
   { value: 'devoir', label: 'Devoir' },
   { value: 'ressource numérique', label: 'Ressource Numérique' },
 ];
+
 
 const fetchMediaFromCache = async (url) => {
   if (!url) return null;
@@ -66,6 +178,7 @@ export default function UpdateResource() {
   const hiddenFileInputVideo = useRef(null);
 
   const token = useMemo(() => getToken(), []);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleOnline = async () => {
@@ -273,12 +386,15 @@ export default function UpdateResource() {
         setBookReference("");
         setDisplayLinkInput(false);
         setDisplayBookInput(false);
+
+         toast.success("Resource updated successfully!");
+        navigate("/dashboard/resources"); // Navigate after success
       } else {
         throw new Error("Failed to update resource");
       }
     } catch (error) {
-      console.error("Error updating resource:", error);
-    }
+toast.error("Error updating resource. Please try again."); // Show error notification
+        console.error("Error updating resource:", error);    }
   },
 });
 
@@ -570,7 +686,11 @@ const handleParcoursChange = (selectedParcours) => {
   };
 
   return (
-    <Container>
+    <StyledContainer>
+            <ToastContainer /> {/* Add this to display toast notifications */}
+
+            <FormTitle>Modifier une ressource</FormTitle>
+
       <Row className="justify-content-md-center">
         <Col md={8}>
           <Form onSubmit={formik.handleSubmit}>
@@ -793,42 +913,56 @@ const handleParcoursChange = (selectedParcours) => {
               </Form.Group>
             )}
 
-    <div className="image-preview-container">
-  {images.length > 0 && images.map((image, index) => (
-    <div className="image-preview" key={index}>
-      <img
-        src={
-          typeof image.preview === 'string' && image.preview.startsWith('blob')
-            ? image.preview
-            : `http://localhost:1337${image.preview}`
-        }
-        alt={`Preview ${index}`}
-        className="thumbnail-image"
-      />
-      <Button variant="outline-danger" onClick={() => removeFile("image", index)}>
-        <FiTrash2 size={24} /> Supprimer
-      </Button>
-    </div>
-  ))}
-</div>
+    
+
+    <ImagePreviewContainer>
+  {images.length > 0 &&
+    images.map((image, index) => (
+      <ImageCard key={index}>
+        <DeleteButton
+          variant="danger"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeFile("image", index);
+          }}
+        >
+          <FiTrash2 size={16} />
+        </DeleteButton>
+        <Zoom>
+          <img
+            src={
+              typeof image.preview === 'string' && image.preview.startsWith('blob')
+                ? image.preview
+                : `http://localhost:1337${image.preview}`
+            }
+            alt={`Preview ${index}`}
+          />
+        </Zoom>
+      </ImageCard>
+    ))}
+</ImagePreviewContainer>
 
 
 
             {audioFile.preview && (
               <div className="audio-preview">
                 <AudioPlayer audioFile={audioFile.preview?.startsWith('blob') ? audioFile.preview : `http://localhost:1337${audioFile.preview}`} />
+            <div className="d-flex justify-content-center">
                 <Button variant="outline-danger" onClick={() => removeFile("audio")}>
                   <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
+                </div>
               </div>
             )}
 
             {pdfFile.preview && (
               <div className="pdf-preview">
                 <iframe title="PDF Preview" src={pdfFile.preview?.startsWith('blob') ? pdfFile.preview : `http://localhost:1337${pdfFile.preview}`} width="100%" height="500px" />
+         <div className="d-flex justify-content-center">
                 <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
                   <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>
+                </div>
               </div>
             )}
 
@@ -841,13 +975,19 @@ const handleParcoursChange = (selectedParcours) => {
               </div>
             )}
 
-            <Button type="submit" className="mt-3">
-              Mettre à jour la ressource
-            </Button>
+           <LargeButtonGroup>
+              <LargeButton variant="secondary" onClick={() => navigate("/dashboard/resources")}>
+                Annuler
+              </LargeButton>
+
+              <LargeButton type="submit" variant="primary">
+                Mettre à jour
+              </LargeButton>
+            </LargeButtonGroup>
           </Form>
         </Col>
       </Row>
-    </Container>
+    </StyledContainer>
   );
 }
 

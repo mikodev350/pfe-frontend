@@ -7,7 +7,27 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { deleteResource } from "../../api/apiResource";
 import { getToken } from "../../util/authUtils";
+import styled from "styled-components";
 
+const StyledIconButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  background-color: #e0e0e0; /* Default gray background */
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  color: #424242; /* Dark grey icon color */
+
+  &:hover,
+  &:focus {
+    background-color: #007bff; /* Blue background on hover/focus */
+    color: #ffffff; /* White icon color on hover/focus */
+    transform: translateY(-3px); /* Slight lift on hover/focus */
+  }
+`;
 export default function TableIconeResource({ id, dataLabel }) {
   const token = React.useMemo(() => getToken(), []);
   const queryClient = useQueryClient();
@@ -41,20 +61,25 @@ export default function TableIconeResource({ id, dataLabel }) {
   };
 
   return (
-    <td data-label={dataLabel} style={{ alignItems: "center" }}>
+    <td
+      data-label={dataLabel}
+      style={{ alignItems: "center", display: "flex", gap: "10px" }}
+    >
       <Link to={`/dashboard/resource-preview/${id}`}>
-        <span className="icon-option">
+        <StyledIconButton>
           <BiDetail size={23} />
-        </span>
+        </StyledIconButton>
       </Link>
+
       <Link to={`/dashboard/update-resource/${id}`}>
-        <span className="icon-option">
+        <StyledIconButton>
           <BiEdit size={24} />
-        </span>
+        </StyledIconButton>
       </Link>
-      <span className="icon-option" onClick={handleDelete}>
+
+      <StyledIconButton onClick={handleDelete}>
         <BiTrash size={24} />
-      </span>
+      </StyledIconButton>
     </td>
   );
 }

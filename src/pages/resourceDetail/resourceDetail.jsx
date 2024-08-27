@@ -4,50 +4,127 @@ import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 import styled from 'styled-components';
 import { FaSave } from "react-icons/fa";
-
+import GenerateLinkButton from "../../components/GenerateLinkButton/GenerateLinkButton";
 const StyledCard = styled(Card)`
-  background-color: #f8f9fa;
+  background-color: #ffffff !important;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-`;
-
-const StyledHeader = styled(Card.Header)`
-  background-color: #007bff;
-  color: white;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  margin-bottom: 20px;
   padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 66px;
 `;
 
-const ButtonsContainer = styled.div`
+
+const InfoCard = styled(Card)`
+  background-color: #ffffff !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important; /* Plus d'ombre pour un effet de profondeur accentué */
+  border-radius: 8px !important;
+  padding: 15px !important;
+  margin-bottom: 10px !important;
+`;
+
+const InfoTitle = styled.h4`
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #10266F;
+  margin-bottom: 15px;
+`;
+
+const InfoContent = styled.div`
+  font-size: 1rem !important;
+  color: #333 !important;
+  margin-bottom: 10px !important;
+`;
+
+const TitleContainer = styled.div`
   display: flex;
-  gap: 10px;
+  justify-content: space-between; /* Space between title and button */
+  align-items: center;
+  background: linear-gradient(135deg, #10266F, #007bff); /* Gradient background */
+  padding: 15px 20px; /* Padding for some spacing */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 20px; /* Spacing below the container */
+`;
+
+const Title = styled.h2`
+  font-size: 2rem;
+  font-weight: bold;
+  color: white; /* White color for contrast against the background */
+  margin: 0;
 `;
 
 const SaveButton = styled(Button)`
-  background-color: transparent;
+  background-color: #ffffff !important; /* White background */
   border: none;
-  color: white;
+  color: #007bff !important; /* Blue icon color */
   font-size: 1.5rem;
+  width: 50px !important;
+  height: 50px !important;
+  padding: 0; /* Remove inner padding */
+  border-radius: 50% !important; /* Fully rounded button */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    background-color: #e6f0ff !important; /* Lighter blue on hover */
+  }
 `;
+
+const InnerCardBody = styled(Card.Body)`
+  padding: 15px !important; /* Renforcer le padding */
+  color: #333 !important; /* Couleur du texte */
+  font-size: 1rem !important; /* Taille du texte */
+`;
+
+
+
 
 const InnerCard = styled(Card)`
-  background-color: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  background-color: #ffffff !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important; /* Plus d'ombre pour un effet de profondeur accentué */
+  border-radius: 8px !important;
+  padding: 15px !important;
+  margin-bottom: 10px !important;
 `;
 
+
+const SectionTitle = styled.h3`
+  color: #10266F; /* Bleu foncé principal */
+  margin-top: 20px;
+  margin-bottom: 15px;
+  font-weight: bold;
+`;
 const Image = styled.img`
-  border-radius: 4px;
+  border-radius: 4px !important;
+  width: 100px !important; 
+  height: 100px !important; 
+  object-fit: cover !important;
+
+  @media (max-width: 768px) {
+    width: 80px !important; /* Réduction de la taille pour les écrans plus petits */
+    height: 80px !important;
+  }
+
+  @media (max-width: 576px) {
+    width: 60px !important; /* Réduction supplémentaire pour les très petits écrans */
+    height: 60px !important;
+  }
 `;
 
-const ResourceDetails = ({ resource }) => {
+const NoteTitle = styled.p`
+  font-size: 1.5rem; /* Increases the font size */
+  font-weight: bold;
+  color: #10266F; /* Adjust the color to match your theme */
+  margin-bottom: 10px; /* Optional spacing */
+`;
+
+
+
+
+const ResourceDetails = ({ resource , isFromLink, token}) => {
   const [show, setShow] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [cachedImages, setCachedImages] = useState([]);
@@ -205,7 +282,7 @@ const ResourceDetails = ({ resource }) => {
           <Zoom>
             <Image src={image} alt={`Image ${index + 1}`} className="img-fluid" />
           </Zoom>
-          <Button variant="link" onClick={() => handleShow(index)}>Voir en plein écran</Button>
+          {/* <Button variant="link" onClick={() => handleShow(index)}>Voir en plein écran</Button> */}
         </Col>
       ));
     }
@@ -254,81 +331,63 @@ const ResourceDetails = ({ resource }) => {
     return null;
   };
 
-  return (
+   return (
+    <>
+         <TitleContainer>
+        <Title>{resource.nom}</Title>
+       
+        {isFromLink && (
+ <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip">Save Resource</Tooltip>}>
+          <SaveButton onClick={handleSaveResource}>
+            <FaSave />
+          </SaveButton>
+        </OverlayTrigger>           
+          )}
+          {!isFromLink && <GenerateLinkButton resourceId={resource.id} />}
+      </TitleContainer>
+   
     <StyledCard className="mt-4">
-      <StyledHeader>
-        <h2>{resource.nom}</h2>
-        <ButtonsContainer>
-          <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip">Save Resource</Tooltip>}>
-            <SaveButton onClick={handleSaveResource}>
-              <FaSave />
-            </SaveButton>
-          </OverlayTrigger>
-        </ButtonsContainer>
-      </StyledHeader>
+     
       <Card.Body>
         <Row>
           <Col md={6}>
-            <p><strong>Format:</strong> {resource.format}</p>
-            <p><strong>Note:</strong></p>
-            <div dangerouslySetInnerHTML={{ __html: resource.note }} />
+                     <InfoCard>
+      <InfoContent>
+        <strong>Format:</strong> {resource.format}
+      </InfoContent>
+      <InfoTitle>Note:</InfoTitle>
+      <InfoContent dangerouslySetInnerHTML={{ __html: resource.note }} />
+    </InfoCard>
           </Col>
-          <Col md={6}>
-              {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderVideo(cachedVideo) :(!navigator.onLine && isLocalUpdate)? renderBlobVideo():null}
 
-          </Col>
-        </Row>
-        <Row className="mt-4">
           <Col md={6}>
-            <h3>Parcours</h3>
-            {resource.parcours && resource.parcours.map((parcours) => (
-              <InnerCard key={parcours.id} className="mb-2">
-                <Card.Body>
-                  <p>Nom du parcours: {parcours.nom}</p>
-                </Card.Body>
-              </InnerCard>
-            ))}
+            {isLocalUpdate ? renderBlobVideo() : renderVideo(cachedVideo)}
+            {isLocalUpdate ? renderBlobAudio() : renderAudio(cachedAudio)}
+            {isLocalUpdate ? renderBlobPDF() : renderPDF(cachedPDF)}
+{
+  isLocalUpdate ? (
+    <div className="mt-4">
+      <SectionTitle>Images</SectionTitle>
+      <Row className="d-flex justify-content-center">
+        {renderBlobImages()}
+      </Row>
+    </div>
+  ) : (
+    <div className="mt-4">
+      <SectionTitle>Images</SectionTitle>
+      <Row className="d-flex justify-content-center">
+        {cachedImages.map((image, index) => (
+          <Col key={index}>
+            <Zoom>
+              {renderMedia(image)}
+            </Zoom>
           </Col>
-          <Col md={6}>
-            <h3>Modules</h3>
-            {resource.modules && resource.modules.map((module) => (
-              <InnerCard key={module.id} className="mb-2">
-                <Card.Body>
-                  <p>Nom du module: {module.nom}</p>
-                </Card.Body>
-              </InnerCard>
-            ))}
-          </Col>
-        </Row>
-        <Row className="mt-4">
-          <Col md={6}>
-            <h3>Leçons</h3>
-            {resource.lessons && resource.lessons.map((lesson) => (
-              <InnerCard key={lesson.id} className="mb-2">
-                <Card.Body>
-                  <p>Nom de la leçon: {lesson.nom}</p>
-                </Card.Body>
-              </InnerCard>
-            ))}
-          </Col>
-          <Col md={6}>
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderAudio(cachedAudio) :(!navigator.onLine && isLocalUpdate)? renderBlobAudio():null}
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate) ? renderPDF(cachedPDF) :(!navigator.onLine && isLocalUpdate)? renderBlobPDF():null}
-            {(navigator.onLine && !isLocalUpdate)|| (!navigator.onLine && !isLocalUpdate)? (
-              <div className="mt-4">
-                <h3>Images</h3>
-                <Row>{cachedImages.map((image, index) => (
-                  <Col md={4} key={index}>
-                    <Zoom>
-                      {renderMedia(image)}
-                    </Zoom>
-                    <Button variant="link" onClick={() => handleShow(index)}>
-                      Voir en plein écran
-                    </Button>
-                  </Col>
-                ))}</Row>
-              </div>
-            ) :(!navigator.onLine && isLocalUpdate)? renderBlobImages():(null)}
+        ))}
+      </Row>
+    </div>
+  )
+}
+
             {resource.link && (
               <div className="mt-4">
                 <h3>Lien</h3>
@@ -337,8 +396,44 @@ const ResourceDetails = ({ resource }) => {
             )}
           </Col>
         </Row>
+        <Row className="mt-4">
+          <Col md={6}>
+            <SectionTitle>Parcours</SectionTitle>
+            {resource.parcours && resource.parcours.map((parcours) => (
+              <InnerCard key={parcours.id} className="mb-2">
+                <InnerCardBody>
+                  <p><strong>Nom du parcours:</strong> {parcours.nom}</p>
+                </InnerCardBody>
+              </InnerCard>
+            ))}
+          </Col>
+          <Col md={6}>
+            <SectionTitle>Modules</SectionTitle>
+            {resource.modules && resource.modules.map((module) => (
+              <InnerCard key={module.id} className="mb-2">
+                <InnerCardBody>
+                  <p><strong>Nom du module:</strong> {module.nom}</p>
+                </InnerCardBody>
+              </InnerCard>
+            ))}
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col md={6}>
+            <SectionTitle>Leçons</SectionTitle>
+            {resource.lessons && resource.lessons.map((lesson) => (
+              <InnerCard key={lesson.id} className="mb-2">
+                <InnerCardBody>
+                  <p><strong>Nom de la leçon: </strong>{lesson.nom}</p>
+                </InnerCardBody>
+              </InnerCard>
+            ))}
+          </Col>
+          
+        </Row>
       </Card.Body>
     </StyledCard>
+     </>
   );
 };
 

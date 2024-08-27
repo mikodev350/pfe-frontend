@@ -1,4 +1,3 @@
-// Export the accordionStyles as a named export
 export const accordionStyles = {
   header: {
     fontWeight: "bold",
@@ -8,6 +7,7 @@ export const accordionStyles = {
     borderBottom: "1px solid #ced4da",
     borderRadius: "5px",
     transition: "background-color 0.2s ease, color 0.2s ease",
+    fontSize: "1rem",
   },
   headerActive: {
     backgroundColor: "#007bff",
@@ -19,6 +19,8 @@ export const accordionStyles = {
     borderRadius: "0 0 5px 5px",
     border: "1px solid #ced4da",
     borderTop: "none",
+    fontSize: "0.9rem",
+    lineHeight: "1.5",
   },
   card: {
     border: "none",
@@ -34,5 +36,15 @@ export const accordionStyles = {
     borderRadius: "5px",
     padding: "8px 16px",
     transition: "background-color 0.2s ease",
+  },
+  deleteButton: {
+    marginTop: "10px",
+    backgroundColor: "#dc3545",
+    borderColor: "#dc3545",
+    color: "#fff",
+    borderRadius: "5px",
+    padding: "8px 16px",
+    transition: "background-color 0.2s ease",
+    marginLeft: "10px",
   },
 };

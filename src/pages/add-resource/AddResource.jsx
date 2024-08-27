@@ -11,6 +11,122 @@ import { getToken } from "../../util/authUtils";
 import { saveResource, addFileInToIndexedDB } from "../../api/apiResource";
 import { useQueryClient } from "react-query";
 import { uploadFile } from "../../api/apiUpload";
+import "react-medium-image-zoom/dist/styles.css";
+import Zoom from "react-medium-image-zoom";
+import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+import styled from "styled-components";
+
+
+
+
+  // Styled components
+const StyledContainer = styled.div`
+  padding: 20px;
+  background-color: #ffffff; /* White background */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+`;
+
+
+const FormTitle = styled.h2`
+  color: #10266F; /* Dark blue main color */
+  margin-bottom: 30px;
+  font-weight: bold;
+  text-align: center;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+`;
+
+const LargeButton = styled(Button)`
+  padding: 15px 20px !important; // Increase padding for larger click area
+  font-size: 1.2rem !important;
+  border-radius: 35px !important;
+  margin: 0 10px !important;
+  flex: 1 !important;
+
+  @media (max-width: 768px) {
+    width: 100% !important; // Full width on smaller screens
+    margin: 10px 0 !important; // Vertical margin when stacked
+    font-size: 1.5rem !important; // Increase font size on smaller screens
+  }
+`;
+
+const LargeButtonGroup = styled.div`
+  display: flex !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  margin-top: 20px !important;
+  width: 100% !important;
+
+  @media (max-width: 768px) {
+    flex-direction: column !important; // Stack buttons vertically
+    align-items: center !important;
+  }
+`;
+
+
+const ImagePreviewContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  
+  justify-content: center;
+`;
+
+const ImageCard = styled.div`
+  position: relative;
+  width: 150px;
+  height: 100px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 0, 0, 1);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: white;
+  }
+`;
+
+
 
 const formatOptions = [
   { value: 'cours', label: 'Cours' },
@@ -26,6 +142,8 @@ const CheckboxOption = (props) => (
 );
 
 export default function AddResource() {
+    const navigate = useNavigate(); // Use the useNavigate hook
+
   const [parcoursOptions, setParcoursOptions] = useState([]);
   const [moduleOptions, setModuleOptions] = useState([]);
   const [lessonOptions, setLessonOptions] = useState([]);
@@ -169,8 +287,13 @@ export default function AddResource() {
             setReferenceLivre("");
             setDisplayLinkInput(false);
             setDisplayBookInput(false);
+
+               toast.success("Ressource enregistrée avec succès !");
+        navigate("/dashboard/resources");
           } else {
             throw new Error("Failed to save resource");
+                    toast.error("Erreur lors de l'enregistrement de la ressource.");
+
           }
         }
       } catch (error) {
@@ -288,8 +411,12 @@ export default function AddResource() {
   };
 
   return (
-    <Container>
-      <Row className="justify-content-md-center">
+ <StyledContainer className="mt-4">
+   <ToastContainer />
+      {/* <StyledCard>     */}
+            <FormTitle>Ajouter une ressource</FormTitle>
+
+          <Row className="justify-content-md-center">
         <Col md={8}>
           <Form onSubmit={formik.handleSubmit}>
             <Form.Group controlId="nom">
@@ -373,113 +500,109 @@ export default function AddResource() {
                 <div className="text-danger">{formik.errors.note}</div>
               )}
             </Form.Group>
+{/* **************************************************************************************** */}
+<Form.Group>
+  <Form.Label>Options de téléchargement :</Form.Label>
+  <Row className="justify-content-center">
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("image")}
+        className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
+        disabled={!!(audioFile || pdfPreview || videoPreview || link || referenceLivre)}
+      >
+        <FiImage size={35} />
+      </Button>
+      <input
+        type="file"
+        accept="image/png, image/jpeg"
+        ref={hiddenFileInputImage}
+        onChange={(event) => handleFileChange(event, "image")}
+        multiple
+        style={{ display: "none" }}
+      />
+    </Col>
 
-            <Form.Group>
-              <Form.Label>Options de téléchargement :</Form.Label>
-              <div className="d-flex justify-content-center">
-                <Button
-                  onClick={() => handleClick("image")}
-                  className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
-                  disabled={!!(audioFile || pdfPreview || videoPreview || link || referenceLivre)}
-                >
-                  <span>
-                    <FiImage size={35} />
-                    Télécharger des images
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  ref={hiddenFileInputImage}
-                  onChange={(event) => handleFileChange(event, "image")}
-                  multiple
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("audio")}
+        className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
+        disabled={!!(images.length > 0 || pdfPreview || videoPreview || link || referenceLivre)}
+      >
+        <FiVolume2 size={35} />
+      </Button>
+      <input
+        type="file"
+        accept="audio/*"
+        ref={hiddenFileInputAudio}
+        onChange={(event) => handleFileChange(event, "audio")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("audio")}
-                  className={`btn-tab-audio ${audioFile ? "active-audio" : ""}`}
-                  disabled={!!(images.length > 0 || pdfPreview || videoPreview || link || referenceLivre)}
-                >
-                  <span>
-                    <FiVolume2 size={35} />
-                    Télécharger un audio
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  ref={hiddenFileInputAudio}
-                  onChange={(event) => handleFileChange(event, "audio")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("pdf")}
+        className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
+        disabled={!!(audioFile || images.length > 0 || videoPreview || link || referenceLivre)}
+      >
+        <FiFile size={35} />
+      </Button>
+      <input
+        type="file"
+        accept="application/pdf"
+        ref={hiddenFileInputPdf}
+        onChange={(event) => handleFileChange(event, "pdf")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("pdf")}
-                  className={`btn-tab-googleDrive ${pdfFile ? "active-googleDrive" : ""}`}
-                  disabled={!!(audioFile || images.length > 0 || videoPreview || link || referenceLivre)}
-                >
-                  <span>
-                    <FiFile size={35} />
-                    Télécharger un PDF
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  ref={hiddenFileInputPdf}
-                  onChange={(event) => handleFileChange(event, "pdf")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("video")}
+        className={`btn-tab-video ${videoFile ? "active-video" : ""}`}
+        disabled={!!(audioFile || images.length > 0 || pdfPreview || link || referenceLivre)}
+      >
+        <FiVideo size={35} />
+      </Button>
+      <input
+        type="file"
+        accept="video/*"
+        ref={hiddenFileInputVideo}
+        onChange={(event) => handleFileChange(event, "video")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("video")}
-                  className={`btn-tab-video ${videoFile ? "active-video" : ""}`}
-                  disabled={!!(audioFile || images.length > 0 || pdfPreview || link || referenceLivre)}
-                >
-                  <span>
-                    <FiVideo size={35} />
-                    Télécharger une vidéo
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="video/*"
-                  ref={hiddenFileInputVideo}
-                  onChange={(event) => handleFileChange(event, "video")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => {
+          setDisplayLinkInput(true);
+          setDisplayBookInput(false);
+        }}
+        className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
+        disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || referenceLivre)}
+      >
+        <FiLink size={35} />
+      </Button>
+    </Col>
 
-                <Button
-                  onClick={() => {
-                    setDisplayLinkInput(true);
-                    setDisplayBookInput(false);
-                  }}
-                  className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-                  disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || referenceLivre)}
-                >
-                  <span>
-                    <FiLink size={35} />
-                    Ajouter un lien
-                  </span>
-                </Button>
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => {
+          setDisplayBookInput(true);
+          setDisplayLinkInput(false);
+        }}
+        className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
+        disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || link)}
+      >
+        <FiBook size={35} />
+      </Button>
+    </Col>
+  </Row>
+</Form.Group>
 
-                <Button
-                  onClick={() => {
-                    setDisplayBookInput(true);
-                    setDisplayLinkInput(false);
-                  }}
-                  className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
-                  disabled={!!(audioFile || images.length > 0 || pdfPreview || videoPreview || link)}
-                >
-                  <span>
-                    <FiBook size={35} />
-                    Ajouter une référence de livre
-                  </span>
-                </Button>
-              </div>
-            </Form.Group>
 
+{/* **************************************************************************************** */}
             {displayLinkInput && (
               <Form.Group controlId="link">
                 <Form.Label>Lien externe</Form.Label>
@@ -512,51 +635,118 @@ export default function AddResource() {
               </Form.Group>
             )}
 
-            <div className="image-preview-container">
-              {images.length > 0 && images.map((image, index) => (
-                <div className="image-preview" key={index}>
-                  <img src={image.preview} alt={`Preview ${index}`} className="thumbnail-image" />
-                  <Button variant="outline-danger" onClick={() => removeFile("image", index)}>
-                    <FiTrash2 size={24} /> Supprimer
-                  </Button>
-                </div>
-              ))}
-            </div>
-
+          {/* ********************************************************************** */}
+         <ImagePreviewContainer>
+      {images.length > 0 &&
+        images.map((image, index) => (
+          <ImageCard key={index}>
+             <DeleteButton
+              variant="danger"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevents the click from opening the modal
+                removeFile("image", index);
+              }}
+            >
+              <FiTrash2 size={16} />
+            </DeleteButton>
+            <Zoom>
+              <img src={image.preview} alt={`Preview ${index}`} />
+            </Zoom>
+           
+          </ImageCard>
+        ))}
+    </ImagePreviewContainer>
+          {/*  *************************************************************************/}
             {audioFile && (
               <div className="audio-preview">
                 <AudioPlayer audioFile={audioFile.preview} />
-                <Button variant="outline-danger" onClick={() => removeFile("audio")}>
+                <div className="d-flex justify-content-center">
+                <Button variant="outline-danger"   onClick={() => removeFile("audio")}>
                   <FiTrash2 size={24} /> Supprimer l'audio
                 </Button>
+                </div>
               </div>
             )}
 
             {pdfPreview && (
               <div className="pdf-preview">
                 <iframe src={pdfPreview} width="100%" height="500px" title="PDF Preview" />
-                <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
+                                <div className="d-flex justify-content-center">
+                <Button variant="outline-danger" className="d-flex justify-content-center"   onClick={() => removeFile("pdf")}>
                   <FiTrash2 size={24} /> Supprimer le PDF
                 </Button>
+                </div>
               </div>
             )}
 
             {videoPreview && (
               <div className="video-preview">
                 <video src={videoPreview} controls width="100%" />
-                <Button variant="outline-danger" onClick={() => removeFile("video")}>
+                                                <div className="d-flex justify-content-center">
+                <Button variant="outline-danger" className="d-flex justify-content-center" onClick={() => removeFile("video")}>
                   <FiTrash2 size={24} /> Supprimer la vidéo
                 </Button>
+                </div>
               </div>
             )}
 
-            <Button type="submit" className="mt-3">Enregistrer la ressource</Button>
+            <Container>
+      <Row>
+        <LargeButtonGroup>
+                  <LargeButton variant="secondary" onClick={() => navigate("/dashboard/resources")}>
+              Annuler
+            </LargeButton>
+            <LargeButton type="submit" variant="primary">
+              Enregistrer 
+            </LargeButton>
+        </LargeButtonGroup>
+      </Row>
+    </Container>
+
+
+
+
+
+
+
+
           </Form>
         </Col>
       </Row>
-    </Container>
+     {/* </StyledCard> */}
+    </StyledContainer>
   );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

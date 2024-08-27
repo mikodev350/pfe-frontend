@@ -14,23 +14,22 @@ import styled from "styled-components";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { BiEdit, BiTrash } from "react-icons/bi";
+import { FaEye, FaShareAlt } from "react-icons/fa"; // New icons
 
-// Updated styled components for a modern look
+// Styled Components for a Clean and Customizable Design
 const LessonCard = styled(Card)`
   border-radius: 15px;
   overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    #e3f2fd,
-    #bbdefb
-  ); /* Soft blue gradient */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
-  border: none; /* Remove border for a cleaner look */
+  background: linear-gradient(135deg, #ffffff, #f7faff);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out,
+    background-color 0.3s ease-in-out;
+  border: none;
 
   &:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    background-color: #eef7ff;
   }
 `;
 
@@ -49,32 +48,32 @@ const LessonTitle = styled.h5`
   margin: 0;
   font-size: 1.3rem;
   font-weight: bold;
-  color: #0d47a1; /* Deep blue for contrast */
+  color: #0d47a1;
 `;
 
 const LessonText = styled.p`
   margin: 5px 0;
-  color: #424242; /* Dark grey for readability */
+  color: #555555;
   font-size: 1rem;
 `;
 
 const IconContainer = styled.div`
   display: flex;
   gap: 10px;
-  font-size: 1.3rem;
+  font-size: 1.8rem;
 
   .icon {
     cursor: pointer;
     padding: 8px;
     border-radius: 8px;
-    background-color: #ffffff; /* White background for icons */
+    background-color: #f4f5f7;
     color: #424242;
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 
     &:hover {
       transform: scale(1.1);
-      background-color: #0d47a1; /* Blue background on hover */
-      color: #ffffff; /* White icon color on hover */
+      background-color: #0d47a1;
+      color: #ffffff;
     }
   }
 `;
@@ -219,9 +218,14 @@ const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
                   </LessonText>
                 </LessonDetails>
                 <IconContainer>
-                  <BiEdit className="icon" onClick={() => onEditLesson(item)} />
+                  <BiEdit
+                    className="icon"
+                    size={30}
+                    onClick={() => onEditLesson(item)}
+                  />
                   <BiTrash
                     className="icon"
+                    size={30}
                     onClick={() => handleDelete(item.id)}
                   />
                 </IconContainer>

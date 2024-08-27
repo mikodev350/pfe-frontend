@@ -13,25 +13,35 @@ import styled from "styled-components";
 
 
 
-// Styled Components
 const Container = styled.div`
   padding: 20px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f0f0f5; /* Fond neutre */
+  background: #f0f0f5; /* Neutral background */
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
+
 
 const CardGrid = styled(Row)`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
-  width: 100%;
+  width: calc(100% - 50px); /* Adjusted width to create space from the sidebar */
   max-width: 1200px;
   margin-bottom: 20px;
-`;
+  margin-left: 50px; /* Add margin to create separation from the sidebar */
 
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    width: 100%;
+    margin-left: 0;
+  }
+`;
 const ModernCard = styled.div`
   position: relative;
   padding: 20px;
@@ -58,9 +68,17 @@ const ModernCard = styled.div`
     right: 0;
     width: 80px;
     height: 80px;
-    background: linear-gradient(45deg, #007bff, #00c6ff);
+    background: linear-gradient(45deg, #FFD700 30%, #FFB352 60%, #FFB352);
     clip-path: polygon(100% 0, 0 0, 100% 100%);
     z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    &:before {
+      width: 60px;
+      height: 60px;
+    }
   }
 `;
 
@@ -74,19 +92,30 @@ const CardTitle = styled.h2`
   font-weight: 600;
   color: #333;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const CardSubtitle = styled.h3`
   font-size: 1rem;
   color: #555;
   margin-bottom: 15px;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const CardText = styled.p`
   font-size: 0.9rem;
   color: #666;
-`;
 
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+`;
 const ActionWrapper = styled.div`
   margin-top: 15px;
   display: flex;
@@ -153,8 +182,7 @@ const ResourceTable = ({ searchValue }) => {
 
   const resources = Array.isArray(data?.data) ? data.data : [];
   
- 
-  return (
+ return (
     <Container>
       <CardGrid>
         {resources.map((resource, index) => (
@@ -186,6 +214,7 @@ const ResourceTable = ({ searchValue }) => {
       </PaginationWrapper>
     </Container>
   );
+
 };
 
 export default ResourceTable;
