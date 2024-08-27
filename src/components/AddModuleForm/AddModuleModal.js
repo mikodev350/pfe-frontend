@@ -1,8 +1,69 @@
 import React, { useEffect } from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { BiTrash } from "react-icons/bi";
+import styled from "styled-components";
+
+// Styled Components
+const StyledModalBody = styled(Modal.Body)`
+  padding: 20px;
+`;
+
+const StyledFormGroup = styled(Form.Group)`
+  margin-bottom: 15px;
+`;
+
+const StyledFormControl = styled(Form.Control)`
+  border-radius: 20px;
+  padding-right: 40px;
+  flex: 1;
+`;
+
+const DeleteButton = styled(Button)`
+  border-radius: 50%;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  margin-top: 0px;
+
+  @media (max-width: 576px) {
+    margin-top: 10px;
+    margin-left: 0;
+  }
+`;
+
+const LessonRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  border-radius: 20px;
+  padding: 10px;
+  width: 100%;
+  background-color: ${(props) =>
+    props.variant === "danger" ? "#dc3545" : "#003366"};
+  border: none;
+  margin-bottom: ${(props) => (props.mb ? "20px" : "0")};
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  font-size: 0.875em;
+  margin-top: 5px;
+`;
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -28,7 +89,6 @@ const AddModuleModal = ({ show, handleClose, onSave, initialData, type }) => {
     if (!initialData) {
       formik.resetForm();
     }
-    // eslint-disable-next-line
   }, [show, initialData]);
 
   const handleLessonChange = (index, event) => {
@@ -55,13 +115,13 @@ const AddModuleModal = ({ show, handleClose, onSave, initialData, type }) => {
           {type === "continue" ? "formation" : "module"}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <StyledModalBody>
         <Form onSubmit={formik.handleSubmit}>
-          <Form.Group controlId="nom">
+          <StyledFormGroup controlId="nom">
             <Form.Label>
               Nom de la {type === "continue" ? "formation" : "module"}
             </Form.Label>
-            <Form.Control
+            <StyledFormControl
               type="text"
               name="nom"
               value={formik.values.nom}
@@ -74,77 +134,54 @@ const AddModuleModal = ({ show, handleClose, onSave, initialData, type }) => {
               }
             />
             {formik.touched.nom && formik.errors.nom && (
-              <div className="text-danger">{formik.errors.nom}</div>
+              <ErrorMessage>{formik.errors.nom}</ErrorMessage>
             )}
-          </Form.Group>
+          </StyledFormGroup>
 
           {formik.values.lessons.map((lesson, index) => (
-            <Form.Group key={index} controlId={`lesson${index}`}>
-              <Row className="align-items-center">
-                <Col sm={8}>
-                  <Form.Label>
-                    Nom du {type === "continue" ? "cours" : "leçon"}
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={lesson}
-                    onChange={(event) => handleLessonChange(index, event)}
-                    className="mb-2"
-                  />
-                  {formik.touched.lessons &&
-                    formik.touched.lessons[index] &&
-                    formik.errors.lessons &&
-                    formik.errors.lessons[index] && (
-                      <div className="text-danger">
-                        {formik.errors.lessons[index]}
-                      </div>
-                    )}
-                </Col>
-                <Col
-                  sm={2}
-                  className="text-right"
-                  style={{ paddingTop: "35px" }}
+            <StyledFormGroup key={index} controlId={`lesson${index}`}>
+              <Form.Label>
+                Nom du {type === "continue" ? "cours" : "leçon"}
+              </Form.Label>
+              <LessonRow>
+                <StyledFormControl
+                  type="text"
+                  value={lesson}
+                  onChange={(event) => handleLessonChange(index, event)}
+                />
+                <DeleteButton
+                  variant="danger"
+                  onClick={() => handleRemoveLesson(index)}
                 >
-                  <Button
-                    variant="danger"
-                    onClick={() => handleRemoveLesson(index)}
-                    className="mb-2"
-                  >
-                    <BiTrash />
-                  </Button>
-                </Col>
-              </Row>
-            </Form.Group>
+                  <BiTrash size={14} />
+                </DeleteButton>
+              </LessonRow>
+              {formik.touched.lessons &&
+                formik.touched.lessons[index] &&
+                formik.errors.lessons &&
+                formik.errors.lessons[index] && (
+                  <ErrorMessage>{formik.errors.lessons[index]}</ErrorMessage>
+                )}
+            </StyledFormGroup>
           ))}
 
-          <Button
-            variant="secondary"
-            onClick={handleAddLesson}
-            className="mb-3"
-          >
+          <StyledButton variant="secondary" onClick={handleAddLesson} mb="true">
             Ajouter un {type === "continue" ? "cours" : "leçon"}
-          </Button>
+          </StyledButton>
 
-          <Modal.Footer>
-            <Row className="mt-3 w-100">
-              <Col xs={6} className="text-left">
-                <Button
-                  variant="secondary"
-                  onClick={handleClose}
-                  className="mr-2"
-                >
-                  Annuler
-                </Button>
-              </Col>
-              <Col xs={6} className="text-right">
-                <Button variant="primary" type="submit">
-                  Enregistrer la {type === "continue" ? "formation" : "module"}
-                </Button>
-              </Col>
-            </Row>
+          <Modal.Footer
+            style={{
+              padding: "0",
+              borderTop: "none",
+              marginTop: "20px",
+            }}
+          >
+            <StyledButton variant="primary" type="submit">
+              Enregistrer la {type === "continue" ? "formation" : "module"}
+            </StyledButton>
           </Modal.Footer>
         </Form>
-      </Modal.Body>
+      </StyledModalBody>
     </Modal>
   );
 };

@@ -19,7 +19,8 @@ const Parcours = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px; /* Add padding similar to the input */
+    padding: 10px 20px;
+    text-decoration: none !important;
     transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out,
       transform 0.2s ease-in-out;
 
@@ -70,9 +71,11 @@ const Parcours = () => {
       <StyledTitle>Parcours</StyledTitle>
       <Row>
         <Col xs={12} md={6}>
-          <Link to={`/dasboard/new-parcour`}>
-            <GradientButton>Ajouter</GradientButton>
-          </Link>
+          <span>
+            <Link to={`/dashboard/new-parcour`}>
+              <GradientButton>Ajouter</GradientButton>
+            </Link>
+          </span>
         </Col>
         <Col xs={12} md={6}>
           <SearchForm searchValue={searchValue} onSearch={handleSearch} />

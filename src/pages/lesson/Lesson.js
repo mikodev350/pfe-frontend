@@ -94,7 +94,7 @@ const Lesson = () => {
       }
       queryClient.invalidateQueries([
         "lessons",
-        { searchValue, moduleId: idModule, currentPage: 1 },
+        // { searchValue, moduleId: idModule, currentPage: 1 },
       ]);
       if (navigator.onLine && !isSyncing) {
         setIsSyncing(true);

@@ -52,12 +52,33 @@ const ModelModule = ({
               {formik.errors.nom}
             </Form.Control.Feedback>
           </Form.Group>
-          <Button variant="secondary" onClick={handleClose}>
-            Annuler
-          </Button>
-          <Button variant="primary" type="submit">
-            Enregistrer
-          </Button>
+          <div className="d-flex justify-content-end mt-3">
+            <Button
+              variant="secondary"
+              onClick={handleClose}
+              style={{
+                width: "100%",
+                height: "52px",
+                marginRight: "10px",
+                backgroundColor: "#6c757d",
+                borderColor: "#6c757d",
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              type="submit"
+              style={{
+                width: "100%",
+                height: "52px",
+                backgroundColor: "#007bff",
+                borderColor: "#007bff",
+              }}
+            >
+              Enregistrer
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
     </Modal>
