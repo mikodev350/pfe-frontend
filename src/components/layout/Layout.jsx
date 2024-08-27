@@ -105,14 +105,9 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
-      <main
-        style={{
-          backgroundColor,
-          minHeight: "100vh",
-          paddingLeft: windowWidth < 900 ? "0px" : "220px",
-        }}
-      >
-        <Container>
+      <main style={{ backgroundColor, minHeight: "100vh",paddingLeft: windowWidth < 900 ? "20px " : "240px"}}>
+        <>
+          
           {fullcontent ? (
             children
           ) : (
@@ -133,7 +128,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               </Col>
             </Row>
           )}
-        </Container>
+        </>
       </main>
     </>
   );

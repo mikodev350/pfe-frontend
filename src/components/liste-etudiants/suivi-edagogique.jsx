@@ -78,7 +78,7 @@ const ListItem = styled(ListGroup.Item)`
   borderradius: 12px;
   boxshadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  grid-template-columns: auto 130px;
+  grid-template-columns: auto 170px;
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
@@ -290,7 +290,7 @@ const SuiviPedagogique = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <div className="tabs-container">
+      <div >
         <StyledTabs
           defaultActiveKey="individuels"
           id="etudiants-tabs"
@@ -451,9 +451,7 @@ const SuiviPedagogique = () => {
                             )}
                           </div>
                         </div>
-                        <div style={styles.detail}>
-                          <span>Professeur: {group.professeur.username}</span>
-                        </div>
+                
                       </div>
                       <div style={styles.actions}>
                         <Link
