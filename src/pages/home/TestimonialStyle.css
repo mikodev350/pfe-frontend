@@ -137,3 +137,10 @@
   opacity: 0.6;
 }
 
+
+
+@media (max-width: 450px) {
+.display-slide {
+        display: none !important;
+  }
+     }

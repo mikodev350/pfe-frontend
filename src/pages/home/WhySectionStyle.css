@@ -111,16 +111,15 @@
     margin-top: 150px !important;
   }
 .Imge-why-Section{
-  width: 250px !important;
+  width: 300px !important;
 }
 .why-green{
-    width: 250px !important;
+    width: 300px !important;
 }
-@media (max-width: 410px) {
-
+@media (max-width: 440px) {
   .why-green {
-  left: auto !important;
-    right: 100px !important;
+    margin-right: 50px !important; 
+    position: fixed;
   }
 }
 

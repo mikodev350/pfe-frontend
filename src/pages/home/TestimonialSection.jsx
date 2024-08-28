@@ -5,7 +5,6 @@ import "./TestimonialStyle.css";
 import textimg from "./images/Webinar-pana.png";
 import text2img from "./images/Learning-pana.png";
 import { BsCheckCircleFill } from "react-icons/bs"; // Icône de validation
-import { FaCircle, FaArrowLeft, FaArrowRight } from "react-icons/fa"; // Icône pour le cercle
 
 const TestimonialSection = () => {
   const [index, setIndex] = useState(0);
@@ -27,8 +26,8 @@ const TestimonialSection = () => {
           <div className="container">
             <div className="row align-items-center">
               {/* Colonne pour la photo */}
-              <div className="col-md-5 d-flex justify-content-center">
-                <div style={{ width: 440, height: 530 }}>
+              <div className="col-md-5 d-flex justify-content-center" >
+                <div  className="display-slide" style={{ width: 440, height: 530 }}>
                   <div className="testimonial_img1 ml-3">
                     <Ratio>
                       <embed src={text2img} />
@@ -105,7 +104,7 @@ const TestimonialSection = () => {
             <div className="row align-items-center">
               {/* Colonne pour la photo */}
               <div className="col-md-5 ml-50 ">
-                <div style={{ width: 450, height: 500 }}>
+                <div  className="display-slide"style={{ width: 450, height: 500 }} >
                   <Ratio className="testimonial_img2 ml-45">
                     <embed src={textimg} />
                   </Ratio>

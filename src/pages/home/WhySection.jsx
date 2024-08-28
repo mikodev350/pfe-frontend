@@ -18,7 +18,7 @@ const WhySection = () => {
                 </Ratio>
               </div>
               <img
-                className="why-green"
+                className="why-green "
                 src="./assets/img/why/why-shape-orange.png"
                 alt="Why Shape Orange"
                 style={{ opacity: "0.4" }}
