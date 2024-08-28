@@ -65,7 +65,7 @@ export default function Home() {
       <CustomHeader /> {/* CustomHeader doit être rendu en premier */}
       <SideBarMobile /> {/* SideBarMobile peut suivre CustomHeader */}
       {/* ************ header section ******* */}
-      <section id="hero">
+      <section id="hero" style={{ marginTop: "100px" }}>
         <HeroSection />
       </section>
       {/* ************ c quoi easylearn section ******* */}
