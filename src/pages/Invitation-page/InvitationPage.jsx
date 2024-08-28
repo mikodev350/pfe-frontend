@@ -55,6 +55,15 @@ const styles = {
     marginBottom: "1rem",
     borderRadius: "50%",
   },
+  noInvitations: {
+    textAlign: "center",
+    padding: "40px",
+    fontSize: "1.2rem",
+    color: "#6c757d",
+    backgroundColor: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+  },
 };
 
 const InvitationPage = () => {
@@ -160,61 +169,79 @@ const InvitationPage = () => {
       </h1>
       {message && <Alert variant="info">{message}</Alert>}
       <Row>
-        {invitations?.map((invitation) => (
-          <Col key={invitation?.id} sm={12} md={6} lg={4}>
-            <Card
-              className="shadow-sm"
-              style={styles.card}
-              onMouseEnter={(e) => (e.currentTarget.style = styles.cardHover)}
-              onMouseLeave={(e) => (e.currentTarget.style = styles.card)}
-            >
-              <Card.Body style={styles.cardBody}>
-                <Image
-                  src={
-                    invitation?.expediteur?.profil?.photoProfil?.url
-                      ? "http://localhost:1337" +
-                        invitation?.expediteur?.profil?.photoProfil?.url
-                      : `https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png`
-                  }
-                  roundedCircle
-                  width="150"
-                  height="150"
-                  style={styles.image}
-                  className="mb-3"
-                />
-                <Card.Title style={styles.cardTitle}>
-                  {invitation.expediteur.username}
-                </Card.Title>
-                <Card.Text style={styles.cardText}>
-                  {getInvitationText(invitation.expediteur)}
-                </Card.Text>
-                <Button
-                  variant="outline-primary"
-                  className="me-2"
-                  style={styles.button}
-                  onClick={() => handleAcceptRequest(invitation.expediteur.id)}
-                  disabled={
-                    acceptInvitationMutation.isLoading ||
-                    cancelInvitationMutation.isLoading
-                  }
-                >
-                  <FaCheck /> Accepter
-                </Button>
-                <Button
-                  variant="outline-danger"
-                  style={styles.button}
-                  onClick={() => handleCancelRequest(invitation.expediteur.id)}
-                  disabled={
-                    acceptInvitationMutation.isLoading ||
-                    cancelInvitationMutation.isLoading
-                  }
-                >
-                  <FaTimes /> Refuser
-                </Button>
-              </Card.Body>
-            </Card>
+        {invitations && invitations.length > 0 ? (
+          invitations.map((invitation) => (
+            <Col key={invitation?.id} sm={12} md={6} lg={4}>
+              <Card
+                className="shadow-sm"
+                style={styles.card}
+                onMouseEnter={(e) =>
+                  Object.assign(e.currentTarget.style, styles.cardHover)
+                }
+                onMouseLeave={(e) =>
+                  Object.assign(e.currentTarget.style, styles.card)
+                }
+              >
+                <Card.Body style={styles.cardBody}>
+                  <Image
+                    src={
+                      invitation?.expediteur?.profil?.photoProfil?.url
+                        ? "http://localhost:1337" +
+                          invitation?.expediteur?.profil?.photoProfil?.url
+                        : `https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png`
+                    }
+                    roundedCircle
+                    width="150"
+                    height="150"
+                    style={styles.image}
+                    className="mb-3"
+                  />
+                  <Card.Title style={styles.cardTitle}>
+                    {invitation.expediteur.username}
+                  </Card.Title>
+                  <Card.Text style={styles.cardText}>
+                    {getInvitationText(invitation.expediteur)}
+                  </Card.Text>
+                  <Button
+                    variant="outline-primary"
+                    className="me-2"
+                    style={styles.button}
+                    onClick={() =>
+                      handleAcceptRequest(invitation.expediteur.id)
+                    }
+                    disabled={
+                      acceptInvitationMutation.isLoading ||
+                      cancelInvitationMutation.isLoading
+                    }
+                  >
+                    <FaCheck /> Accepter
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    style={styles.button}
+                    onClick={() =>
+                      handleCancelRequest(invitation.expediteur.id)
+                    }
+                    disabled={
+                      acceptInvitationMutation.isLoading ||
+                      cancelInvitationMutation.isLoading
+                    }
+                  >
+                    <FaTimes /> Refuser
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <Col>
+            <div style={styles.noInvitations}>
+              {invitationType === "AMIS"
+                ? "Vous n'avez reçu aucune invitation communautaire."
+                : "Vous n'avez reçu aucune demande de coaching."}
+            </div>
           </Col>
-        ))}
+        )}
       </Row>
     </Container>
   );

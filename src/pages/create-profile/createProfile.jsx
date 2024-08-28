@@ -7,6 +7,83 @@ import { getToken } from "../../util/authUtils";
 import { validationProfileSchemaStudent, validationProfileSchemaTeacher } from "../../validator/profileValidator";
 import { useNavigate } from "react-router-dom";
 
+import styled from "styled-components";
+
+// /Styled components
+const StyledTitle = styled.h1`
+  background-color: #10266f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.5rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+`;
+
+// Styled components
+
+const StyledCard = styled.div`
+  background-color: #ffffff;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+  border-radius: 16px; /* Smoother rounded corners */
+  padding: 20px 30px;
+  max-width: 800px;
+  width: 100%;
+  margin-top: 20px;
+`;
+
+
+
+const CardHeaderCustom = styled(Card.Header)`
+  background-color: #10266f;
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+`;
+
+const FormGroupCustom = styled(Form.Group)`
+  margin-bottom: 20px;
+`;
+
+const CustomButton = styled(Button)`
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-weight: bold;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+const ProfileImageWrapper = styled.div`
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 20px;
+`;
+
+const RemovePhotoButton = styled(Button)`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border-radius: 50%;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ff4d4f;
+  border: none;
+  &:hover {
+    background-color: #e60000;
+  }
+`;
+
 // Fonction pour télécharger l'image
 const apiUpload = async (file, token) => {
   const formData = new FormData();
@@ -121,6 +198,8 @@ const levelsOptions = {
   ],
 };
 
+
+
 const CreerProfil = () => {
   const navigate = useNavigate(); 
 
@@ -206,7 +285,7 @@ const CreerProfil = () => {
     onSubmit: async (values) => {
       console.log("Form values:", values); // Log des valeurs du formulaire pour débogage
       await submitForm(values, profile, token, isUpdate, profileId);
-      navigate('/student/edit-profile');
+      navigate('/dashboard/edit-profile');
     },
   });
 
@@ -256,17 +335,19 @@ const CreerProfil = () => {
     formik.setFieldValue("niveauEnseigne", value);
   };
 
-  return (
+return (
     <Container fluid className="mt-5">
       <Row className="justify-content-center">
-        <Card className="container-dashboard">
-          <Card.Header className="card-header-custom shadow-sm">
+        <StyledCard>
+          <StyledTitle>
             {isUpdate ? "Modifier Votre Profil" : "Créer Votre Profil"}
-          </Card.Header>
+          </StyledTitle>
           <Card.Body>
-            <p className="text-center mb-4">Fournissez quelques informations pour faire ressortir votre profil</p>
+            <p className="text-center mb-4">
+              Fournissez quelques informations pour faire ressortir votre profil
+            </p>
             <div className="text-center mb-4">
-              <div className="profile-image-wrapper">
+              <ProfileImageWrapper>
                 <Form.Label htmlFor="photoProfil">
                   <Image
                     src={profile.photoProfilPreview || "https://via.placeholder.com/150"}
@@ -277,9 +358,9 @@ const CreerProfil = () => {
                     style={{ cursor: "pointer" }}
                   />
                   {profile.photoProfilPreview && (
-                    <Button variant="danger" onClick={handleRemovePhoto} className="remove-photo-btn">
-                      <BiTrash size={24} />
-                    </Button>
+                    <RemovePhotoButton onClick={handleRemovePhoto}>
+                      <BiTrash size={20} />
+                    </RemovePhotoButton>
                   )}
                 </Form.Label>
                 <Form.Control
@@ -289,14 +370,16 @@ const CreerProfil = () => {
                   onChange={handleFileChange}
                   style={{ display: "none" }}
                 />
-              </div>
+              </ProfileImageWrapper>
             </div>
 
             <Form onSubmit={formik.handleSubmit}>
               {role === "STUDENT" && (
                 <>
-                  <Form.Group controlId="typeEtudes" className="form-group-custom">
-                    <Form.Label>Type d'Études <span className="text-danger">*</span></Form.Label>
+                  <FormGroupCustom controlId="typeEtudes">
+                    <Form.Label>
+                      Type d'Études <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       as="select"
                       name="typeEtudes"
@@ -309,13 +392,17 @@ const CreerProfil = () => {
                       <option value="académique">Académique</option>
                       <option value="continue">Continue</option>
                     </Form.Control>
-                    <Form.Control.Feedback type="invalid">{formik.errors.typeEtudes}</Form.Control.Feedback>
-                  </Form.Group>
+                    <Form.Control.Feedback type="invalid">
+                      {formik.errors.typeEtudes}
+                    </Form.Control.Feedback>
+                  </FormGroupCustom>
 
                   {typeEtudes === "académique" && (
                     <>
-                      <Form.Group controlId="niveauEtudes" className="form-group-custom">
-                        <Form.Label>Niveau d'Études <span className="text-danger">*</span></Form.Label>
+                      <FormGroupCustom controlId="niveauEtudes">
+                        <Form.Label>
+                          Niveau d'Études <span className="text-danger">*</span>
+                        </Form.Label>
                         <Form.Control
                           as="select"
                           name="niveauEtudes"
@@ -324,18 +411,24 @@ const CreerProfil = () => {
                           isInvalid={!!formik.errors.niveauEtudes}
                           className="form-control-custom"
                         >
-                          <option value="">Sélectionner le niveau d'études</option>
+                          <option value="">
+                            Sélectionner le niveau d'études
+                          </option>
                           <option value="Primaire">Primaire</option>
                           <option value="Moyen">Moyen</option>
                           <option value="Lycée">Lycée</option>
                           <option value="Université">Université</option>
                         </Form.Control>
-                        <Form.Control.Feedback type="invalid">{formik.errors.niveauEtudes}</Form.Control.Feedback>
-                      </Form.Group>
+                        <Form.Control.Feedback type="invalid">
+                          {formik.errors.niveauEtudes}
+                        </Form.Control.Feedback>
+                      </FormGroupCustom>
 
                       {niveauEtudes && (
-                        <Form.Group controlId="niveauSpecifique" className="form-group-custom">
-                          <Form.Label>Niveau spécifique <span className="text-danger">*</span></Form.Label>
+                        <FormGroupCustom controlId="niveauSpecifique">
+                          <Form.Label>
+                            Niveau spécifique <span className="text-danger">*</span>
+                          </Form.Label>
                           <Form.Control
                             as="select"
                             name="niveauSpecifique"
@@ -344,18 +437,27 @@ const CreerProfil = () => {
                             isInvalid={!!formik.errors.niveauSpecifique}
                             className="form-control-custom"
                           >
-                            <option value="">Sélectionner le niveau spécifique</option>
-                            {levelsOptions[niveauEtudes] && levelsOptions[niveauEtudes].map((option) => (
-                              <option key={option.value} value={option.value}>{option.label}</option>
-                            ))}
+                            <option value="">
+                              Sélectionner le niveau spécifique
+                            </option>
+                            {levelsOptions[niveauEtudes] &&
+                              levelsOptions[niveauEtudes].map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
                           </Form.Control>
-                          <Form.Control.Feedback type="invalid">{formik.errors.niveauSpecifique}</Form.Control.Feedback>
-                        </Form.Group>
+                          <Form.Control.Feedback type="invalid">
+                            {formik.errors.niveauSpecifique}
+                          </Form.Control.Feedback>
+                        </FormGroupCustom>
                       )}
 
                       {niveauEtudes === "Université" && (
-                        <Form.Group controlId="specialite" className="form-group-custom">
-                          <Form.Label>Spécialité <span className="text-danger">*</span></Form.Label>
+                        <FormGroupCustom controlId="specialite">
+                          <Form.Label>
+                            Spécialité <span className="text-danger">*</span>
+                          </Form.Label>
                           <Form.Control
                             type="text"
                             name="specialite"
@@ -364,15 +466,19 @@ const CreerProfil = () => {
                             isInvalid={!!formik.errors.specialite}
                             className="form-control-custom"
                           />
-                          <Form.Control.Feedback type="invalid">{formik.errors.specialite}</Form.Control.Feedback>
-                        </Form.Group>
+                          <Form.Control.Feedback type="invalid">
+                            {formik.errors.specialite}
+                          </Form.Control.Feedback>
+                        </FormGroupCustom>
                       )}
                     </>
                   )}
 
                   {typeEtudes === "continue" && (
-                    <Form.Group controlId="nomFormation" className="form-group-custom">
-                      <Form.Label>Nom de la formation <span className="text-danger">*</span></Form.Label>
+                    <FormGroupCustom controlId="nomFormation">
+                      <Form.Label>
+                        Nom de la formation <span className="text-danger">*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="nomFormation"
@@ -381,16 +487,20 @@ const CreerProfil = () => {
                         isInvalid={!!formik.errors.nomFormation}
                         className="form-control-custom"
                       />
-                      <Form.Control.Feedback type="invalid">{formik.errors.nomFormation}</Form.Control.Feedback>
-                    </Form.Group>
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.nomFormation}
+                      </Form.Control.Feedback>
+                    </FormGroupCustom>
                   )}
                 </>
               )}
 
               {role === "TEACHER" && (
                 <>
-                  <Form.Group controlId="matieresEnseignees" className="form-group-custom">
-                    <Form.Label>Matières enseignées <span className="text-danger">*</span></Form.Label>
+                  <FormGroupCustom controlId="matieresEnseignees">
+                    <Form.Label>
+                      Matières enseignées <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       name="matieresEnseignees"
@@ -400,11 +510,15 @@ const CreerProfil = () => {
                       isInvalid={!!formik.errors.matieresEnseignees}
                       className="form-control-custom"
                     />
-                    <Form.Control.Feedback type="invalid">{formik.errors.matieresEnseignees}</Form.Control.Feedback>
-                  </Form.Group>
+                    <Form.Control.Feedback type="invalid">
+                      {formik.errors.matieresEnseignees}
+                    </Form.Control.Feedback>
+                  </FormGroupCustom>
 
-                  <Form.Group controlId="niveauEnseigne" className="form-group-custom">
-                    <Form.Label>Niveau(x) enseigné(s) <span className="text-danger">*</span></Form.Label>
+                  <FormGroupCustom controlId="niveauEnseigne">
+                    <Form.Label>
+                      Niveau(x) enseigné(s) <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Control
                       as="select"
                       name="niveauEnseigne"
@@ -419,12 +533,16 @@ const CreerProfil = () => {
                       <option value="Lycée">Lycée</option>
                       <option value="Université">Université</option>
                     </Form.Control>
-                    <Form.Control.Feedback type="invalid">{formik.errors.niveauEnseigne}</Form.Control.Feedback>
-                  </Form.Group>
+                    <Form.Control.Feedback type="invalid">
+                      {formik.errors.niveauEnseigne}
+                    </Form.Control.Feedback>
+                  </FormGroupCustom>
 
                   {niveauEnseigne === "Université" && (
-                    <Form.Group controlId="specialiteEnseigne" className="form-group-custom">
-                      <Form.Label>Spécialité <span className="text-danger">*</span></Form.Label>
+                    <FormGroupCustom controlId="specialiteEnseigne">
+                      <Form.Label>
+                        Spécialité <span className="text-danger">*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="specialiteEnseigne"
@@ -433,14 +551,16 @@ const CreerProfil = () => {
                         isInvalid={!!formik.errors.specialiteEnseigne}
                         className="form-control-custom"
                       />
-                      <Form.Control.Feedback type="invalid">{formik.errors.specialiteEnseigne}</Form.Control.Feedback>
-                    </Form.Group>
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.specialiteEnseigne}
+                      </Form.Control.Feedback>
+                    </FormGroupCustom>
                   )}
                 </>
               )}
 
-              <Form.Group controlId="etablisement" className="form-group-custom">
-                <Form.Label>etablisement</Form.Label>
+              <FormGroupCustom controlId="etablisement">
+                <Form.Label>Établissement</Form.Label>
                 <Form.Control
                   type="text"
                   name="etablisement"
@@ -449,11 +569,15 @@ const CreerProfil = () => {
                   isInvalid={!!formik.errors.etablisement}
                   className="form-control-custom"
                 />
-                <Form.Control.Feedback type="invalid">{formik.errors.etablisement}</Form.Control.Feedback>
-              </Form.Group>
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.etablisement}
+                </Form.Control.Feedback>
+              </FormGroupCustom>
 
-              <Form.Group controlId="competences" className="form-group-custom">
-                <Form.Label>Compétences <span className="text-danger">*</span></Form.Label>
+              <FormGroupCustom controlId="competences">
+                <Form.Label>
+                  Compétences <span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   name="competences"
@@ -463,10 +587,12 @@ const CreerProfil = () => {
                   isInvalid={!!formik.errors.competences}
                   className="form-control-custom"
                 />
-                <Form.Control.Feedback type="invalid">{formik.errors.competences}</Form.Control.Feedback>
-              </Form.Group>
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.competences}
+                </Form.Control.Feedback>
+              </FormGroupCustom>
 
-              <Form.Group controlId="bio" className="form-group-custom">
+              <FormGroupCustom controlId="bio">
                 <Form.Label>Bio</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -476,15 +602,19 @@ const CreerProfil = () => {
                   rows={3}
                   className="form-control-custom"
                 />
-              </Form.Group>
+              </FormGroupCustom>
 
-                <div className="d-flex justify-content-between">
-                <Button variant="secondary" onClick={() => navigate('/student/edit-profile')} className="mr-2">Retour</Button>
-                <Button variant="primary" type="submit">Envoyer</Button>
+              <div className="d-flex justify-content-between">
+                <CustomButton variant="secondary" onClick={() => navigate('/dashboard/edit-profile')} className="mr-2">
+                  Retour
+                </CustomButton>
+                <CustomButton type="submit" variant="primary">
+                  Envoyer
+                </CustomButton>
               </div>
             </Form>
           </Card.Body>
-        </Card>
+        </StyledCard>
       </Row>
     </Container>
   );

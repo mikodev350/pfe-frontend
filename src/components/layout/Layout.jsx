@@ -17,6 +17,7 @@ import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
+import Retour from "../retour-arriere/Retour";
 
 const Layout = ({
   center,
@@ -116,10 +117,10 @@ const Layout = ({
         style={{
           backgroundColor,
           minHeight: "100vh",
-          paddingLeft: windowWidth < 900 || center ? "0px" : "220px",
+          paddingLeft: windowWidth < 900 ? "20px " : "240px",
         }}
       >
-        <Container>
+        <>
           {fullcontent ? (
             children
           ) : (
@@ -127,12 +128,23 @@ const Layout = ({
               <Col md={12}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
-                  <ErrorPage message="Aucun résultat trouvé." />
+                  <>
+                    {" "}
+                    <Retour />
+                    <ErrorPage message="Aucun résultat trouvé." />
+                  </>
                 ) : searchResults.length > 0 ? (
                   filterType === "resource" ? (
-                    <ResourceResults results={searchResults} />
+                    <>
+                      <Retour />
+                      <ResourceResults results={searchResults} />
+                    </>
                   ) : (
-                    <UserResults results={searchResults} />
+                    <>
+                      {" "}
+                      <Retour />
+                      <UserResults results={searchResults} />
+                    </>
                   )
                 ) : (
                   children
@@ -140,7 +152,7 @@ const Layout = ({
               </Col>
             </Row>
           )}
-        </Container>
+        </>
       </main>
     </>
   );
