@@ -206,9 +206,10 @@ const CustomNavbar = () => {
             <div
               style={{
                 position: "absolute",
-                right: "0px",
-                top: "10px",
-                zIndex: 12220,
+                right: isExpanded ? "170px" : "0px",
+                top: "3px",
+                zIndex: 1221120,
+                transition: "0.3s",
               }}
             >
               <Hamburger
