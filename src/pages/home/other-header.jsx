@@ -7,6 +7,10 @@ import styled from "styled-components";
 import AppLogo from "./images/ggg.png";
 import { Link } from "react-router-dom";
 
+const NavbarCustom = styled(Navbar)`
+  position: sticky !important;
+  top: 0;
+`;
 // Styled Components
 const Header = styled.header`
   /* Styles généraux */
@@ -33,9 +37,7 @@ const Header = styled.header`
     margin: 0 10px;
     text-decoration: none;
     position: relative;
-    transition:
-      color 0.3s ease,
-      background-color 0.3s ease,
+    transition: color 0.3s ease, background-color 0.3s ease,
       box-shadow 0.3s ease;
     border-radius: 5px;
     padding: 0px 10px;
@@ -73,12 +75,9 @@ const Header = styled.header`
     border-radius: 50px;
     padding: 6px 15px !important;
     margin-left: 20px;
-    box-shadow:
-      rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
       rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-    transition:
-      background-color 0.3s ease,
-      transform 0.3s ease,
+    transition: background-color 0.3s ease, transform 0.3s ease,
       box-shadow 0.3s ease;
     color: #fff !important;
     cursor: pointer;
@@ -122,8 +121,7 @@ const Header = styled.header`
     justify-content: center; /* Centrer verticalement */
     height: 100%; /* Occuper toute la hauteur */
   }
-
-  .nav_btn {
+  NavbarCustom .nav_btn {
     margin-top: auto;
     display: flex;
     flex-direction: column;
@@ -159,10 +157,14 @@ const CustomNavbar = () => {
 
   return (
     <Header>
-      <Navbar
+      <NavbarCustom
         expand="lg"
         className="custom-navbar "
-        style={{ backgroundColor: "rgba(255, 255, 255, 0) !important", marginTop: "20px"}}
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0) !important",
+          marginTop: "20px",
+          position: "sticky",
+        }}
       >
         <Container>
           <Navbar.Brand
@@ -234,27 +236,29 @@ const CustomNavbar = () => {
                 </Nav.Link>
               </Nav>
               <Nav className="nav_btn">
-               <Link to="/signup">
-                <Nav.Item 
-                  duration={500}
-                  className="header__btn text-center"
-                  id="clssone"
-                >
-                  S'inscrire
-                </Nav.Item></Link> 
+                <Link to="/signup">
+                  <Nav.Item
+                    duration={500}
+                    className="header__btn text-center"
+                    id="clssone"
+                  >
+                    S'inscrire
+                  </Nav.Item>
+                </Link>
                 <Link to="/login">
-                <Nav.Item 
-                  duration={500}
-                  className="header__btn text-center"
-                  id="clsstwo"
-                >
-                  {"Se\u00A0connecter"}
-                </Nav.Item></Link>
+                  <Nav.Item
+                    duration={500}
+                    className="header__btn text-center"
+                    id="clsstwo"
+                  >
+                    {"Se\u00A0connecter"}
+                  </Nav.Item>
+                </Link>
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
         </Container>
-      </Navbar>
+      </NavbarCustom>
     </Header>
   );
 };

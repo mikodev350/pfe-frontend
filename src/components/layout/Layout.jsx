@@ -18,7 +18,12 @@ import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
 
-const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
+const Layout = ({
+  center,
+  fullcontent,
+  backgroundColorIdentification,
+  children,
+}) => {
   const location = useLocation();
 
   const dispatch = useDispatch();
@@ -97,7 +102,9 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
   return (
     <>
-      <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      {localStorage.getItem("token") && (
+        <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      )}
       <aside>
         <SideBarMobile />
       </aside>
@@ -109,7 +116,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
         style={{
           backgroundColor,
           minHeight: "100vh",
-          paddingLeft: windowWidth < 900 ? "0px" : "220px",
+          paddingLeft: windowWidth < 900 || center ? "0px" : "220px",
         }}
       >
         <Container>

@@ -57,27 +57,52 @@ const Login = () => {
     }
     setIsSubmitting(false);
   };
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <>
       <Helmet>
         <link rel="stylesheet" type="text/css" href="./login.css" />
       </Helmet>
-      <Layout fullcontent={true} backgroundColorIdentification={true}>
+      <Layout
+        center={true}
+        fullcontent={true}
+        backgroundColorIdentification={true}
+      >
         <ToastContainer />
-        <div className="main-login-container">
-          <Row className="w-100 no-gutters">
+        <div className="main-login-container" style={{ marginTop: "90px" }}>
+          <Row
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: " center",
+            }}
+          >
             {/* Colonne pour l'image */}
-            <Col md={6} className="image-login">
-              <img
-                src={loginImage}
-                alt="Login Illustration"
-                className="image-style w-100"
-              />
-            </Col>
+            {windowWidth > 900 && (
+              <Col md={6} className="image-login">
+                <img
+                  src={loginImage}
+                  alt="Login Illustration"
+                  className="image-style w-100"
+                />
+              </Col>
+            )}
 
             {/* Colonne pour le formulaire */}
-            <Col md={6} id="login-box">
+            <Col md={6}>
               <Formik
                 initialValues={{ identifier: "", password: "" }}
                 validationSchema={LoginSchema}
@@ -92,7 +117,10 @@ const Login = () => {
                   handleSubmit,
                 }) => (
                   <Form onSubmit={handleSubmit} className="mt-5">
-                    <h2 className="text-center custom-heading">Connexion</h2>
+                    <h2 className="text-center custom-heading">
+                      {" "}
+                      {"Se\u00A0connecter"}{" "}
+                    </h2>
                     <Form.Group
                       className="mb-3 mt-5"
                       controlId="formBasicEmail"
@@ -139,7 +167,7 @@ const Login = () => {
                         variant="primary"
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-50 button-Login btn-color mt-5 mb-2"
+                        className="button-Login  w-100 mt-3 mb-3"
                       >
                         {"Se\u00A0connecter"}
                       </Button>
@@ -149,6 +177,14 @@ const Login = () => {
                           <Link to={"/"}>Mot de passe oublié ?</Link>
                         </p>
                       </div>
+                      <hr />
+                      <Button
+                        variant="primary"
+                        className="button-Login  w-100"
+                        onClick={() => navigate("/signup")}
+                      >
+                        {"Créer un compte"}
+                      </Button>
                     </Form.Group>
                   </Form>
                 )}

@@ -176,7 +176,7 @@ function SocialMediaNavbar({ onFilterChange }) {
       if (type === "messages") {
         navigate("/chat");
       } else if (type === "notifications") {
-        navigate("/notifications");
+        navigate("/dashboard/notifications");
       }
     } else {
       if (type === "messages") {
@@ -191,7 +191,11 @@ function SocialMediaNavbar({ onFilterChange }) {
     <Navbar
       expand="lg"
       className="pt-2 pb-1 rounded"
-      style={{ ...styles.fixedNavbar, backgroundColor: "white" }}
+      style={{
+        ...styles.fixedNavbar,
+        backgroundColor: "white",
+        position: "sticky",
+      }}
     >
       <Container fluid>
         <Navbar.Brand as={Link} to="/" className="me-auto">
@@ -328,6 +332,10 @@ function SocialMediaNavbar({ onFilterChange }) {
                   href="#"
                   className="dropdown-item"
                   style={styles.dropdownItem}
+                  onClick={() => {
+                    window.localStorage.clear();
+                    navigate("/");
+                  }}
                 >
                   <FaSignOutAlt /> Logout
                 </a>

@@ -204,7 +204,7 @@ export default function Quiz() {
       token: localStorage.getItem("token"),
       data: { question: item.questions, id: item.questions.id },
     });
-    setInitQuiz(quiz);
+    setInitQuiz(JSON.parse(JSON.stringify(quiz)));
     Swal.fire({
       title: "Success",
       text: "Saved",
@@ -427,9 +427,11 @@ export default function Quiz() {
           ))}
         </Accordion>
         {/* </Tabs> */}
-        <Button variant="primary" onClick={onHanldeNewNewQuiz}>
-          Nouveau Question
-        </Button>
+        {!id && (
+          <Button variant="primary" onClick={onHanldeNewNewQuiz}>
+            Nouveau Question
+          </Button>
+        )}
         {!id && (
           <>
             <hr />

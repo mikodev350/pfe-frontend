@@ -7,7 +7,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
+import Swal from "sweetalert2";
 const CardStylled = styled(Card)`
   background-color: #fff !important;
   border-radius: 12px;
@@ -84,6 +84,7 @@ export default function Quizzes() {
         token: localStorage.getItem("token"),
         id: id,
       });
+
       setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
     } catch (error) {
       console.error("Échec de la suppression du quiz", error);
