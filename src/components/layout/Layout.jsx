@@ -86,18 +86,26 @@ const Layout = ({
       newRole = "";
     }
 
+
+
+     if ((location.pathname === "/settings/information-account") ||(location.pathname === "/settings/change-password")) {
+      newType = "SETTINGS";
+    }
+
     if (newType !== type) {
       dispatch(setType(newType));
     }
-
-    if (newRole !== role) {
-      dispatch(setRole(newRole));
-    }
-
     if (location.pathname !== prevLocation) {
       dispatch(clearResults());
       setPrevLocation(location.pathname);
     }
+
+
+  console.log("------------------------------------")
+    console.log("location.pathname")
+    console.log(location.pathname)
+  console.log("------------------------------------")
+
   }, [location.pathname, prevLocation, dispatch, role, type]);
 
   const backgroundColor = backgroundColorIdentification ? "white" : "#F1F1F1";
@@ -117,6 +125,7 @@ const Layout = ({
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
       <main
+      
         style={{
           backgroundColor,
           minHeight: "100vh",
@@ -150,6 +159,8 @@ const Layout = ({
                     </>
                   )
                 ) : (
+
+                  
                   children
                 )}
               </Col>

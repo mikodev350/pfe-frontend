@@ -1,4 +1,4 @@
-import { BiArchive, BiUser } from "react-icons/bi";
+import { BiArchive, BiLock, BiUser } from "react-icons/bi";
 import { AiFillHome } from "react-icons/ai";
 import {
   FaBook,
@@ -15,30 +15,18 @@ import {
 import { FaPeopleGroup } from "react-icons/fa6";
 
 // const role = localStorage.getItem("role"); // Get the role from local storage
-
-let PageRouteSettingsTeacher = [
+let Settings = [
   {
-    name: "Information account",
-    route: "/settings/update-account",
+    name: "Information",
+    route: "/settings/information-account",
   },
   {
-    name: "Change the password",
+    name: "Changer le motde password",
     route: "/settings/change-password",
   },
   {
     name: "Offer",
     route: "/settings/offers",
-  },
-];
-
-let PageRouteSettingsStudent = [
-  {
-    name: "Information account",
-    route: "/settings/update-account",
-  },
-  {
-    name: "Change the password",
-    route: "/settings/change-password",
   },
 ];
 
@@ -74,12 +62,14 @@ let PageRouteSettingsStudent = [
 
 let PageRouteSettings = [
   {
-    name: "Informations du compte",
+    name: "Informations",
     route: "/settings/information-account",
+    icon: BiUser,
   },
   {
-    name: "Changez votre mot de passe",
+    name: "Changer le mot de passe",
     route: "/settings/change-password",
+    icon: BiLock, // Icône représentant la sécurité/mot de passe
   },
 ];
 
@@ -225,9 +215,7 @@ const PageRouteDashbordTeacher = [
 // /.../;
 
 export const routesSide = {
-  SETTINGS_TEACHER: PageRouteSettingsTeacher,
   DASHEBOARD_TEACHER: PageRouteDashbordTeacher,
   DASHEBOARD_STUDENT: PageRouteDashbordStudent,
-  SETTINGS_STUDENT: PageRouteSettingsStudent,
   SETTINGS: PageRouteSettings,
 };
