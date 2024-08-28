@@ -14,6 +14,45 @@ export const postQuiz = async ({ token, form }) => {
 
   return response.data;
 };
+
+export const updateQuistionQuiz = async ({ token, data }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const { question, id } = data;
+
+  const response = await axios.put(
+    `${API_BASE_URL}/question-quiz/${id}`,
+    {
+      question: question,
+    },
+    config
+  );
+
+  return response.data;
+};
+export const updateQuiz = async ({ token, data }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const { titre, duration, id } = data;
+
+  const response = await axios.put(
+    `${API_BASE_URL}/quiz/${id}`,
+    {
+      titre,
+      duration,
+    },
+    config
+  );
+
+  return response.data;
+};
+
 export const getQuiz = async ({ token, id }) => {
   const config = {
     headers: {
