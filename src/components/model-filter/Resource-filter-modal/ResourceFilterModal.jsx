@@ -261,10 +261,7 @@ const ResourceFilterModal = ({ show, handleClose, onFilterChange }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Container>
-          <Row>
-            <Col sm={6}>
-            <Button variant="secondary" onClick={handleClose}               
+            {/* <Button variant="secondary" onClick={handleClose}               
         style={{
                 width: "100%",
                 height: "52px",
@@ -272,9 +269,8 @@ const ResourceFilterModal = ({ show, handleClose, onFilterChange }) => {
                 borderColor: "#007bff",
               }}>
           Annuler
-        </Button>
-            </Col>
-                        <Col sm={6}> <Button variant="primary" onClick={applyFilters} 
+        </Button> */}
+            <Button variant="primary" onClick={applyFilters} 
          style={{
                 width: "100%",
                 height: "52px",
@@ -284,9 +280,7 @@ const ResourceFilterModal = ({ show, handleClose, onFilterChange }) => {
               >
           Appliquer
         </Button>
-        </Col>
-          </Row>
-        </Container>
+        
        
       </Modal.Footer>
     </Modal>

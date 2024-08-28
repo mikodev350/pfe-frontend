@@ -155,6 +155,42 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                   onChange={(selectedOptions) =>
                     handleFilterChange('niveauEnseigne', selectedOptions.map((option) => option.value))
                   }
+                   styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                   value={niveauEnseigneOptions.filter((option) =>
                     filters.niveauEnseigne.includes(option.value)
                   )}
@@ -175,10 +211,14 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Annuler
-        </Button>
-        <Button variant="primary" onClick={applyFilters}>
+
+        <Button variant="primary" style={{
+                width: "100%",
+                height: "52px",
+                backgroundColor: "#007bff",
+                borderColor: "#007bff",
+              }}
+              onClick={applyFilters}>
           Appliquer
         </Button>
       </Modal.Footer>

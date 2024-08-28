@@ -130,19 +130,21 @@ export const ProfileHeader = ({
   };
 
   const renderButtons = () => {
-    if (userRole === "TEACHER" && type === "STUDENT") {
-      return (
-        !status.coachingRequestSent && (
-          <Button
-            variant="outline-light"
-            className="mt-2 custom-light-button"
-            onClick={() => handleSendRequest("COACHING")}
-          >
-            Demande de Coach
-          </Button>
-        )
-      );
-    } else if (userRole === "TEACHER" && type === "TEACHER") {
+
+//  if (userRole === "TEACHER" && type === "STUDENT") {
+//       return (
+//         !status.coachingRequestSent && (
+//           <Button
+//             variant="outline-light"
+//             className="mt-2 custom-light-button"
+//             onClick={() => handleSendRequest("COACHING")}
+//           >
+//             Demande de Coach
+//           </Button>
+//         )
+//       );
+//     }
+if (userRole === "TEACHER" && type === "TEACHER") {
       return (
         <>
           {!status.friendRequestSent && (
@@ -165,7 +167,10 @@ export const ProfileHeader = ({
           )}
         </>
       );
-    } else if (userRole === "STUDENT" && type === "STUDENT") {
+    } 
+    
+    
+    else if (userRole === "STUDENT" && type === "STUDENT") {
       return (
         !status.friendRequestSent && (
           <Button

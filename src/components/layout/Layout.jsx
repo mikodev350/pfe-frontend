@@ -17,6 +17,7 @@ import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
+import Retour from "../retour-arriere/Retour";
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const location = useLocation();
@@ -115,12 +116,19 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               <Col md={12}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
+                  <>      <Retour />
+
                   <ErrorPage message="Aucun résultat trouvé." />
+                  </>
                 ) : searchResults.length > 0 ? (
                   filterType === "resource" ? (
-                    <ResourceResults results={searchResults} />
+                    <>
+                    <Retour />
+                    <ResourceResults results={searchResults} /></>
                   ) : (
+                    <>                    <Retour />
                     <UserResults results={searchResults} />
+                    </>
                   )
                 ) : (
                   children
