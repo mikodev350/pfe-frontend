@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { FiTrash2, FiEdit } from 'react-icons/fi'; // Import de l'icône d'édition
+import { FiTrash2 } from 'react-icons/fi'; // Import de l'icône d'édition
 import { Link } from 'react-router-dom';
 import {
   fetchForModelDevoirs,
@@ -11,6 +11,7 @@ import {
   fetchAssignations,
 } from '../../api/apiDevoir';
 import { getToken } from '../../util/authUtils';
+import { FaCheckCircle } from 'react-icons/fa';
 
 const styles = {
   modalTitle: {
@@ -171,7 +172,7 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
       style={styles.editButton}
       title="Corriger"
     >
-      <FiEdit size={20} />
+      <FaCheckCircle size={20} />
     </Link>
                       {/* Bouton de suppression */}
                       <Button
@@ -203,7 +204,44 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
                 value={selectedAssignments}
                 onChange={handleAssignmentChange}
                 placeholder={`Sélectionnez les ${assignmentType}s`}
+                            styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
               />
+               <br />
             </Form.Group>
             <Button variant="secondary" onClick={handleBack} style={styles.secondaryButton}>
               Retour
@@ -212,10 +250,12 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Annuler
-        </Button>
-        <Button variant="primary" onClick={onSubmit}>
+        <Button variant="primary"       
+            style={{   
+            width: "100%",
+                height: "52px",
+                backgroundColor: "#007bff",
+                borderColor: "#007bff",}}  onClick={onSubmit}>
           Assigner
         </Button>
       </Modal.Footer>

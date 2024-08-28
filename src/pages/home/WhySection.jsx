@@ -12,7 +12,7 @@ const WhySection = () => {
         <div className="row align-items-center">
           <div className="col-xxl-5 col-xl-5 col-lg-6 col-md-8 pr-50">
             <div className="why__thumb pr-40">
-              <div style={{ width: 400, height: "auto"}}>
+              <div className="Imge-why-Section">
                 <Ratio>
                   <embed src={whyimg} />
                 </Ratio>

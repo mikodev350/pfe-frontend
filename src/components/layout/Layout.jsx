@@ -17,6 +17,7 @@ import SocialMediaNavbar from "../header/SocialMediaNavbar";
 import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
+import Retour from "../retour-arriere/Retour";
 
 const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
   const location = useLocation();
@@ -105,14 +106,9 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
-      <main
-        style={{
-          backgroundColor,
-          minHeight: "100vh",
-          paddingLeft: windowWidth < 900 ? "0px" : "220px",
-        }}
-      >
-        <Container>
+      <main style={{ backgroundColor, minHeight: "100vh",paddingLeft: windowWidth < 900 ? "20px " : "240px"}}>
+        <>
+          
           {fullcontent ? (
             children
           ) : (
@@ -120,12 +116,19 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               <Col md={12}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
+                  <>      <Retour />
+
                   <ErrorPage message="Aucun résultat trouvé." />
+                  </>
                 ) : searchResults.length > 0 ? (
                   filterType === "resource" ? (
-                    <ResourceResults results={searchResults} />
+                    <>
+                    <Retour />
+                    <ResourceResults results={searchResults} /></>
                   ) : (
+                    <>                    <Retour />
                     <UserResults results={searchResults} />
+                    </>
                   )
                 ) : (
                   children
@@ -133,7 +136,7 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               </Col>
             </Row>
           )}
-        </Container>
+        </>
       </main>
     </>
   );

@@ -19,6 +19,17 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
   }
 }
+
+
+
+.Imge-why-Section{
+    width: 400 !important;
+    height: auto !important;
+    
+  }
+
+
+
 @keyframes slideInLeft {
   0% {
     opacity: 0;
@@ -92,4 +103,29 @@
 .why__thumb {
   position: fixed; /* ou position: absolute; selon le besoin */
   animation: float 3s ease-in-out infinite; /* Applique l'animation */
+}
+
+
+@media (max-width: 450px) {
+  section#why {
+    margin-top: 150px !important;
+  }
+.Imge-why-Section{
+  width: 250px !important;
+}
+.why-green{
+    width: 250px !important;
+}
+@media (max-width: 410px) {
+
+  .why-green {
+  left: auto !important;
+    right: 100px !important;
+  }
+}
+
+
+  /* div.why__thumb{
+      height: 400px !important;
+    } */
 }
