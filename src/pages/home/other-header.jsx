@@ -7,15 +7,18 @@ import styled from "styled-components";
 import AppLogo from "./images/ggg.png";
 import { Link } from "react-router-dom";
 
-// Styled Components
+const NavbarCustom = styled(Navbar)`
+  position: sticky !important;
+  top: 0;
+`;
 // Styled Components
 const Header = styled.header`
+  /* Styles généraux */
   .custom-navbar {
     background-color: rgba(255, 255, 255, 0) !important;
     padding: 0px 20px;
     z-index: 1000;
     box-shadow: none;
-    transition: background-color 0.3s ease-in-out;
   }
 
   .logo img {
@@ -34,9 +37,7 @@ const Header = styled.header`
     margin: 0 10px;
     text-decoration: none;
     position: relative;
-    transition:
-      color 0.3s ease,
-      background-color 0.3s ease,
+    transition: color 0.3s ease, background-color 0.3s ease,
       box-shadow 0.3s ease;
     border-radius: 5px;
     padding: 0px 10px;
@@ -74,12 +75,9 @@ const Header = styled.header`
     border-radius: 50px;
     padding: 6px 15px !important;
     margin-left: 20px;
-    box-shadow:
-      rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
       rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-    transition:
-      background-color 0.3s ease,
-      transform 0.3s ease,
+    transition: background-color 0.3s ease, transform 0.3s ease,
       box-shadow 0.3s ease;
     color: #fff !important;
     cursor: pointer;
@@ -112,17 +110,18 @@ const Header = styled.header`
   .offcanvas {
     width: auto;
     height: 100vh;
+    // padding: 2rem;
     text-align: center;
   }
 
   .offcanvas-body {
     display: flex;
+    // flex-direction: column;
     align-items: center; /* Centrer horizontalement */
     justify-content: center; /* Centrer verticalement */
     height: 100%; /* Occuper toute la hauteur */
   }
-
-  .nav_btn {
+  NavbarCustom .nav_btn {
     margin-top: auto;
     display: flex;
     flex-direction: column;
@@ -134,6 +133,7 @@ const Header = styled.header`
     display: none; /* Masquer le bouton de basculement lorsqu'il est actif */
   }
 
+  /* Styles pour les écrans de taille minimale de 993px */
   @media (min-width: 993px) {
     .navbar-toggler {
       display: none; /* Masquer le bouton de basculement sur les écrans plus grands */
@@ -155,11 +155,17 @@ const CustomNavbar = () => {
 
   const handleToggle = () => setShowOffcanvas(!showOffcanvas);
 
- 
- 
   return (
     <Header>
-      <Navbar expand="lg" sticky="top" className="custom-navbar">
+      <NavbarCustom
+        expand="lg"
+        className="custom-navbar "
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0) !important",
+          marginTop: "20px",
+          position: "sticky",
+        }}
+      >
         <Container>
           <Navbar.Brand
             as={ScrollLink}
@@ -168,7 +174,10 @@ const CustomNavbar = () => {
             duration={500}
             className="logo"
           >
+            {/* ******** dert import l logo fi 3od lien  ******* */}
             <img src={AppLogo} alt="Easy Learn Logo" />
+            {/* ******  Ajoutit titre t3 logo ******** */}
+            {/* <span style={{ color: '#10266f' }}>Easy</span><span style={{ color: '#59bcf3' }}> Learn</span> */}
           </Navbar.Brand>
           <Navbar.Toggle
             aria-controls="offcanvasNavbar"
@@ -184,7 +193,7 @@ const CustomNavbar = () => {
           >
             <Offcanvas.Header closeButton>
               <Offcanvas.Title id="offcanvasNavbarLabel">
-                <img src={AppLogo} className="logoMenu" alt="Menu Logo" />
+                <img src={AppLogo} className="logoMenu" />
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
@@ -249,7 +258,7 @@ const CustomNavbar = () => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
         </Container>
-      </Navbar>
+      </NavbarCustom>
     </Header>
   );
 };

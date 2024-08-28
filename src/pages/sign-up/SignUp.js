@@ -94,24 +94,43 @@ const SignUp = () => {
 
   const nextStep = () => setStep((prevStep) => prevStep + 1);
   const prevStep = () => setStep((prevStep) => prevStep - 1);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <>
       <Helmet>
         <link rel="stylesheet" type="text/css" href="./SignUpStyle.css" />
       </Helmet>
-      <Layout fullcontent={true} backgroundColorIdentification={true}>
+      <Layout
+        center={true}
+        fullcontent={true}
+        backgroundColorIdentification={true}
+      >
         <ToastContainer />
-        <div className="main-signup-container mt-0">
-          <Row className="justify-content-center">
-            <Col md={6} className="image-signup p-0">
-              <img
-                src={signImage}
-                alt="Login Illustration"
-                className="background-image w-150"
-              />
-            </Col>
-            <Col md={6} id="signup-box">
+        <div className="main-login-container" style={{ marginTop: "90px" }}>
+          <Row>
+            {windowWidth > 900 && (
+              <Col md={6} className="image-signup p-0">
+                <img
+                  src={signImage}
+                  alt="Login Illustration"
+                  className="background-image w-150"
+                />
+              </Col>
+            )}
+            <Col md={6}>
               <Formik
                 initialValues={initialValues}
                 validationSchema={SignUpSchema}
@@ -196,11 +215,17 @@ const SignUp = () => {
                             {errors.email}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <div className="d-flex justify-content-between">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: " center",
+                          }}
+                        >
                           <Button
                             variant="primary"
                             onClick={nextStep}
-                            className="button-Login  w-100"
+                            className="button-Login  w-100 mt-3 mb-3"
                           >
                             Suivant
                           </Button>
@@ -259,7 +284,14 @@ const SignUp = () => {
                             {errors.confirmPassword}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <div className="d-flex justify-content-between">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: " center",
+                            gap: "10px",
+                          }}
+                        >
                           <Button
                             variant="secondary"
                             onClick={prevStep}
@@ -327,7 +359,14 @@ const SignUp = () => {
                             {errors.dateOfBirth}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <div className="d-flex justify-content-between">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: " center",
+                            gap: "10px",
+                          }}
+                        >
                           <Button
                             variant="secondary"
                             onClick={prevStep}
@@ -436,7 +475,14 @@ const SignUp = () => {
                             {errors.gender}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <div className="d-flex justify-content-between">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: " center",
+                            gap: "10px",
+                          }}
+                        >
                           <Button
                             variant="secondary"
                             onClick={prevStep}
@@ -455,6 +501,23 @@ const SignUp = () => {
                         </div>
                       </>
                     )}
+                    <hr />
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: " center",
+                      }}
+                    >
+                      {" "}
+                      <Button
+                        variant="primary"
+                        className="button-Login  w-100"
+                        onClick={() => navigate("/login")}
+                      >
+                        {"Se connecter"}
+                      </Button>
+                    </div>
                   </Form>
                 )}
               </Formik>

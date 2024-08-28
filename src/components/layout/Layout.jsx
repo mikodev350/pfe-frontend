@@ -19,7 +19,12 @@ import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
 import Retour from "../retour-arriere/Retour";
 
-const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
+const Layout = ({
+  center,
+  fullcontent,
+  backgroundColorIdentification,
+  children,
+}) => {
   const location = useLocation();
 
   const dispatch = useDispatch();
@@ -98,7 +103,9 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
 
   return (
     <>
-      <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      {localStorage.getItem("token") && (
+        <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      )}
       <aside>
         <SideBarMobile />
       </aside>
@@ -106,9 +113,14 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
       {type === "DASHEBOARD_STUDENT" && <SidebarDesktop student />}
       {type === "DASHEBOARD_TEACHER" && <SidebarDesktop teacher />}
       {type === "SETTINGS" && <SidebarDesktop settings />}
-      <main style={{ backgroundColor, minHeight: "100vh",paddingLeft: windowWidth < 900 ? "20px " : "240px"}}>
+      <main
+        style={{
+          backgroundColor,
+          minHeight: "100vh",
+          paddingLeft: windowWidth < 900 ? "20px " : "240px",
+        }}
+      >
         <>
-          
           {fullcontent ? (
             children
           ) : (
@@ -116,18 +128,22 @@ const Layout = ({ fullcontent, backgroundColorIdentification, children }) => {
               <Col md={12}>
                 {searchStatus === "loading" && <div>Loading...</div>}
                 {searchStatus === "succeeded" && searchResults.length === 0 ? (
-                  <>      <Retour />
-
-                  <ErrorPage message="Aucun résultat trouvé." />
+                  <>
+                    {" "}
+                    <Retour />
+                    <ErrorPage message="Aucun résultat trouvé." />
                   </>
                 ) : searchResults.length > 0 ? (
                   filterType === "resource" ? (
                     <>
-                    <Retour />
-                    <ResourceResults results={searchResults} /></>
+                      <Retour />
+                      <ResourceResults results={searchResults} />
+                    </>
                   ) : (
-                    <>                    <Retour />
-                    <UserResults results={searchResults} />
+                    <>
+                      {" "}
+                      <Retour />
+                      <UserResults results={searchResults} />
                     </>
                   )
                 ) : (

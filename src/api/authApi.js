@@ -96,7 +96,6 @@ export async function loginAPI(IdentifierData) {
       IdentifierData
     );
 
-    alert("Success");
     localStorage.setItem("token", response.data.jwt);
     console.log("====================================");
     console.log(response.data.user.type.toUpperCase());

@@ -4,9 +4,21 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+<<<<<<< HEAD
+import Swal from "sweetalert2";
+const CardStylled = styled(Card)`
+  background-color: #fff !important;
+  border-radius: 12px;
+  padding: 25px 0px;
+  border: none;
+  margin-bottom: 30px;
+`;
+
+=======
 import { deleteQuiz, getQuizzes } from "../../../api/apiQuiz";
 
 // Styled Components
+>>>>>>> 8ab5955a068a65a7672f7dc4d4476fa75ecd0ca3
 const GradientButton = styled(Button)`
   background: linear-gradient(135deg, #10266f, #3949ab);
   border: none;
@@ -152,6 +164,7 @@ export default function Quizzes() {
         token: localStorage.getItem("token"),
         id: id,
       });
+
       setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
     } catch (error) {
       console.error("Échec de la suppression du quiz", error);
