@@ -10,32 +10,76 @@ import {
   fetchFilteredAnswerHistories,
   sendAssignationNote,
 } from "../../api/apiReponseStudent";
+import styled from "styled-components";
+import Retour from "../retour-arriere/Retour";
 
-const accordionStyles = {
-  card: {
-    marginBottom: "10px",
-  },
-  header: {
-    backgroundColor: "#007bff",
-    color: "#ffffff",
-    padding: "10px",
-    fontWeight: "bold",
-  },
-  body: {
-    padding: "15px",
-    backgroundColor: "#f8f9fa",
-  },
-  assignNoteButton: {
-    marginTop: "10px",
-    backgroundColor: "#28a745",
-    color: "#ffffff",
-  },
-  attachmentImage: {
-    maxWidth: "100px",
-    marginRight: "10px",
-    cursor: "zoom-in",
-  },
-};
+// Styled Components
+const StyledCard = styled(Card)`
+  margin-bottom: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const StyledAccordionHeader = styled(Accordion.Header)`
+  background-color: #FFB352;
+  color: #ffffff;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+`;
+
+const StyledAccordionBody = styled(Accordion.Body)`
+  padding: 15px;
+  background-color: #f8f9fa;
+`;
+
+const AssignNoteButton = styled(Button)`
+  margin-top: 10px;
+  background-color: #28a745;
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 8px 15px;
+  font-size: 14px;
+
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const AttachmentImage = styled.img`
+  max-width: 100px;
+  margin-right: 10px;
+  cursor: zoom-in;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const ModalTitle = styled(Modal.Title)`
+  font-weight: bold;
+`;
+
+const CustomModalFooter = styled(Modal.Footer)`
+  display: flex;
+  justify-content: space-between;
+`;
+
+
+
+/*****************************/ 
+
+const Title = styled.h2`
+  font-size: 2rem;
+  font-weight: bold;
+  color: #10266F;
+  text-align: center;
+  margin-bottom: 20px;
+`;
 
 const validationSchema = Yup.object().shape({
   note: Yup.number()
@@ -63,7 +107,6 @@ const AllAssignationsDevoir = () => {
     (noteData) => sendAssignationNote(noteData.assignationId, noteData.note),
     {
       onSuccess: () => {
-        // Invalidate and refetch
         queryClient.invalidateQueries(["assignations", { group, etudiant, devoir }]);
         handleCloseModal();
       },
@@ -90,14 +133,17 @@ const AllAssignationsDevoir = () => {
 
   return (
     <div className="p-3">
+      <Retour />
+          <Title>Corriger les Devoirs</Title>
+
       <Accordion defaultActiveKey="0">
         {assignations.map((assignation, index) => (
-          <Card key={assignation.assignationId} style={accordionStyles.card}>
+          <StyledCard key={assignation.assignationId}>
             <Accordion.Item eventKey={index.toString()}>
-              <Accordion.Header style={accordionStyles.header}>
+              <StyledAccordionHeader>
                 <span>{assignation.devoir}</span>
-              </Accordion.Header>
-              <Accordion.Body style={accordionStyles.body}>
+              </StyledAccordionHeader>
+              <StyledAccordionBody>
                 <div>
                   <strong>Étudiant: </strong>
                   {assignation.etudiant}
@@ -123,10 +169,9 @@ const AllAssignationsDevoir = () => {
                                 history.attachements.map(
                                   (attachment, attachmentIndex) => (
                                     <Zoom key={attachmentIndex}>
-                                      <img
+                                      <AttachmentImage
                                         src={`http://localhost:1337${attachment.url}`}
                                         alt={attachment.name}
-                                        style={accordionStyles.attachmentImage}
                                       />
                                     </Zoom>
                                   )
@@ -138,9 +183,7 @@ const AllAssignationsDevoir = () => {
                     </div>
                   )}
 
-                <Button
-                  variant="success"
-                  style={accordionStyles.assignNoteButton}
+                <AssignNoteButton
                   size="sm"
                   onClick={() => handleShowModal(assignation)}
                   disabled={assignation.note !== null} // Désactiver le bouton si une note est déjà attribuée
@@ -148,16 +191,16 @@ const AllAssignationsDevoir = () => {
                   {assignation.note !== null
                     ? "Note déjà attribuée"
                     : "Attribuer une Note"}
-                </Button>
-              </Accordion.Body>
+                </AssignNoteButton>
+              </StyledAccordionBody>
             </Accordion.Item>
-          </Card>
+          </StyledCard>
         ))}
       </Accordion>
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Attribuer une Note</Modal.Title>
+          <ModalTitle>Attribuer une Note</ModalTitle>
         </Modal.Header>
         <Modal.Body>
           <Formik
@@ -183,14 +226,14 @@ const AllAssignationsDevoir = () => {
                     className="invalid-feedback"
                   />
                 </Form.Group>
-                <Modal.Footer>
+                <CustomModalFooter>
                   <Button variant="secondary" onClick={handleCloseModal}>
                     Annuler
                   </Button>
                   <Button variant="primary" type="submit">
                     Attribuer la Note
                   </Button>
-                </Modal.Footer>
+                </CustomModalFooter>
               </FormikForm>
             )}
           </Formik>

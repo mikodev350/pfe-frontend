@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import { Container, Form, Row, Col, Button } from 'react-bootstrap';
 import styled from 'styled-components';
-import { experienceValidationSchema } from '../../validator/experienceValidationSchema';
+import { validationSchema } from '../../validator/educationValidationSchema';
 import { getToken } from '../../util/authUtils';
-import { createExperience, updateExperience, getExperience } from '../../api/apiProfile';
+import { createEducation, updateEducation, getEducation } from '../../api/apiProfile';
 import { useParams, useNavigate } from "react-router-dom";
 
 // Styled components
@@ -38,106 +38,106 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const AddExperience = () => {
+const AddEducation = () => {
   const token = React.useMemo(() => getToken(), []);
-  const { experienceId } = useParams();
+  const { educationId } = useParams();
   const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
-      titrePoste: '',
-      entreprise: '',
-      localisation: '',
+      ecole: '',
+      diplome: '',
+      domaineEtude: '',
       dateDebut: '',
       dateFin: null,
-      posteActuel: false,
-      descriptionPoste: ''
+      ecoleActuelle: false,
+      descriptionProgramme: ''
     },
-    validationSchema: experienceValidationSchema,
+    validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
         let response;
-        if (experienceId) {
-          response = await updateExperience(experienceId, values, token);
+        if (educationId) {
+          response = await updateEducation(educationId, values, token);
         } else {
-          response = await createExperience(values, token);
+          response = await createEducation(values, token);
         }
-        navigate('/student/edit-profile');
+        navigate('/dashboard/edit-profile');
       } catch (error) {
-        console.error('Error saving experience:', error);
+        console.error('Error saving education:', error);
       }
     }
   });
 
   useEffect(() => {
-    if (experienceId) {
-      const fetchExperience = async () => {
+    if (educationId) {
+      const fetchEducation = async () => {
         try {
-          const experience = await getExperience(experienceId, token);
+          const education = await getEducation(educationId, token);
           formik.setValues({
-            titrePoste: experience.titrePoste,
-            entreprise: experience.entreprise,
-            localisation: experience.localisation,
-            dateDebut: experience.dateDebut,
-            dateFin: experience.dateFin,
-            posteActuel: experience.posteActuel,
-            descriptionPoste: experience.descriptionPoste
+            ecole: education.ecole,
+            diplome: education.diplome,
+            domaineEtude: education.domaineEtude,
+            dateDebut: education.dateDebut,
+            dateFin: education.dateFin,
+            ecoleActuelle: education.ecoleActuelle,
+            descriptionProgramme: education.descriptionProgramme
           });
         } catch (error) {
-          console.error('Error fetching experience:', error);
+          console.error('Error fetching education:', error);
         }
       };
-      fetchExperience();
+      fetchEducation();
     }
-  }, [experienceId, token]);
+  }, [educationId, token]);
 
   return (
-    <Container  className=" d-flex justify-content-center">
+    <Container className="d-flex justify-content-center">
       <StyledCard>
-        <StyledTitle>{experienceId ? 'Modifier' : 'Ajouter'} une expérience</StyledTitle>
+        <StyledTitle>{educationId ? 'Modifier' : 'Ajouter'} une éducation</StyledTitle>
         <Form onSubmit={formik.handleSubmit}>
-          <Form.Group controlId="titrePoste">
-            <Form.Label>Titre du poste</Form.Label>
+          <Form.Group controlId="ecole">
+            <Form.Label>École</Form.Label>
             <Form.Control
               type="text"
-              name="titrePoste"
-              value={formik.values.titrePoste}
+              name="ecole"
+              value={formik.values.ecole}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              isInvalid={formik.touched.titrePoste && formik.errors.titrePoste}
+              isInvalid={formik.touched.ecole && formik.errors.ecole}
             />
             <Form.Control.Feedback type="invalid">
-              {formik.errors.titrePoste}
+              {formik.errors.ecole}
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group controlId="entreprise">
-            <Form.Label>Entreprise</Form.Label>
+          <Form.Group controlId="diplome">
+            <Form.Label>Diplôme</Form.Label>
             <Form.Control
               type="text"
-              name="entreprise"
-              value={formik.values.entreprise}
+              name="diplome"
+              value={formik.values.diplome}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              isInvalid={formik.touched.entreprise && formik.errors.entreprise}
+              isInvalid={formik.touched.diplome && formik.errors.diplome}
             />
             <Form.Control.Feedback type="invalid">
-              {formik.errors.entreprise}
+              {formik.errors.diplome}
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group controlId="localisation">
-            <Form.Label>Localisation</Form.Label>
+          <Form.Group controlId="domaineEtude">
+            <Form.Label>Domaine d'étude</Form.Label>
             <Form.Control
               type="text"
-              name="localisation"
-              value={formik.values.localisation}
+              name="domaineEtude"
+              value={formik.values.domaineEtude}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              isInvalid={formik.touched.localisation && formik.errors.localisation}
+              isInvalid={formik.touched.domaineEtude && formik.errors.domaineEtude}
             />
             <Form.Control.Feedback type="invalid">
-              {formik.errors.localisation}
+              {formik.errors.domaineEtude}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -168,7 +168,7 @@ const AddExperience = () => {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   isInvalid={formik.touched.dateFin && formik.errors.dateFin}
-                  disabled={formik.values.posteActuel}
+                  disabled={formik.values.ecoleActuelle}
                 />
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.dateFin}
@@ -177,36 +177,36 @@ const AddExperience = () => {
             </Col>
           </Row>
 
-          <Form.Group controlId="posteActuel" className="mb-3">
+          <Form.Group controlId="ecoleActuelle" className="mb-3">
             <Form.Check
               type="checkbox"
-              label="Poste actuel"
-              name="posteActuel"
-              checked={formik.values.posteActuel}
+              label="École actuelle"
+              name="ecoleActuelle"
+              checked={formik.values.ecoleActuelle}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
           </Form.Group>
 
-          <Form.Group controlId="descriptionPoste">
-            <Form.Label>Description du poste</Form.Label>
+          <Form.Group controlId="descriptionProgramme">
+            <Form.Label>Description du programme</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
-              name="descriptionPoste"
-              value={formik.values.descriptionPoste}
+              name="descriptionProgramme"
+              value={formik.values.descriptionProgramme}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              isInvalid={formik.touched.descriptionPoste && formik.errors.descriptionPoste}
+              isInvalid={formik.touched.descriptionProgramme && formik.errors.descriptionProgramme}
             />
             <Form.Control.Feedback type="invalid">
-              {formik.errors.descriptionPoste}
+              {formik.errors.descriptionProgramme}
             </Form.Control.Feedback>
           </Form.Group>
 
           <div className="d-flex justify-content-between mt-4">
             <StyledButton variant="secondary" onClick={() => navigate('/dashboard/edit-profile')}>Retour</StyledButton>
-            <StyledButton type="submit" variant="primary">{experienceId ? 'Mettre à jour' : 'Envoyer'}</StyledButton>
+            <StyledButton type="submit" variant="primary">{educationId ? 'Mettre à jour' : 'Envoyer'}</StyledButton>
           </div>
         </Form>
       </StyledCard>
@@ -214,4 +214,4 @@ const AddExperience = () => {
   );
 };
 
-export default AddExperience;
+export default AddEducation;

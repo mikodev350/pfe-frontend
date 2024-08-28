@@ -4,6 +4,7 @@ import styled from "styled-components";
 import DevoirForm from "../../components/devoir-form/DevoirForm";
 import { fetchDevoirById } from "../../api/apiDevoir";
 import { getToken } from "../../util/authUtils";
+import Retour from "../../components/retour-arriere/Retour";
 
 // Styled container for the card-like layout
 const CardContainer = styled.div`
@@ -71,6 +72,7 @@ export default function GestionDevoir() {
 
   return (
     <CardContainer>
+      <Retour />
       <Title>{isEdit ? "Modifier le Devoir" : "Créer un Nouveau Devoir"}</Title>
       {initialData && (
         <DevoirForm

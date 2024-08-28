@@ -16,6 +16,15 @@ import "./homeDashboardStyle.css";
 import helloimg from "./Hello-cuate.png";
 import { FaBook } from "react-icons/fa"; // Icon for resources
 import { fetchNotes, fetchRecentAssignments } from "../../api/apiStudent";
+import styled from "styled-components";
+
+const StyledCard = styled.div`
+  background-color: #ffffff; /* White background */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  border-radius: 15px; /* Rounded borders */
+  padding: 20px; /* Padding for the card content */
+  margin-bottom: 20px; /* Space below the card */
+`;
 
 // Initialize Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -87,6 +96,7 @@ const HomeDashboard = () => {
   };
 
   return (
+    <StyledCard>
       <Row>
         <Col md={9}>
           {/* Welcome Card */}
@@ -169,6 +179,7 @@ const HomeDashboard = () => {
           </Card>
         </Col>
       </Row>
+      </StyledCard>
   );
 };
 

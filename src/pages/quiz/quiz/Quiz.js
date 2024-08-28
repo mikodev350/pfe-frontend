@@ -1,65 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { FaArrowLeft, FaRegTrashAlt } from "react-icons/fa";
 import Card from "react-bootstrap/Card";
-import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
-import { getQuiz, postQuiz } from "../../../api/apiQuiz";
 import { v4 as uuidv4 } from "uuid";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { getQuiz, postQuiz } from "../../../api/apiQuiz";
 
-const CardStylled = styled(Card)`
-  background-color: #fff !important;
+// Styled Components
+const CardStyled = styled(Card)`
+  background-color: #ffffff !important;
   border-radius: 12px;
   padding: 25px;
   border: none;
   margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
 `;
 
-const ButtonStylled = styled(Button)`
-  max-width: 300px !important;
-  width: 100% !important;
-`;
 const GradientButton = styled(Button)`
-  background: linear-gradient(135deg, #10266f, #3949ab);
-  border: 2px solid #10266f; /* Border matching the input */
+  background: linear-gradient(135deg, #162b72, #3949ab) !important;
+  border: none;
   color: #ffffff;
   font-weight: bold;
-  border-radius: 8px; /* Rounded corners to mimic input field */
-  height: 50px; /* Match the height of the input */
-  width: 100% !important;
+  border-radius: 8px;
+  height: 50px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  text-decoration: none !important;
-  transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out,
-    transform 0.2s ease-in-out;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    background: linear-gradient(
-      135deg,
-      #3949ab,
-      #10266f
-    ); /* Darken the gradient on hover */
+    background: linear-gradient(135deg, #3949ab, #162b72);
     transform: translateY(-3px);
-    border-color: #3949ab; /* Match border with background on hover */
   }
 
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(16, 38, 111, 0.25); /* Focus outline */
-    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 0 0.2rem rgba(22, 43, 114, 0.25);
+    outline: none;
   }
 
   @media (max-width: 576px) {
-    height: 45px; /* Adjust height for mobile */
-    font-size: 1rem; /* Adjust font size for mobile */
-    padding: 8px 16px; /* Adjust padding for mobile */
+    height: 45px;
+    font-size: 1rem;
+    padding: 8px 16px;
     width: 250px;
   }
 `;
-let placeholderquiz = {
+
+const ButtonStyled = styled(Button)`
+  max-width: 300px;
+  width: 100%;
+  background-color: #007bff;
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+  }
+`;
+
+const TrashIcon = styled(FaRegTrashAlt)`
+  color: #ff4d4f;
+  position: absolute;
+  top: 55px;
+  right: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: #e60000;
+  }
+`;
+
+const placeholderQuiz = {
   id: uuidv4(),
   question: "",
   vraixreponse: "",
@@ -72,53 +103,48 @@ let placeholderquiz = {
 };
 
 export default function Quiz() {
-  const [details, setDetails] = React.useState({
+  const [details, setDetails] = useState({
     titre: "",
     duration: 0,
   });
+  const [quiz, setQuiz] = useState([placeholderQuiz]);
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const navigate = useNavigate();
 
   const fetchQuiz = async () => {
-    const result = await getQuiz({
-      token: localStorage.getItem("token"),
-      id: id,
-    });
-    const brigeDetails = {
-      titre: result.titre,
-      duration: result.duration,
-    };
-    const brigeQuiz = result.questions.map((item) => {
-      const data = {
+    if (id) {
+      const result = await getQuiz({
+        token: localStorage.getItem("token"),
+        id,
+      });
+      setDetails({
+        titre: result.titre,
+        duration: result.duration,
+      });
+      const brigeQuiz = result.questions.map((item) => ({
         id: item.id,
         question: item.question,
-        vraixreponse: item.reponses.filter((ans) => !!ans.isCorrect)[0].reponse,
+        vraixreponse: item.reponses.find((ans) => ans.isCorrect).reponse,
         faussereponse: item.reponses.filter((ans) => !ans.isCorrect),
-      };
-      return data;
-    });
-    setDetails(brigeDetails);
-    setQuiz(brigeQuiz);
+      }));
+      setQuiz(brigeQuiz);
+    }
   };
 
-  React.useEffect(() => {
-    if (id) {
-      fetchQuiz();
-    }
+  useEffect(() => {
+    fetchQuiz();
   }, [id]);
 
-  const [quiz, setQuiz] = React.useState([placeholderquiz]);
-
-  const onHandleChangeQuiz = (e) => {
+  const handleChangeQuiz = (e) => {
     const { name, value } = e.target;
-
     if (name === "titre" || name === "duration") {
       setDetails((prevDetails) => ({
         ...prevDetails,
         [name]: value,
       }));
     } else {
-      let updateQuiz = quiz.map((item) => {
+      const updateQuiz = quiz.map((item) => {
         if (name.startsWith("desc") && name.split(":")[1] === item.id) {
           item.question = value;
         } else if (
@@ -140,8 +166,8 @@ export default function Quiz() {
     }
   };
 
-  const onHanldeNewNewWrongAsnwer = ({ questionPosition }) => {
-    let updateQuiz = quiz.map((item) => {
+  const handleNewWrongAnswer = ({ questionPosition }) => {
+    const updateQuiz = quiz.map((item) => {
       if (item.id === questionPosition) {
         item.faussereponse.push({
           id: uuidv4(),
@@ -153,7 +179,7 @@ export default function Quiz() {
     setQuiz(updateQuiz);
   };
 
-  const onHanldeNewNewQuiz = () => {
+  const handleNewQuiz = () => {
     setQuiz([
       ...quiz,
       {
@@ -170,62 +196,55 @@ export default function Quiz() {
     ]);
   };
 
-  const onhandleDeleteWrongAnswer = ({ id }) => {
-    let updateQuiz = quiz.map((item) => {
-      let updatedAnswers = item.faussereponse.filter((item) => item.id !== id);
+  const handleDeleteWrongAnswer = ({ id }) => {
+    const updateQuiz = quiz.map((item) => {
+      const updatedAnswers = item.faussereponse.filter(
+        (answer) => answer.id !== id
+      );
       return { ...item, faussereponse: updatedAnswers };
     });
     setQuiz(updateQuiz);
   };
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await postQuiz({
+    await postQuiz({
       token: localStorage.getItem("token"),
-      form: { ...details, quiz: quiz },
+      form: { ...details, quiz },
     });
-  };
-
-  const navigate = useNavigate();
-  const handleBackToQuiz = () => {
     navigate(`/dashboard/quizzes`);
   };
+
   return (
     <>
-      <GradientButton onClick={handleBackToQuiz}>
-        <FaArrowLeft /> Back
+      <GradientButton onClick={() => navigate(`/dashboard/quizzes`)}>
+        <FaArrowLeft /> Retour
       </GradientButton>
       <h2>{id ? "Modifier le QUIZ" : "Ajouter un NOUVEAU QUIZ"}</h2>
-      <Form onSubmit={submit} style={{ paddingBottom: "200px" }}>
-        <CardStylled style={{ marginBottom: "50px" }}>
+      <Form onSubmit={handleSubmit} style={{ paddingBottom: "200px" }}>
+        <CardStyled>
           <Card.Body>
             <Row>
               <Col>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlTextarea1"
-                >
+                <Form.Group className="mb-3" controlId="formTitre">
                   <Form.Label>Titre: *</Form.Label>
                   <Form.Control
                     name="titre"
                     type="text"
                     value={details.titre}
-                    onChange={onHandleChangeQuiz}
+                    onChange={handleChangeQuiz}
                     required
                   />
                 </Form.Group>
               </Col>
               <Col>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlTextarea1"
-                >
+                <Form.Group className="mb-3" controlId="formDuration">
                   <Form.Label>Durée: (min) *</Form.Label>
                   <Form.Control
                     name="duration"
                     type="number"
                     value={details.duration}
-                    onChange={onHandleChangeQuiz}
+                    onChange={handleChangeQuiz}
                     required
                   />
                 </Form.Group>
@@ -235,25 +254,20 @@ export default function Quiz() {
               <Button variant="success">Enregistrer les modifications</Button>
             )}
           </Card.Body>
-        </CardStylled>
-        <Tabs
-          defaultActiveKey="1"
-          id="uncontrolled-tab-example"
-          className="mb-3"
-          fill
-        >
-          {quiz.map((item, Qindex) => (
+        </CardStyled>
+        <Tabs defaultActiveKey="1" id="quiz-tabs" className="mb-3" fill>
+          {quiz.map((item, index) => (
             <Tab
               key={item.id}
-              eventKey={Qindex + 1}
-              title={`Question ` + Number(Qindex + 1)}
+              eventKey={index + 1}
+              title={`Question ${index + 1}`}
             >
-              <CardStylled key={Qindex} style={accordionStyles.card}>
+              <CardStyled>
                 <Card.Body>
-                  <h4>Question: {Qindex + 1}</h4>
+                  <h4>Question: {index + 1}</h4>
                   <Form.Group
                     className="mb-3"
-                    controlId="exampleForm.ControlTextarea1"
+                    controlId={`formQuestion${index}`}
                   >
                     <Form.Label>Question: *</Form.Label>
                     <Form.Control
@@ -262,10 +276,13 @@ export default function Quiz() {
                       name={`desc:${item.id}`}
                       value={item.question}
                       required
-                      onChange={onHandleChangeQuiz}
+                      onChange={handleChangeQuiz}
                     />
                   </Form.Group>
-                  <Form.Group className="mb-3" controlId="formanswer">
+                  <Form.Group
+                    className="mb-3"
+                    controlId={`formVraiReponse${index}`}
+                  >
                     <Form.Label>Bonne réponse</Form.Label>
                     <Form.Control
                       type="text"
@@ -273,40 +290,32 @@ export default function Quiz() {
                       placeholder="Bonne réponse"
                       value={item.vraixreponse}
                       required
-                      onChange={onHandleChangeQuiz}
+                      onChange={handleChangeQuiz}
                     />
                   </Form.Group>
                   <hr />
                   <Row>
-                    {item.faussereponse.map((wrongAnswer, index) => (
+                    {item.faussereponse.map((wrongAnswer, i) => (
                       <Col md={6} key={wrongAnswer.id}>
                         <div style={{ position: "relative" }}>
-                          <Form.Group className="mb-3" controlId="formanswer">
-                            <Form.Label>
-                              Mauvaise réponse {index + 1}
-                            </Form.Label>
+                          <Form.Group
+                            className="mb-3"
+                            controlId={`formFauxReponse${i}`}
+                          >
+                            <Form.Label>Mauvaise réponse {i + 1}</Form.Label>
                             <Form.Control
                               type="text"
-                              placeholder={`Mauvaise réponse ${index + 1}`}
+                              placeholder={`Mauvaise réponse ${i + 1}`}
                               name={`faussereponse:${wrongAnswer.id}`}
                               value={wrongAnswer.reponse}
                               required
-                              onChange={onHandleChangeQuiz}
+                              onChange={handleChangeQuiz}
                             />
                           </Form.Group>
-                          {index !== 0 && (
-                            <FaRegTrashAlt
-                              style={{
-                                position: "absolute",
-                                top: 55,
-                                right: 10,
-                                color: "red",
-                                cursor: "pointer",
-                              }}
+                          {i !== 0 && (
+                            <TrashIcon
                               onClick={() =>
-                                onhandleDeleteWrongAnswer({
-                                  id: wrongAnswer.id,
-                                })
+                                handleDeleteWrongAnswer({ id: wrongAnswer.id })
                               }
                             />
                           )}
@@ -314,44 +323,26 @@ export default function Quiz() {
                       </Col>
                     ))}
                     <Col md={12}>
-                      <ButtonStylled
+                      <ButtonStyled
                         disabled={
                           item.faussereponse[item.faussereponse.length - 1]
                             ?.reponse.length === 0
                         }
                         onClick={() =>
-                          onHanldeNewNewWrongAsnwer({
-                            questionPosition: item.id,
-                          })
+                          handleNewWrongAnswer({ questionPosition: item.id })
                         }
-                        style={{ width: "3002px !important" }}
                       >
                         Ajouter Mauvaise Réponse
-                      </ButtonStylled>{" "}
+                      </ButtonStyled>
                     </Col>
                   </Row>
-
-                  {id && (
-                    <Button
-                      variant="success"
-                      disabled={
-                        item.faussereponse[item.faussereponse.length - 1]
-                          ?.reponse.length === 0
-                      }
-                      onClick={() =>
-                        onHanldeNewNewWrongAsnwer({ questionPosition: item.id })
-                      }
-                    >
-                      Enregistrer les modifications
-                    </Button>
-                  )}
                 </Card.Body>
-              </CardStylled>
+              </CardStyled>
             </Tab>
           ))}
         </Tabs>
-        <Button variant="primary" onClick={onHanldeNewNewQuiz}>
-          Nouveau Question
+        <Button variant="primary" onClick={handleNewQuiz}>
+          Nouvelle Question
         </Button>
         {!id && (
           <>

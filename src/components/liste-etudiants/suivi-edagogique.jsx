@@ -14,6 +14,7 @@ import {
   FiPlus,
   FiEdit2,
   FiTrash2,
+  FiHelpCircle,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -369,10 +370,10 @@ const SuiviPedagogique = () => {
                           }
                           title="Assigner un Quiz"
                         >
-                          <FiBarChart2 size={20} />
+                          <FiHelpCircle size={20} />
                         </Button>
                         <Link
-                          to={`/student/progression/individuel/${student.id}`}
+                          to={`/dashboard/progression/individuel/${student.id}`}
                           style={styles.button}
                           title="Progress"
                         >
@@ -455,7 +456,7 @@ const SuiviPedagogique = () => {
                       </div>
                       <div style={styles.actions}>
                         <Link
-                          to={`/student/progression/group/${group.id}`}
+                          to={`/dashboard/progression/group/${group.id}`}
                           style={styles.button}
                           title="Progress"
                         >
@@ -479,7 +480,7 @@ const SuiviPedagogique = () => {
                           }
                           title="Assigner un Quiz"
                         >
-                          <FiBarChart2 size={20} />
+                          <FiHelpCircle size={20} />
                         </Button>
                         <Button
                           variant="link"
@@ -533,6 +534,42 @@ const SuiviPedagogique = () => {
                   value: student.id,
                   label: student.username,
                 }))}
+                            styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                 value={selectedMembers}
                 onChange={handleMembersChange}
                 placeholder="Sélectionnez les membres"
@@ -541,10 +578,14 @@ const SuiviPedagogique = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Annuler
-          </Button>
-          <Button variant="primary" onClick={handleSubmit}>
+
+          <Button variant="primary"  
+          style={{   
+            width: "100%",
+                height: "52px",
+                backgroundColor: "#007bff",
+                borderColor: "#007bff",}}
+          onClick={handleSubmit}>
             {isEditing ? "Modifier" : "Créer"}
           </Button>
         </Modal.Footer>

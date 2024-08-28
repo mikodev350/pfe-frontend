@@ -53,6 +53,7 @@ const DashboardProfile = () => {
 
   return (
     <Container className="container-dashboard">
+      <StyledCard>
       <h1 className="mb-4 text-center">Mon profil</h1>
       <Row className="mb-4 justify-content-center">
         <Col className="text-center mb-2" xs={12} md={3}>
@@ -140,12 +141,20 @@ const DashboardProfile = () => {
       <Row className="justify-content-center">
         <CustomButton variant="danger" className="mt-4">Supprimer Mon Compte</CustomButton>
       </Row>
+      </StyledCard>
     </Container>
   );
 };
 
 export default DashboardProfile;
 
+
+const StyledCard = styled.div`
+  background-color: #ffffff !important;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
 const StyledLink = styled(Link)`
   display: inline-block;
   padding: 8px 16px;
