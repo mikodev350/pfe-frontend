@@ -82,7 +82,7 @@ const Login = () => {
         backgroundColorIdentification={true}
       >
         <ToastContainer />
-        <div className="main-login-container" style={{ marginTop: "90px" }}>
+        <div className="main-login-container" style={{ marginTop: "20px" }}>
           <Row
             style={{
               display: "flex",
