@@ -71,7 +71,7 @@ function App() {
           <Route path="/quiz" element={<PrivateRoute element={Quiz} />} />
           <Route path="/quizzes" element={<PrivateRoute element={Quizzes} />} />
           <Route
-            path="/evaluation"
+            path="/settings"
             element={<PrivateRoute element={Settings} />}
           />
         </Routes>
