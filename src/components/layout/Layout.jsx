@@ -18,6 +18,7 @@ import ResourceResults from "../search-results/ResourceResults";
 import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
 import Retour from "../retour-arriere/Retour";
+import CustomNavbar from "../../pages/home/other-header";
 
 const Layout = ({
   center,
@@ -103,8 +104,10 @@ const Layout = ({
 
   return (
     <>
-      {localStorage.getItem("token") && (
+      {localStorage.getItem("token") ? (
         <SocialMediaNavbar onFilterChange={handleSearchResults} />
+      ) : (
+        <CustomNavbar />
       )}
       <aside>
         <SideBarMobile />
@@ -117,10 +120,10 @@ const Layout = ({
         style={{
           backgroundColor,
           minHeight: "100vh",
-          paddingLeft: windowWidth < 900 ? "20px " : "240px",
+          paddingLeft: windowWidth < 900 || center ? "20px " : "240px",
         }}
       >
-        <>
+        <div className={center ? "container" : ""}>
           {fullcontent ? (
             children
           ) : (
@@ -152,7 +155,7 @@ const Layout = ({
               </Col>
             </Row>
           )}
-        </>
+        </div>
       </main>
     </>
   );
