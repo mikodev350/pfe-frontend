@@ -119,7 +119,7 @@ const SignUp = () => {
         backgroundColorIdentification={true}
       >
         <ToastContainer />
-        <div className="main-login-container" style={{ marginTop: "90px" }}>
+        <div className="main-login-container" style={{ marginTop: "20px" }}>
           <Row>
             {windowWidth > 900 && (
               <Col md={6} className="image-signup p-0">
@@ -508,8 +508,7 @@ const SignUp = () => {
                         alignItems: "center",
                         justifyContent: " center",
                       }}
-                    >
-                      {" "}
+                    > 
                       <Button
                         variant="primary"
                         className="button-Login  w-100"
