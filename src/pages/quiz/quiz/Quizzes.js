@@ -1,11 +1,14 @@
 import React from "react";
-import { Table, Button } from "react-bootstrap";
+import Layout from "../../../components/layout/Layout";
+import { deleteQuiz, getQuizzes } from "../../../api/apiQuiz";
+import { Card, Col, Row, Button } from "react-bootstrap";
+import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-<<<<<<< HEAD
 import Swal from "sweetalert2";
+
 const CardStylled = styled(Card)`
   background-color: #fff !important;
   border-radius: 12px;
@@ -14,131 +17,49 @@ const CardStylled = styled(Card)`
   margin-bottom: 30px;
 `;
 
-=======
-import { deleteQuiz, getQuizzes } from "../../../api/apiQuiz";
-
-// Styled Components
->>>>>>> 8ab5955a068a65a7672f7dc4d4476fa75ecd0ca3
 const GradientButton = styled(Button)`
   background: linear-gradient(135deg, #10266f, #3949ab);
-  border: none;
+  border: 2px solid #10266f; /* Border matching the input */
   color: #ffffff;
   font-weight: bold;
-  border-radius: 8px;
-  height: 50px;
-  width: 100%;
+  border-radius: 8px; /* Rounded corners to mimic input field */
+  height: 50px; /* Match the height of the input */
+  width: 100% !important;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  text-decoration: none;
-  transition: background 0.3s ease, transform 0.2s ease;
+  text-decoration: none !important;
+  transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out,
+    transform 0.2s ease-in-out;
 
   &:hover {
-    background: linear-gradient(135deg, #3949ab, #10266f);
+    background: linear-gradient(
+      135deg,
+      #3949ab,
+      #10266f
+    ); /* Darken the gradient on hover */
     transform: translateY(-3px);
+    border-color: #3949ab; /* Match border with background on hover */
   }
 
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(16, 38, 111, 0.25);
-    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(16, 38, 111, 0.25); /* Focus outline */
+    outline: none; /* Remove default focus outline */
   }
 
   @media (max-width: 576px) {
-    height: 45px;
-    font-size: 1rem;
-    padding: 8px 16px;
+    height: 45px; /* Adjust height for mobile */
+    font-size: 1rem; /* Adjust font size for mobile */
+    padding: 8px 16px; /* Adjust padding for mobile */
     width: 250px;
   }
 `;
-
-const ActionsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-
-  @media (max-width: 768px) {
-    justify-content: center;
-    margin-top: 10px;
-  }
-`;
-
-const ActionIcon = styled.div`
-  cursor: pointer;
-  font-size: 20px;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #3949ab;
-  }
-
-  &.delete-icon:hover {
-    color: #ff4c4c;
-  }
-
-  &.edit-icon {
-    color: #3b82f6;
-  }
-
-  &.delete-icon {
-    color: #ff4c4c;
-  }
-`;
-
-const StyledTable = styled(Table)`
-  margin-top: 20px;
-  border-collapse: separate;
-  border-spacing: 0 10px;
-
-  thead th {
-    background-color: #162b72;
-    color: #ffffff;
-    font-weight: bold;
-    text-align: center;
-  }
-
-  tbody tr {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    td {
-      vertical-align: middle;
-      text-align: center;
-    }
-
-    &:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-  }
-
-  @media (max-width: 768px) {
-    tbody td {
-      display: block;
-      text-align: right;
-      padding: 10px 15px;
-    }
-
-    tbody td::before {
-      content: attr(data-label);
-      float: left;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-  }
-`;
-
 export default function Quizzes() {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = React.useState([]);
 
-  // Fetch quizzes from API
+  // Récupération des quiz depuis l'API
   const fetchQuizzes = async () => {
     const result = await getQuizzes({
       token: localStorage.getItem("token"),
@@ -150,11 +71,11 @@ export default function Quizzes() {
     fetchQuizzes();
   }, []);
 
-  const onHandlerRedirect = (id) => {
+  const onhandleredirect = (id) => {
     navigate(`/dashboard/quiz?id=${id}`);
   };
 
-  const onHandleNewQuiz = () => {
+  const onhandleNewQuiz = () => {
     navigate(`/dashboard/quiz`);
   };
 
@@ -176,45 +97,61 @@ export default function Quizzes() {
       <h3>Mes Quiz</h3>
       <GradientButton
         variant="primary"
-        onClick={onHandleNewQuiz}
+        onClick={onhandleNewQuiz}
         title="Créer un nouveau quiz"
       >
         Nouveau Quiz
       </GradientButton>
       <hr />
-      <StyledTable bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Titre</th>
-            <th>Total de Questions</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {quizzes.map((item) => (
-            <tr key={item.id}>
-              <td data-label="Titre">{item.titre}</td>
-              <td data-label="Total de Questions">{item.questions}</td>
-              <td data-label="Actions">
-                <ActionsWrapper>
-                  <ActionIcon
-                    className="edit-icon"
-                    onClick={() => onHandlerRedirect(item.id)}
-                  >
-                    <FiEdit2 />
-                  </ActionIcon>
-                  <ActionIcon
-                    className="delete-icon"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <FaRegTrashAlt />
-                  </ActionIcon>
-                </ActionsWrapper>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </StyledTable>
+      <CardStylled style={{ marginBottom: "20px" }}>
+        <Card.Body>
+          <Row>
+            <Col>
+              <b>Titre</b>
+            </Col>
+            <Col>
+              <b>Total de Questions</b>
+            </Col>
+            <Col style={{ textAlign: "right" }} md="1">
+              <b>Actions</b>
+            </Col>
+          </Row>
+        </Card.Body>
+      </CardStylled>
+      {quizzes.map((item) => (
+        <CardStylled key={item.id} style={accordionStyles.card}>
+          <Card.Body>
+            <Row>
+              <Col>
+                <span>{item.titre}</span>
+              </Col>
+              <Col>
+                <span>{item.questions}</span>
+              </Col>
+              <Col style={{ textAlign: "right" }} md="1">
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "10px",
+                  }}
+                >
+                  <FiEdit2
+                    size={20}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onhandleredirect(item.id)}
+                  />
+                  <FaRegTrashAlt
+                    size={20}
+                    style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => handleDelete(item.id)} // Appel à handleDelete lorsqu'on clique sur la corbeille
+                  />
+                </div>
+              </Col>
+            </Row>
+          </Card.Body>
+        </CardStylled>
+      ))}
     </>
   );
 }
