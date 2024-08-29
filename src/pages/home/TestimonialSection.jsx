@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
 import Ratio from "react-bootstrap/Ratio";
 import "./TestimonialStyle.css";
-import textimg from "./images/Webinar-pana.png";
-import text2img from "./images/Learning-pana.png";
 import { BsCheckCircleFill } from "react-icons/bs"; // Icône de validation
 
 const TestimonialSection = () => {
@@ -30,7 +28,7 @@ const TestimonialSection = () => {
                 <div  className="display-slide" style={{ width: 440, height: 530 }}>
                   <div className="testimonial_img1 ml-3">
                     <Ratio>
-                      <embed src={text2img} />
+                      <embed src={"/images/Learning-pana.png"} />
                     </Ratio>
                   </div>
                 </div>
@@ -106,7 +104,7 @@ const TestimonialSection = () => {
               <div className="col-md-5 ml-50 ">
                 <div  className="display-slide"style={{ width: 450, height: 500 }} >
                   <Ratio className="testimonial_img2 ml-45">
-                    <embed src={textimg} />
+                    <embed src={"/images/Webinar-pana.png"} />
                   </Ratio>
                 </div>
               </div>

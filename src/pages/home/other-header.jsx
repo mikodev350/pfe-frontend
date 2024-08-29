@@ -10,101 +10,52 @@ import styled from "styled-components";
 import Hamburger from "hamburger-react";
 
 // ******* affichier Logo ******
-import AppLogo from "./images/ggg.png";
-import { Link } from "react-router-dom";
+
+import { Link as ReactScrollLink } from "react-scroll";
+import { Link as RouterLink } from "react-router-dom";
 import useOnClickOutside from "../../util/useOnClickOutside";
 
 const StyledSidebar = styled.div`
   position: fixed;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  top: 0px !important;
-  button: 0px !important;
-  z-index: 100220 !important;
-  width: 220px !important;
-  padding: 30px;
-  height: calc(
-    100vh
-  ); /* Ajuster la hauteur pour qu'elle corresponde à la hauteur de la fenêtre */
-  background-color: #10266f;
+  font-family: "Roboto", sans-serif;
+  top: 0;
+  right: ${(props) => (props.open ? "0" : "-100%")};
+  z-index: 100220;
+  width: 260px;
+  padding: 20px;
+  height: 100vh;
+  background-color: #10266f; /* Conserve la couleur existante */
   color: #ffffff;
+  transition: right 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  box-shadow: ${(props) => (props.open ? "0px 0px 15px rgba(0, 0, 0, 0.5)" : "none")};
 
-  right: ${(props) => (props.open ? "0px" : "-220px")};
-  transition: right 0.3s ease;
-  // overflow-y: auto; /* Activer le défilement vertical */
-  //overflow-x: hidden; /* Cacher le défilement horizontal */
-  /* Hide scrollbar for all browsers */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
 
   &::-webkit-scrollbar {
-    /* WebKit browsers like Chrome, Safari */
     width: 0;
     height: 0;
   }
 
-  // .nav-menu {
-  //   padding: 0px;
-  // }
+  & a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 15px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
 
-  // .nav-item {
-  //   margin: 3px 0;
-  // }
-
-  // .nav-link {
-  //   display: flex;
-  //   align-items: center;
-  //   padding: 10px;
-  //   text-decoration: none;
-  //   color: #ffffff;
-  //   transition: background-color 0.3s ease, transform 0.3s ease;
-  //   border-radius: 10px;
-  //   position: relative;
-  //   overflow: hidden;
-
-  //   &:hover {
-  //     transform: scale(1.05);
-  //   }
-
-  //   &:hover .sidebar-icon {
-  //     background-color: #e2e7f9;
-  //     color: #10266f;
-  //   }
-
-  //   .sidebar-icon {
-  //     margin-right: 19px;
-  //     color: #ffffff;
-  //     font-weight: 600;
-  //     font-size: 2.5rem;
-  //     background-color: #10266f;
-  //     border-radius: 30%;
-  //     padding: 10px;
-  //     transition: background-color 0.3s ease, transform 0.3s ease;
-  //   }
-
-  //   .icon-text {
-  //     font-size: 15px;
-  //     white-space: nowrap;
-  //     overflow: hidden;
-  //     text-overflow: ellipsis;
-  //     transition: opacity 0.3s ease;
-  //     //opacity: ${(props) => (props.expanded ? 1 : 0)};
-  //     color: #ffffff;
-  //   }
-  // }
-
-  // .sub-menu-container {
-  //   padding-left: 20px;
-  //   max-height: 0;
-  //   overflow: hidden;
-  //   transition: max-height 0.3s ease, opacity 0.3s ease;
-  //   opacity: 0;
-  // }
-
-  // .sub-menu-container.expanded {
-  //   max-height: 200px;
-  //   opacity: 1;
-  // }
+    &:hover {
+      color: #ffb352; /* Couleur d'accentuation survolée */
+    }
+  }
 `;
+
 
 const NavbarCustom = styled(Navbar)`
   position: fixed !important;
@@ -135,7 +86,7 @@ const ButtonStyled = styled(Button)`
   }
 `;
 
-const AnimatedLink = styled(Link)`
+const AnimatedRouterLink = styled(RouterLink)`
   display: block;
   color: ${(props) => (props.white ? "#fff !important" : "#000")};
   text-decoration: none;
@@ -155,6 +106,28 @@ const AnimatedLink = styled(Link)`
     transition: width 0.3s;
   }
 `;
+
+const AnimatedScrollLink = styled(ReactScrollLink)`
+  display: block;
+  color: ${(props) => (props.white ? "#fff !important" : "#000")};
+  text-decoration: none;
+  margin-right: 20px;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 3px;
+    background: ${(props) => (props.white ? "#fff !important" : "#000")};
+    transition: width 0.3s;
+  }
+
+  &:hover::after {
+    width: 100%;
+    transition: width 0.3s;
+  }
+`;
+
 
 const CustomNavbar = () => {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -198,9 +171,12 @@ const CustomNavbar = () => {
     <>
       <NavbarCustom isVisible={isVisible}>
         <Container style={{ position: "relative" }}>
-          <Navbar.Brand href="#home">
-            <img src={AppLogo} alt="Easy Learn Logo" height={"45px"} />
+          
+                    <RouterLink to="http://localhost:3000">
+          <Navbar.Brand >
+            <img src={"/img/logo.png"} alt="Easy Learn Logo" height={"45px"} />
           </Navbar.Brand>
+          </RouterLink>
 
           {windowWidth < 900 ? (
             <div
@@ -222,10 +198,10 @@ const CustomNavbar = () => {
             <>
               {" "}
               <Nav className="mr-auto">
-                <AnimatedLink to="#link1">Accueil</AnimatedLink>
-                <AnimatedLink to="#link1">Cours</AnimatedLink>
-                <AnimatedLink to="#link1">Blog</AnimatedLink>
-                <AnimatedLink to="#link1">Contact</AnimatedLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="why">Pourquoi</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="testimonial">Rejoindre</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="services">Services</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="proud">Équipe</AnimatedScrollLink>
               </Nav>
               <Navbar.Toggle />
               <Navbar.Collapse className="justify-content-end">
@@ -235,18 +211,17 @@ const CustomNavbar = () => {
                     second={true}
                     className="button-Login  w-100"
                   >
-                    <Link to="/signup">S'inscrire</Link>
+                    <RouterLink to="/signup">S'inscrire</RouterLink>
                   </ButtonStyled>
 
-                  <Link to="/login">
-                    {" "}
-                    <ButtonStyled
-                      variant="primary"
-                      className="button-Login  w-100"
-                    >
-                      {"Se\u00A0connecter"}
-                    </ButtonStyled>
-                  </Link>
+                  
+      <ButtonStyled variant="primary" className="button-Login w-100">
+            <RouterLink to="/login" className="w-100">
+
+        Se&nbsp;connecter
+            </RouterLink>
+
+      </ButtonStyled>
                 </Nav>
               </Navbar.Collapse>
             </>
@@ -261,25 +236,20 @@ const CustomNavbar = () => {
       >
         <StyledSidebar open={isExpanded}>
           {" "}
-          <AnimatedLink to="#link1" white={true}>
-            Accueil
-          </AnimatedLink>
-          <AnimatedLink to="#link1" white={true}>
-            Cours
-          </AnimatedLink>
-          <AnimatedLink to="#link1" white={true}>
-            Blog
-          </AnimatedLink>
-          <AnimatedLink to="#link1" white={true}>
-            Contact
-          </AnimatedLink>
+          <AnimatedRouterLink to="http://localhost:3000/" white={true}>
+            Accueille
+          </AnimatedRouterLink>
           <br />
-          <AnimatedLink to="#link1" white={true}>
+           <AnimatedScrollLink smooth={true} duration={500} to="why">Pourquoi</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="testimonial" white={true}>Rejoindre</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="services" white={true}>Services</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="proud" white={true}>Équipe</AnimatedScrollLink>
+          <AnimatedRouterLink to="/login" white={true}>
             {"Se\u00A0connecter"}
-          </AnimatedLink>
-          <AnimatedLink to="#link1" white={true}>
+          </AnimatedRouterLink>
+          <AnimatedRouterLink to="/signup" white={true}>
             S'inscrire
-          </AnimatedLink>
+          </AnimatedRouterLink>
         </StyledSidebar>
       </div>
     </>

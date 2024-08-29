@@ -4,6 +4,7 @@ import { FaArrowRight } from "react-icons/fa";
 import "./WhySectionStyle.css";
 import Ratio from "react-bootstrap/Ratio";
 import whyimg from "./images/Webinar-amico.png";
+import { Link } from "react-router-dom";
 
 const WhySection = () => {
   return (
@@ -14,7 +15,7 @@ const WhySection = () => {
             <div className="why__thumb pr-40">
               <div className="Imge-why-Section">
                 <Ratio>
-                  <embed src={whyimg} />
+                  <embed src={"/images/Webinar-amico.png"} />
                 </Ratio>
               </div>
               <img
@@ -51,9 +52,9 @@ const WhySection = () => {
                 </p>
               </div>
               <div className="why__btn">
-                <a className="e-btn e-btn-3 mr-30" href="/signup">
+                <Link to="/signup" className="e-btn e-btn-3 mr-30" href="/signup">
                   Rejoignez-nous Gratuitement
-                </a>
+                </Link>
               </div>
             </div>
           </div>

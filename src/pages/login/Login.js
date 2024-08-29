@@ -82,115 +82,117 @@ const Login = () => {
         backgroundColorIdentification={true}
       >
         <ToastContainer />
-        <div className="main-login-container" style={{ marginTop: "20px" }}>
-          <Row
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: " center",
-            }}
-          >
-            {/* Colonne pour l'image */}
-            {windowWidth > 900 && (
-              <Col md={6} className="image-login">
-                <img
-                  src={loginImage}
-                  alt="Login Illustration"
-                  className="image-style w-100"
-                />
-              </Col>
-            )}
+        <div className="main-login-container " style={{ marginTop: "20px" }}>
+          <div className="shadow m-4 bg-white rounded">
+            <Row
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: " center",
+              }}
+            >
+              {/* Colonne pour l'image */}
+              {windowWidth > 900 && (
+                <Col md={6} className="image-login">
+                  <img
+                    src={loginImage}
+                    alt="Login Illustration"
+                    className="image-style w-100"
+                  />
+                </Col>
+              )}
 
-            {/* Colonne pour le formulaire */}
-            <Col md={6}>
-              <Formik
-                initialValues={{ identifier: "", password: "" }}
-                validationSchema={LoginSchema}
-                onSubmit={handleSubmit}
-              >
-                {({
-                  values,
-                  errors,
-                  touched,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                }) => (
-                  <Form onSubmit={handleSubmit} className="mt-5">
-                    <h2 className="text-center custom-heading">
-                      {" "}
-                      {"Se\u00A0connecter"}{" "}
-                    </h2>
-                    <Form.Group
-                      className="mb-3 mt-5"
-                      controlId="formBasicEmail"
-                    >
-                      <Form.Label className="ms-4">Adresse e-mail</Form.Label>
-                      <Form.Control
-                        type="email"
-                        name="identifier"
-                        value={values.identifier}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={
-                          touched.identifier && errors.identifier
-                            ? "is-invalid"
-                            : "border-1"
-                        }
-                        style={{ borderColor: "#1e7fc9c2" }}
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.identifier}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group controlId="formBasicPassword">
-                      <Form.Label className="ms-4">Mot de passe</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="password"
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={
-                          touched.password && errors.password
-                            ? "is-invalid"
-                            : "border-1"
-                        }
-                        style={{ borderColor: "#1e7fc9c2" }}
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.password}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group className="mb-3 text-center">
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="button-Login  w-100 mt-3 mb-3"
+              {/* Colonne pour le formulaire */}
+              <Col md={6}>
+                <Formik
+                  initialValues={{ identifier: "", password: "" }}
+                  validationSchema={LoginSchema}
+                  onSubmit={handleSubmit}
+                >
+                  {({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                  }) => (
+                    <Form onSubmit={handleSubmit} className="mt-5 ">
+                      <h2 className="text-center custom-heading">
+                        {" "}
+                        {"Se\u00A0connecter"}{" "}
+                      </h2>
+                      <Form.Group
+                        className="mb-3 mt-5"
+                        controlId="formBasicEmail"
                       >
-                        {"Se\u00A0connecter"}
-                      </Button>
-                      <div className="text-center mt-2 forgot">
-                        <p>
-                          Vous avez des difficultés à vous connecter ?&nbsp;
-                          <Link to={"/"}>Mot de passe oublié ?</Link>
-                        </p>
-                      </div>
-                      <hr />
-                      <Button
-                        variant="primary"
-                        className="button-Login  w-100"
-                        onClick={() => navigate("/signup")}
-                      >
-                        {"Créer un compte"}
-                      </Button>
-                    </Form.Group>
-                  </Form>
-                )}
-              </Formik>
-            </Col>
-          </Row>
+                        <Form.Label className="ms-4">Adresse e-mail</Form.Label>
+                        <Form.Control
+                          type="email"
+                          name="identifier"
+                          value={values.identifier}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className={
+                            touched.identifier && errors.identifier
+                              ? "is-invalid"
+                              : "border-1"
+                          }
+                          style={{ borderColor: "#1e7fc9c2" }}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.identifier}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                      <Form.Group controlId="formBasicPassword">
+                        <Form.Label className="ms-4">Mot de passe</Form.Label>
+                        <Form.Control
+                          type="password"
+                          name="password"
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className={
+                            touched.password && errors.password
+                              ? "is-invalid"
+                              : "border-1"
+                          }
+                          style={{ borderColor: "#1e7fc9c2" }}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.password}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                      <Form.Group className="mb-3 text-center">
+                        <Button
+                          variant="primary"
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="button-Login  w-100 mt-3 mb-3"
+                        >
+                          {"Se\u00A0connecter"}
+                        </Button>
+                        <div className="text-center mt-2 forgot">
+                          <p>
+                            Vous avez des difficultés à vous connecter ?&nbsp;
+                            <Link to={"/"}>Mot de passe oublié ?</Link>
+                          </p>
+                        </div>
+                        <hr />
+                        <Button
+                          variant="secondary"
+                          className="button-Login  w-100"
+                          onClick={() => navigate("/signup")}
+                        >
+                          {"Créer un compte"}
+                        </Button>
+                      </Form.Group>
+                    </Form>
+                  )}
+                </Formik>
+              </Col>
+            </Row>
+          </div>
         </div>
       </Layout>
     </>
