@@ -13,59 +13,70 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { useQuery, useMutation } from "react-query";
 import Swal from "sweetalert2";
 import { useQueryClient } from "react-query";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   acceptFriendRequest,
   cancelFriendRequest,
 } from "../../api/apiFriendRequest";
 import { getToken } from "../../util/authUtils";
+import styled from "styled-components";
 
-const styles = {
-  container: {
-    backgroundColor: "#f8f9fa",
-    padding: "20px",
-    borderRadius: "8px",
-  },
-  card: {
-    transition: "transform 0.3s, box-shadow 0.3s",
-    marginBottom: "20px",
-    boxShadow: "0 0 15px rgba(0, 0, 0, 0.1)",
-  },
-  cardHover: {
-    transform: "translateY(-5px)",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
-  },
-  cardBody: {
-    padding: "20px",
-    textAlign: "center",
-  },
-  cardTitle: {
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-    marginBottom: "15px",
-  },
-  cardText: {
-    color: "#6c757d",
-    marginBottom: "15px",
-  },
-  button: {
-    margin: "5px",
-  },
-  image: {
-    marginBottom: "1rem",
-    borderRadius: "50%",
-  },
-  noInvitations: {
-    textAlign: "center",
-    padding: "40px",
-    fontSize: "1.2rem",
-    color: "#6c757d",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-  },
-};
 
+// Styled Components
+const StyledContainer = styled(Container)`
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+`;
+
+const StyledCard = styled(Card)`
+  transition: transform 0.3s ease !important, box-shadow 0.3s ease !important;
+  margin-bottom: 20px !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important; /* Enhanced shadow effect */
+  transform: translateY(0) !important;
+  border-radius: 15px !important; /* Rounded borders */
+  overflow: hidden !important; /* Ensure content stays within the rounded borders */
+
+  &:hover {
+    transform: translateY(-8px) !important; /* Lift card up more on hover */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2) !important; /* Deeper shadow on hover */
+  }
+`;
+
+const StyledCardBody = styled(Card.Body)`
+  padding: 20px;
+  text-align: center;
+`;
+
+const StyledCardTitle = styled(Card.Title)`
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+`;
+
+const StyledCardText = styled(Card.Text)`
+  color: #6c757d;
+  margin-bottom: 15px;
+`;
+
+const StyledButton = styled(Button)`
+  margin: 5px;
+`;
+
+const StyledImage = styled(Image)`
+  margin-bottom: 1rem;
+  border-radius: 50%;
+`;
+
+const NoInvitations = styled.div`
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #6c757d;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+`;
 const InvitationPage = () => {
   const [message, setMessage] = useState("");
   const queryClient = useQueryClient();
@@ -84,6 +95,12 @@ const InvitationPage = () => {
     () => fetchInvitations(invitationType)
   );
 
+
+  console.log('====================================');
+  console.log("invitations");
+    console.log(invitations);
+
+  console.log('====================================');
   // Accept invitation mutation
   const acceptInvitationMutation = useMutation(
     (id) => acceptFriendRequest(id, getToken()),
@@ -160,8 +177,10 @@ const InvitationPage = () => {
 
   if (isLoading) return <div>Chargement...</div>;
 
-  return (
-    <Container style={styles.container}>
+
+  
+   return (
+    <StyledContainer>
       <h1 className="my-4 text-center">
         {invitationType === "AMIS"
           ? "Invitations Communautaires"
@@ -172,18 +191,11 @@ const InvitationPage = () => {
         {invitations && invitations.length > 0 ? (
           invitations.map((invitation) => (
             <Col key={invitation?.id} sm={12} md={6} lg={4}>
-              <Card
-                className="shadow-sm"
-                style={styles.card}
-                onMouseEnter={(e) =>
-                  Object.assign(e.currentTarget.style, styles.cardHover)
-                }
-                onMouseLeave={(e) =>
-                  Object.assign(e.currentTarget.style, styles.card)
-                }
-              >
-                <Card.Body style={styles.cardBody}>
-                  <Image
+              <StyledCard>
+                <StyledCardBody>
+                  
+                  <Link to={`/dashboard/find-profil/${ invitation?.expediteur?.id}`}>
+                  <StyledImage
                     src={
                       invitation?.expediteur?.profil?.photoProfil?.url
                         ? "http://localhost:1337" +
@@ -193,19 +205,17 @@ const InvitationPage = () => {
                     roundedCircle
                     width="150"
                     height="150"
-                    style={styles.image}
-                    className="mb-3"
                   />
-                  <Card.Title style={styles.cardTitle}>
+                  </Link>
+                  <StyledCardTitle>
                     {invitation.expediteur.username}
-                  </Card.Title>
-                  <Card.Text style={styles.cardText}>
+                  </StyledCardTitle>
+                  <StyledCardText>
                     {getInvitationText(invitation.expediteur)}
-                  </Card.Text>
-                  <Button
+                  </StyledCardText>
+                  <StyledButton
                     variant="outline-primary"
                     className="me-2"
-                    style={styles.button}
                     onClick={() =>
                       handleAcceptRequest(invitation.expediteur.id)
                     }
@@ -215,10 +225,9 @@ const InvitationPage = () => {
                     }
                   >
                     <FaCheck /> Accepter
-                  </Button>
-                  <Button
+                  </StyledButton>
+                  <StyledButton
                     variant="outline-danger"
-                    style={styles.button}
                     onClick={() =>
                       handleCancelRequest(invitation.expediteur.id)
                     }
@@ -228,22 +237,22 @@ const InvitationPage = () => {
                     }
                   >
                     <FaTimes /> Refuser
-                  </Button>
-                </Card.Body>
-              </Card>
+                  </StyledButton>
+                </StyledCardBody>
+              </StyledCard>
             </Col>
           ))
         ) : (
           <Col>
-            <div style={styles.noInvitations}>
+            <NoInvitations>
               {invitationType === "AMIS"
                 ? "Vous n'avez reçu aucune invitation communautaire."
                 : "Vous n'avez reçu aucune demande de coaching."}
-            </div>
+            </NoInvitations>
           </Col>
         )}
       </Row>
-    </Container>
+    </StyledContainer>
   );
 };
 

@@ -24,26 +24,6 @@ import {
 const API_BASE_URL = "http://localhost:1337";
 const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
 
-// const AvatarWithName = (participants, type, id, title) => {
-//   let imageUrl = "";
-//   let name = title;
-//   let url = GROUP_IMAGE_URL;
-//   if (type === "PRIVATE") {
-//     const usersFiltered = participants.filter((item) => item.id !== id);
-//     const { username, profil: { photoProfil: { url } = {} } = {} } = usersFiltered[0];
-//     name = username;
-//     imageUrl = API_BASE_URL + url;
-//   } else if (type === "GROUP") {
-//     imageUrl = GROUP_IMAGE_URL;
-//   }
-//   return (
-//     <ItemCard>
-//       <AvatarImage src={imageUrl} />
-//       <div>{name}</div>
-//     </ItemCard>
-//   );
-// };
-
 const AvatarWithName = (participants, type, id, title) => {
   let imageUrl = "";
   let name = title;
@@ -75,7 +55,6 @@ const AvatarWithName = (participants, type, id, title) => {
 const ChatApp = () => {
   const [searchParams] = useSearchParams();
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   React.useEffect(() => {
@@ -121,14 +100,11 @@ const ChatApp = () => {
       <Helmet>
         <link rel="stylesheet" type="text/css" href="/css/chatStyle.css" />
       </Helmet>
-      <Layout>
+      <Layout fullcontent={false}  backgroundColorIdentification={false}>
         <StyledContainer>
           <Row>
-            <Col md={4}>
-              <CreateModelGroupe
-                show={showCreateGroupModal}
-                handleClose={() => setShowCreateGroupModal(false)}
-              />
+            <Col md={3}>
+              
               <StyledTabs defaultActiveKey="private">
                 <StyledTab eventKey="private" title="Private">
                   <StyledListGroup>
@@ -148,6 +124,11 @@ const ChatApp = () => {
                 </StyledTab>
                 <StyledTab eventKey="group" title="Group">
                   <StyledListGroup>
+                    <CreateModelGroupe
+                show={showCreateGroupModal}
+                handleClose={() => setShowCreateGroupModal(false)}
+              />
+              <br/>
                     {dataGroup?.conversations?.map((item) => (
                       <StyledListGroupItem
                         key={item.id}
@@ -165,7 +146,7 @@ const ChatApp = () => {
                 </StyledTab>
               </StyledTabs>
             </Col>
-            {windowWidth > 900 && (
+            {windowWidth > 800 && (
               <Col md={8}>
                 {selectedConversation ? (
                   <ChatWindow id={searchParams.get("id")} />
@@ -177,9 +158,7 @@ const ChatApp = () => {
               </Col>
             )}
           </Row>
-          <ToggleButton onClick={() => setShowSidebar(!showSidebar)}>
-            {showSidebar ? "Hide" : "Show"} Sidebar
-          </ToggleButton>
+      
         </StyledContainer>
       </Layout>
     </>
@@ -189,7 +168,6 @@ const ChatApp = () => {
 export default ChatApp;
 
 const StyledContainer = styled(Container)`
-  margin-top: 20px;
   position: relative;
 
   .sidebar {
@@ -224,67 +202,77 @@ const ChatHeader = styled.h1`
   color: #007bff;
 `;
 
-const StyledCreateGroupButton = styled(Button)`
-  margin-bottom: 15px;
-  background-color: #007bff;
-  border: none;
-  font-size: 0.9rem;
-  padding: 8px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
 
 const StyledTabs = styled(Tabs)`
   display: flex;
-  justify-content: space-between; /* Center align tabs */
+  justify-content: center; /* Centre les onglets */
   .nav-item {
-    flex: 1;
+    flex: none;
+    margin: 0 10px; /* Ajout d'un léger espacement entre les onglets */
   }
   .nav-link {
-    color: #007bff;
-    padding: 0.5rem 1rem; /* Adjust padding to make tabs smaller */
-    font-size: 0.9rem; /* Adjust font size */
+    color: #555;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
     text-align: center;
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+
     &:hover {
-      color: #003d66; /* Change hover color */
-      border-bottom: 2px solid #003d66; /* Add underline effect on hover */
-      background-color: #e9ecef; /* Light grey background on hover */
+      color: #fff;
+      background-color: #f8f9fa;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     }
   }
   .nav-link.active {
-    color: #fff !important;
-    background-color: #007bff;
-    border-color: #007bff;
+    color: black !important;
+    background-color: #f8f9fa;
+    border: none;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   }
 `;
 
 const StyledTab = styled(Tab)`
-  padding: 10px;
+  padding: 15px;
+  background-color:#f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 `;
+
+
 
 const StyledListGroup = styled(ListGroup)`
   margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Ombre pour le groupe */
 `;
 
 const StyledListGroupItem = styled(ListGroup.Item)`
-  padding: 10px;
+  padding: 12px 15px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: background-color 0.3s;
-
+  transition: background-color 0.3s, transform 0.2s;  /* Ajout d'une transition pour l'effet de survol */
+  border-bottom: 1px solid #e9ecef;  /* Ajout d'une ligne de séparation entre les éléments */
+  background-color: #ffffff;  /* Fond blanc pour chaque élément */
+  
   &:hover {
-    background-color: #f8f9fa;
+    background-color: #f1f3f5;  /* Gris clair lors du survol */
+    transform: scale(1.02);  /* Légère mise à l'échelle lors du survol */
+  }
+  
+  &:last-child {
+    border-bottom: none;  /* Pas de bordure pour le dernier élément */
   }
 `;
+
 
 const ItemCard = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
+  padding: 5px;
 `;
 
 const AvatarImage = styled(Image)`

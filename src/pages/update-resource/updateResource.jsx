@@ -716,6 +716,42 @@ const handleParcoursChange = (selectedParcours) => {
                 onChange={handleFormatChange}
                 classNamePrefix="select"
                 placeholder="Select format"
+                                             styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                 isInvalid={!!formik.errors.format}
               />
               {formik.errors.format && (
@@ -729,6 +765,42 @@ const handleParcoursChange = (selectedParcours) => {
                 isMulti
                 options={parcoursOptions}
                 name="parcours"
+                                             styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                 onChange={handleParcoursChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
@@ -745,6 +817,42 @@ const handleParcoursChange = (selectedParcours) => {
                 isMulti
                 options={moduleOptions}
                 name="modules"
+                                             styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                 onChange={handleModulesChange}
                 classNamePrefix="select"
                 components={{ Option: CheckboxOption }}
@@ -779,111 +887,118 @@ const handleParcoursChange = (selectedParcours) => {
               )}
             </Form.Group>
 
-            <Form.Group>
-              <Form.Label>Options de téléchargement :</Form.Label>
-              <div className="d-flex justify-content-center">
-                <Button
-                  onClick={() => handleClick("image")}
-                  className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
-                  disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
-                >
-                  <span>
-                    <FiImage size={35} />
-                    Télécharger des images
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  ref={hiddenFileInputImage}
-                  onChange={(event) => handleFileChange(event, "image")}
-                  multiple
-                  style={{ display: "none" }}
-                />
+         <Form.Group>
+  <Form.Label>Options de téléchargement :</Form.Label>
+  <Row className="justify-content-center">
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("image")}
+        className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
+        disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
+      >
+        <span>
+          <FiImage size={35} />
+        </span>
+      </Button>
+      <input
+        type="file"
+        accept="image/png, image/jpeg"
+        ref={hiddenFileInputImage}
+        onChange={(event) => handleFileChange(event, "image")}
+        multiple
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("audio")}
-                  className={`btn-tab-audio ${audioFile.preview ? "active-audio" : ""}`}
-                  disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || bookReference)}
-                >
-                  <span>
-                    <FiVolume2 size={35} />
-                    Télécharger un audio
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  ref={hiddenFileInputAudio}
-                  onChange={(event) => handleFileChange(event, "audio")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("audio")}
+        className={`btn-tab-audio ${audioFile.preview ? "active-audio" : ""}`}
+        disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || bookReference)}
+      >
+        <span>
+          <FiVolume2 size={35} />
+        </span>
+      </Button>
+      <input
+        type="file"
+        accept="audio/*"
+        ref={hiddenFileInputAudio}
+        onChange={(event) => handleFileChange(event, "audio")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("pdf")}
-                  className={`btn-tab-googleDrive ${pdfFile.preview ? "active-googleDrive" : ""}`}
-                  disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || bookReference)}
-                >
-                  <span>
-                    <FiFile size={35} />
-                    Télécharger un PDF
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  ref={hiddenFileInputPdf}
-                  onChange={(event) => handleFileChange(event, "pdf")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("pdf")}
+        className={`btn-tab-googleDrive ${pdfFile.preview ? "active-googleDrive" : ""}`}
+        disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || bookReference)}
+      >
+        <span>
+          <FiFile size={35} />
+        </span>
+      </Button>
+      <input
+        type="file"
+        accept="application/pdf"
+        ref={hiddenFileInputPdf}
+        onChange={(event) => handleFileChange(event, "pdf")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => handleClick("video")}
-                  className={`btn-tab-video ${videoFile.preview ? "active-video" : ""}`}
-                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || bookReference)}
-                >
-                  <span>
-                    <FiVideo size={35} />
-                    Télécharger une vidéo
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="video/*"
-                  ref={hiddenFileInputVideo}
-                  onChange={(event) => handleFileChange(event, "video")}
-                  style={{ display: "none" }}
-                />
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => handleClick("video")}
+        className={`btn-tab-video ${videoFile.preview ? "active-video" : ""}`}
+        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || bookReference)}
+      >
+        <span>
+          <FiVideo size={35} />
+        </span>
+      </Button>
+      <input
+        type="file"
+        accept="video/*"
+        ref={hiddenFileInputVideo}
+        onChange={(event) => handleFileChange(event, "video")}
+        style={{ display: "none" }}
+      />
+    </Col>
 
-                <Button
-                  onClick={() => {
-                    setDisplayLinkInput(true);
-                    setDisplayBookInput(false);
-                  }}
-                  className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || bookReference)}
-                >
-                  <span>
-                    <FiLink size={35} />
-                    Ajouter un lien
-                  </span>
-                </Button>
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => {
+          setDisplayLinkInput(true);
+          setDisplayBookInput(false);
+        }}
+        className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
+        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || bookReference)}
+      >
+        <span>
+          <FiLink size={35} />
+        </span>
+      </Button>
+    </Col>
 
-                <Button
-                  onClick={() => {
-                    setDisplayBookInput(true);
-                    setDisplayLinkInput(false);
-                  }}
-                  className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
-                  disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || link)}
-                >
-                  <span>
-                    <FiBook size={35} />
-                    Ajouter une référence de livre
-                  </span>
-                </Button>
-              </div>
-            </Form.Group>
+    <Col xs={12} sm={6} md={4} className="d-flex justify-content-center mb-3">
+      <Button
+        onClick={() => {
+          setDisplayBookInput(true);
+          setDisplayLinkInput(false);
+        }}
+        className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
+        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || link)}
+      >
+        <span>
+          <FiBook size={35} />
+        </span>
+      </Button>
+    </Col>
+  </Row>
+</Form.Group>
+
 
             {displayLinkInput && (
               <Form.Group controlId="link">

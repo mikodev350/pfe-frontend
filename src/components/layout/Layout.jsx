@@ -101,10 +101,6 @@ const Layout = ({
     }
 
 
-  console.log("------------------------------------")
-    console.log("location.pathname")
-    console.log(location.pathname)
-  console.log("------------------------------------")
 
   }, [location.pathname, prevLocation, dispatch, role, type]);
 

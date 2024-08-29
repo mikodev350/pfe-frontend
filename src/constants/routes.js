@@ -14,52 +14,6 @@ import {
 } from "react-icons/fa"; // Ajout des icônes manquantes
 import { FaPeopleGroup } from "react-icons/fa6";
 
-// const role = localStorage.getItem("role"); // Get the role from local storage
-let Settings = [
-  {
-    name: "Information",
-    route: "/settings/information-account",
-  },
-  {
-    name: "Changer le motde password",
-    route: "/settings/change-password",
-  },
-  {
-    name: "Offer",
-    route: "/settings/offers",
-  },
-];
-
-// ...
-
-// const PageRouteDashbordTeacher = [
-//   {
-//     name: "tableau de bord",
-//     route: "/student/homeDashbord",
-//     icon: AiFillHome,
-//   },
-//   {
-//     name: "Mon Profile",
-//     route: "/student/my-profile",
-//     icon: BiUser, // Utilisation de BiUser pour représenter le profil
-//   },
-//   {
-//     name: "mon parcours",
-//     route: "/student/parcours",
-//     icon: FaBook, // Utilisation de BiBook pour représenter le parcours
-//   },
-//   {
-//     name: "mes resource",
-//     route: "/student/resources",
-//     icon: BiArchive, // Utilisation de BiArchive pour représenter les ressources
-//   },
-//   {
-//     name: "gere coatching",
-//     route: "/student/coatching",
-//     icon: FaPeopleGroup, // Utilisation de BiMessageSquareCheck pour représenter le coaching
-//   },
-// ];
-
 let PageRouteSettings = [
   {
     name: "Informations",
@@ -75,12 +29,12 @@ let PageRouteSettings = [
 
 const PageRouteDashbordStudent = [
   {
-    name: "tableau de bord",
+    name: "Tableau de bord",
     route: "/dashboard/home",
     icon: AiFillHome,
   },
   {
-    name: "Mon Profile",
+    name: "Mon profil",
     route: "/dashboard/my-profile",
     icon: BiUser,
   },
@@ -90,19 +44,14 @@ const PageRouteDashbordStudent = [
     icon: FaBook,
   },
   {
-    name: "mes resource",
+    name: "Mes ressources",
     route: "/dashboard/resources",
     icon: BiArchive,
   },
   {
-    name: "Mes Activités",
+    name: "Mes activités",
     route: "/dashboard/assignments",
     icon: FaTasks,
-  },
-  {
-    name: "Mentorat",
-    route: "/dashboard/communaute/coaching",
-    icon: FaChalkboardTeacher,
   },
   {
     name: "Notes",
@@ -119,12 +68,12 @@ const PageRouteDashbordStudent = [
         icon: FaEnvelopeOpenText,
       },
       {
-        name: "Liste d'Amis",
+        name: "Liste d'amis",
         route: "/dashboard/communaute/amis",
         icon: FaUserFriends,
       },
       {
-        name: "Liste de professeur",
+        name: "Liste de professeurs",
         route: "/dashboard/communaute/enseignants",
         icon: FaHandshake,
       },
@@ -134,27 +83,27 @@ const PageRouteDashbordStudent = [
 
 const PageRouteDashbordTeacher = [
   {
-    name: "tableau de bord",
+    name: "Tableau de bord",
     route: "/dashboard/home",
     icon: AiFillHome,
   },
   {
-    name: "Mon Profile",
+    name: "Mon profil",
     route: "/dashboard/my-profile",
     icon: BiUser,
   },
   {
-    name: "mon parcours",
+    name: "Mon parcours",
     route: "/dashboard/parcours",
     icon: FaBook,
   },
   {
-    name: "mes resource",
+    name: "Mes ressources",
     route: "/dashboard/resources",
     icon: BiArchive,
   },
   {
-    name: "suivi pedagogique",
+    name: "Suivi pédagogique",
     route: "/dashboard/suivi-pedagogique",
     icon: FaChalkboardTeacher,
   },
@@ -180,12 +129,12 @@ const PageRouteDashbordTeacher = [
     ],
   },
   {
-    name: "coaching",
+    name: "Coaching",
     route: "/dashboard/communaute/coaching",
     icon: FaPeopleGroup,
   },
   {
-    name: "Mes Activités",
+    name: "Mes activités",
     route: "/dashboard/assignments",
     icon: FaTasks,
   },
@@ -204,15 +153,13 @@ const PageRouteDashbordTeacher = [
         icon: FaUserFriends,
       },
       {
-        name: "Liste de professeur",
+        name: "Liste de professeurs",
         route: "/dashboard/communaute/enseignants",
         icon: FaHandshake,
       },
     ],
   },
 ];
-
-// /.../;
 
 export const routesSide = {
   DASHEBOARD_TEACHER: PageRouteDashbordTeacher,

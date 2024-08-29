@@ -342,7 +342,9 @@ const SuiviPedagogique = () => {
                         }}
                       >
                         <div style={styles.iconContainer}>
+                          <Link to={`/dashboard/find-profil/${student.id}`}>
                           <span>{student.username.charAt(0)}</span>
+                          </Link>
                         </div>
                         <div style={{ ...styles.name, paddingTop: "12px" }}>
                           {student.username}

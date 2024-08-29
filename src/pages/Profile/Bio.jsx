@@ -31,7 +31,11 @@ export const Bio = ({bio,nomComplet ,competences}) => {
     
         <Container className="text-center container-profile">
        <h2 style={{ color: '#122A73' }}>{nomComplet} Bio</h2>
-      <p style={{ color: '#354F7D' }}>{bio}</p>
+      <p style={{ color: '#354F7D' }}>{bio ? (
+        <p style={{ color: '#354F7D' }}>{bio}</p>
+      ) : (
+        <p style={{ color: '#354F7D' }}>Aucune biographie disponible</p>
+      )}</p>
       <div className="line"></div>
      <Skills competencesSkills={competences} />
     </Container>

@@ -164,12 +164,12 @@ const StyledLink = styled(Link)`
   font-weight: bold;
   color: white;
   text-decoration: none;
-  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
-  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#43a047' : '#0a1d4b'};
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#3498db' : '#0a1d4b'};
     color: white;
   }
 `;
@@ -177,8 +177,8 @@ const StyledLink = styled(Link)`
 const CustomButton = styled.button`
   padding: 5px 15px;
   border-radius: 50px;
-  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
-  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#4caf50' : '#10266f'};
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
   color: #ffffff;
   font-weight: bold;
   display: flex;
@@ -189,7 +189,7 @@ const CustomButton = styled.button`
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#43a047' : '#0a1d4b'};
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#3498db' : '#0a1d4b'};
     color: white;
   }
 `;

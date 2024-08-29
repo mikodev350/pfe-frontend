@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import {
   Container,
-  Row,
-  Col,
+
   ListGroup,
   Image,
   Tabs,
@@ -20,6 +19,7 @@ import {
   fetchGroupConversations,
   fetchPrivateConversations,
 } from "../../api/apiConversation";
+import Retour from "../../components/retour-arriere/Retour";
 
 const API_BASE_URL = "http://localhost:1337";
 const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
@@ -122,7 +122,11 @@ const Conversation = () => {
       </Helmet>
       <Layout>
         <>
-          <ChatWindow id={id} />
+        <Retour />
+        <Container>
+                    <ChatWindow id={id} />
+
+        </Container>
 
           {/* <ToggleButton onClick={() => setShowSidebar(!showSidebar)}>
             {showSidebar ? "Hide" : "Show"} Sidebar

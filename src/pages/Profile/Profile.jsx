@@ -42,7 +42,7 @@ export default function Profile() {
         type={profile?.type}
       />
       <Bio
-        bio={profile.profil.bio}
+        bio={profile.profil?.bio}
         nomComplet={profile?.username}
         competences={profile?.profil?.competences}
       />

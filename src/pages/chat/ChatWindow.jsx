@@ -318,7 +318,7 @@ const ChatWindow = ({
             </IconContainer>
           )}
         </StyledCardHeader>
-        <Card.Body>
+        <StyledCardBody>
           <div
             ref={scrollableContainerRef}
             style={{
@@ -366,14 +366,14 @@ const ChatWindow = ({
               </div>
             ))}
           </div>
-        </Card.Body>
-        <Card.Footer>
+        </StyledCardBody>
+        <StyledCardFooter>
           <ActionSection>
             <TextAreaStyled>
               <WriterMessage createMessage={handleSubmit} />
             </TextAreaStyled>
           </ActionSection>
-        </Card.Footer>
+        </StyledCardFooter>
       </StyledCard>
       <Modal
         show={showImageModal}
@@ -681,4 +681,18 @@ const IconContainer = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto;
+`;
+
+const StyledCardBody = styled(Card.Body)`
+  background-color: #ffffff;  /* Fond blanc */
+  padding: 20px;  /* Ajout de padding pour l'espacement interne */
+  // border-radius: 10px;  /* Bordures arrondies pour un look moderne */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Légère ombre pour donner de la profondeur */
+`;
+
+const StyledCardFooter = styled(Card.Footer)`
+  background-color: #ffffff;  /* Fond blanc */
+  padding: 20px;  /* Ajout de padding pour l'espacement interne */
+  border-radius: 10px;  /* Bordures arrondies pour un look moderne */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Légère ombre pour donner de la profondeur */
 `;

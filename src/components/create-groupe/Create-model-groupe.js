@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { Form, Button, Container, Modal } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Container,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createGroup, fetchFriends } from "../../api/apiConversation";
+import { MdGroup } from "react-icons/md";
 
 const CreateModelGroupe = () => {
   const [titre, setTitre] = useState("");
@@ -47,10 +55,35 @@ const CreateModelGroupe = () => {
 
   return (
     <Container className="mt-5">
-      <Button variant="primary" onClick={() => setShowModal(true)}>
-        Create Group
-      </Button>
-
+      <div className="d-flex flex-row-reverse">
+        <Button
+          variant="primary"
+          onClick={() => setShowModal(true)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "5px",
+            borderRadius: "50%",
+            transition: "background-color 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#17a2b8"; // Couleur au survol
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = ""; // Retour à la couleur d'origine
+          }}
+        >
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="tooltip-create-group">Créer un groupe</Tooltip>
+            }
+          >
+            <MdGroup size={24} color="#fff" />
+          </OverlayTrigger>
+        </Button>
+      </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Create Group</Modal.Title>
@@ -77,6 +110,42 @@ const CreateModelGroupe = () => {
                 onChange={(selectedOptions) =>
                   setParticipants(selectedOptions ? selectedOptions : [])
                 }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? "#0066cc" : "#ced4da",
+                    borderRadius: "20px",
+                    height: "45px", // Reduced height
+                    boxShadow: "none",
+                    "&:hover": {
+                      borderColor: "#0056b3",
+                    },
+                  }),
+                  placeholder: (baseStyles) => ({
+                    ...baseStyles,
+                    color: "#6c757d",
+                    fontSize: "14px", // Slightly smaller font size
+                  }),
+                  multiValue: (baseStyles) => ({
+                    ...baseStyles,
+                    backgroundColor: "#e9ecef",
+                    borderRadius: "10px",
+                  }),
+                  menu: (baseStyles) => ({
+                    ...baseStyles,
+                    borderRadius: "20px",
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: state.isFocused ? "#f8f9fa" : "white",
+                    color: "#495057",
+                    "&:active": {
+                      backgroundColor: "#0066cc",
+                      color: "white",
+                    },
+                  }),
+                }}
                 placeholder="Select participants..."
               />
             </Form.Group>
