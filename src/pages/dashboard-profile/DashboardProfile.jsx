@@ -93,10 +93,10 @@ const DashboardProfile = () => {
                   <StyledTd>
                     <div className="d-flex justify-content-center">
                       <StyledLink to={`/dashboard/update-experience/${exp.id}`} variant="success">
-                        <FaEdit /> Modifier
+                        <FaEdit />  Modifier
                       </StyledLink>
                       <CustomButton variant="danger" onClick={() => handleDeleteExperience(exp.id)}>
-                        <FaTrashAlt /> Supprimer
+                        <FaTrashAlt />  supprimer
                       </CustomButton>
                     </div>
                   </StyledTd>
@@ -157,42 +157,45 @@ const StyledCard = styled.div`
 `;
 const StyledLink = styled(Link)`
   display: inline-block;
-  padding: 8px 16px;
-  margin: 5px;
+  padding: 5px 12px;  /* Smaller padding for a more compact size */
+  margin: 0 5px;  /* Consistent margin */
   border-radius: 50px;
   text-align: center;
   font-weight: bold;
+  font-size: 14px;  /* Smaller font size */
   color: white;
   text-decoration: none;
-  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
-  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#3498db' : '#0a1d4b'};
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#FFB352' : '#0a1d4b'};
     color: white;
   }
 `;
 
 const CustomButton = styled.button`
-  padding: 5px 15px;
+  padding: 5px 12px;  /* Matching padding with StyledLink */
   border-radius: 50px;
-  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
-  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#3498db' : '#10266f'};
+  border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
+  background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
   color: #ffffff;
   font-weight: bold;
+  font-size: 14px;  /* Matching font size with StyledLink */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  margin: 0 5px;
+  gap: 5px;  /* Adjusted gap to match size */
+  margin: 0 5px;  /* Consistent margin */
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#3498db' : '#0a1d4b'};
+    background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#FFB352' : '#0a1d4b'};
     color: white;
   }
 `;
+
 
 const StyledTable = styled(Table)`
   th,

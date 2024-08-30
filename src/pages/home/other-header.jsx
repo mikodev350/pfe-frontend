@@ -70,9 +70,10 @@ const NavbarCustom = styled(Navbar)`
 `;
 
 const ButtonStyled = styled(Button)`
-  background-color: ${(props) => (props.second ? "#FFB352" : "#10266f")};
-  border-radius: 12px;
+  background-color: ${(props) => (props.second ? "white" : "#2180D0")};
+  border-radius: 20px;
   color: ${(props) => (props.second ? "black" : "white")};
+  border: 2px solid ${(props) => (props.second ? "#FFB352" : "#2180D0")};
   padding: 5px 20px;
   margin: 0px 10px;
   transition: 0.3s;

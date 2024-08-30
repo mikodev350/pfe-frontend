@@ -53,13 +53,19 @@ const StyledIconButton = styled.div`
   background-color: #e0e0e0;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
-  color: #424242;
+  color: ${props => (props.delete ? '#ff4d4d' : '#007bff')};  /* Default color based on type */
 
   &:hover,
   &:focus {
-    background-color: #007bff;
+    background-color: ${props => (props.delete ? '#ff3333' : '#0056b3')};  /* Hover color based on type */
     color: #ffffff;
     transform: translateY(-3px);
+  }
+
+  /* Style specific to icons */
+  svg {
+    font-size: 18px;  /* Adjust the icon size */
+    color: inherit;  /* Inherit color from StyledIconButton */
   }
 `;
 

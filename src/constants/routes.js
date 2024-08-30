@@ -153,7 +153,7 @@ const PageRouteDashbordTeacher = [
         icon: FaUserFriends,
       },
       {
-        name: "Liste de professeurs",
+        name: "Liste des coaches",
         route: "/dashboard/communaute/enseignants",
         icon: FaHandshake,
       },

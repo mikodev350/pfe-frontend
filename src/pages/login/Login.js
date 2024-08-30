@@ -82,13 +82,22 @@ const Login = () => {
         backgroundColorIdentification={true}
       >
         <ToastContainer />
-        <div className="main-login-container " style={{ marginTop: "20px" }}>
-          <div className="shadow m-4 bg-white rounded">
+        <div
+          className="main-login-container"
+          style={{
+            marginTop: "20px",
+          }}
+        >
+          <div>
             <Row
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: " center",
+                justifyContent: "center", // Corrected spacing
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow effect
+                borderRadius: "10px", // Slightly smaller border radius for subtle rounding
+                padding: "0", // No extra padding, to maintain the original size
+                backgroundColor: "#ffffff", // Background to ensure the shadow is visible
               }}
             >
               {/* Colonne pour l'image */}
