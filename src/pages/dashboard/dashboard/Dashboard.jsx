@@ -44,6 +44,7 @@ function Dashboard() {
   const queryClient = useQueryClient();
   useSyncOnConnectionRestore(queryClient);
 
+  alert("Dashboard")
   const role = localStorage.getItem("role"); // Get the role from localStorage
 
   return (

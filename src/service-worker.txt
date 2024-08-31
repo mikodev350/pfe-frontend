@@ -1,0 +1,89 @@
+/* eslint-disable no-restricted-globals */
+
+import { clientsClaim } from "workbox-core";
+import { ExpirationPlugin } from "workbox-expiration";
+import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching";
+import { registerRoute } from "workbox-routing";
+import {
+  NetworkFirst,
+  CacheFirst,
+  StaleWhileRevalidate,
+} from "workbox-strategies";
+
+console.log("Service worker is starting...");
+
+clientsClaim();
+
+console.log("Starting to precache resources...");
+
+// Precache all resources mentioned in the manifest
+precacheAndRoute(self.__WB_MANIFEST);
+
+console.log("Resources precached successfully: ", self);
+
+// Routing for navigation requests
+const fileExtensionRegexp = new RegExp("/[^/?]+\\.[^/]+$");
+registerRoute(({ request, url }) => {
+  if (request.mode !== "navigate") {
+    return false;
+  }
+  if (url.pathname.startsWith("/_")) {
+    return false;
+  }
+  if (url.pathname.match(fileExtensionRegexp)) {
+    return false;
+  }
+  return true;
+}, createHandlerBoundToURL(process.env.PUBLIC_URL + "/index.html"));
+
+// NetworkFirst strategy for images with caching
+registerRoute(
+  ({ request }) => request.destination === "image",
+  new NetworkFirst({
+    cacheName: "images-cache",
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 50,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
+      }),
+    ],
+    networkTimeoutSeconds: 5, // Si le réseau ne répond pas en 5 secondes, utiliser le cache
+  })
+);
+
+// Stale-While-Revalidate strategy for API requests
+registerRoute(
+  ({ url }) =>
+    url.origin === self.location.origin && url.pathname.startsWith("/api/"),
+  new StaleWhileRevalidate({
+    cacheName: "api-requests",
+    plugins: [new ExpirationPlugin({ maxEntries: 100 })],
+  })
+);
+
+// NetworkFirst strategy for static resources (styles, scripts, videos, audio)
+registerRoute(
+  ({ request }) =>
+    request.destination === "style" ||
+    request.destination === "script" ||
+    request.destination === "video" ||
+    request.destination === "audio",
+  new NetworkFirst({
+    cacheName: "resource-files",
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 100, // Limit the number of files in cache
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache files for 30 days
+      }),
+    ],
+  })
+);
+
+// Listen for SKIP_WAITING message to activate new service worker immediately
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+console.log("Service worker setup complete.");

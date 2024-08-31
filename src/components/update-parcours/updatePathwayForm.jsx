@@ -152,7 +152,7 @@ const UpdatePathwayForm = () => {
         } else {
           console.log('Pathway updated successfully:', response);
         }
-        navigate('/student/parcours');
+        navigate('/dashboard/parcours');
       } catch (error) {
         console.error('Error updating pathway:', error);
       }

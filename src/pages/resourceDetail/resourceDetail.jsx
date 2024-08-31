@@ -153,7 +153,11 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
   };
 
   const fetchMediaFromCache = async (url) => {
+    console.log("-----------------------------------------------")
+    console.log('URL demandée :', url);
+    console.log("-----------------------------------------------")    
     if (!url) return null;
+
 
     try {
       const cache = await caches.open('resource-files');
@@ -212,8 +216,8 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
         if (resource.images && Array.isArray(resource.images)) {
           const offlineImageUrls = await Promise.all(
             resource.images.map(async (image) => {
-               const imageUrl = navigator.onLine ? `http://localhost:1337${image?.url}` : image.url;
-
+              
+              const imageUrl = navigator.onLine ? `http://localhost:1337${image?.url}` : (image?.url || image);
               const cachedUrl = await fetchMediaFromCache(imageUrl);
               return { url: cachedUrl || image.url };
             })
@@ -222,19 +226,26 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
         }
 
         if (resource.video) {
-      const videoUrl = navigator.onLine ? `http://localhost:1337${resource.video?.url}` : resource.video.url;
-          const cachedUrl = await fetchMediaFromCache(videoUrl);
+          console.log("resource.video")
+          console.log(resource.video)
+      const videoUrl = navigator.onLine ? `http://localhost:1337${resource.video?.url}` :  (resource?.video.url || resource.video);
+                console.log("----------------------------------------")
+      console.log("videoUrl")
+          console.log(videoUrl)
+                          console.log("----------------------------------------")
+
+      const cachedUrl = await fetchMediaFromCache(videoUrl);
           setCachedVideo({ url: cachedUrl || resource.video.url });
         }
 
         if (resource.audio) {
-         const audiodUrl = navigator.onLine ? `http://localhost:1337${resource.audio?.url}` : resource.audio.url;
+         const audiodUrl = navigator.onLine ? `http://localhost:1337${resource.audio?.url}` :  (resource?.audio.url|| resource?.audio) ;
           const cachedUrl = await fetchMediaFromCache(audiodUrl);
           setCachedAudio({ url: cachedUrl || resource.audio.url });
         }
 
         if (resource.pdf) {
-                   const pdf = navigator.onLine ? `http://localhost:1337${resource.pdf?.url}` : resource.pdf.url;
+                   const pdf = navigator.onLine ? `http://localhost:1337${resource.pdf?.url}` :  (resource.pdf.url|| resource?.pdf);
 
           const cachedUrl = await fetchMediaFromCache(pdf);
           setCachedPDF({ url: cachedUrl || resource.pdf.url });

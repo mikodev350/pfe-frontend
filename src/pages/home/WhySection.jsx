@@ -15,7 +15,7 @@ const WhySection = () => {
             <div className="why__thumb pr-40">
               <div className="Imge-why-Section">
                 <Ratio>
-                  <embed src={"/images/Webinar-amico.png"} />
+                  <embed src="./images/Webinar-amico.png" />
                 </Ratio>
               </div>
               <img

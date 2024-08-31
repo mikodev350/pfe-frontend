@@ -1,5 +1,4 @@
-// Ce fichier enregistre votre service worker et configure sa gestion
-
+// Vérifie si l'application est en localhost
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
     window.location.hostname === "[::1]" ||
@@ -10,15 +9,16 @@ const isLocalhost = Boolean(
 
 export function register(config) {
   if ("serviceWorker" in navigator) {
-    const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
-    if (publicUrl.origin !== window.location.origin) {
-      return;
-    }
-
     window.addEventListener("load", () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
-      registerValidSW(swUrl, config);
+      if (isLocalhost) {
+        // En localhost, vérifie si le service worker existe
+        checkValidServiceWorker(swUrl, config);
+      } else {
+        // Enregistre le service worker
+        registerValidSW(swUrl, config);
+      }
     });
   }
 }
@@ -35,15 +35,19 @@ function registerValidSW(swUrl, config) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === "installed") {
             if (navigator.serviceWorker.controller) {
+              // Nouveau contenu disponible; notifier l'utilisateur
               console.log(
-                "New content is available and will be used when all tabs for this page are closed. See https://cra.link/PWA."
+                "Nouveau contenu disponible et sera utilisé après la fermeture de tous les onglets de cette page. Voir https://cra.link/PWA."
               );
 
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              console.log("Content is cached for offline use.");
+              // Contenu précaché pour une utilisation hors ligne
+              console.log(
+                "Contenu mis en cache pour une utilisation hors ligne."
+              );
 
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
@@ -54,11 +58,15 @@ function registerValidSW(swUrl, config) {
       };
     })
     .catch((error) => {
-      console.error("Error during service worker registration:", error);
+      console.error(
+        "Erreur lors de l'enregistrement du service worker:",
+        error
+      );
     });
 }
 
 function checkValidServiceWorker(swUrl, config) {
+  // Vérifie si le service worker peut être trouvé. Sinon, recharge la page.
   fetch(swUrl, {
     headers: { "Service-Worker": "script" },
   })
@@ -68,18 +76,20 @@ function checkValidServiceWorker(swUrl, config) {
         response.status === 404 ||
         (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
+        // Aucun service worker trouvé, probablement une application différente. Recharge la page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
             window.location.reload();
           });
         });
       } else {
+        // Enregistre le service worker normalement
         registerValidSW(swUrl, config);
       }
     })
     .catch(() => {
       console.log(
-        "No internet connection found. App is running in offline mode."
+        "Pas de connexion internet trouvée. L'application est en mode hors ligne."
       );
     });
 }
@@ -95,142 +105,3 @@ export function unregister() {
       });
   }
 }
-
-// if ("serviceWorker" in navigator) {
-//   window.addEventListener("load", () => {
-//     navigator.serviceWorker
-//       .register(`${process.env.PUBLIC_URL}/service-worker.js`)
-//       .then((registration) => {
-//         console.log(
-//           "Service Worker registered with scope:",
-//           registration.scope
-//         );
-//       })
-//       .catch((error) => {
-//         console.error("Service Worker registration failed:", error);
-//       });
-//   });
-// }
-
-// // serviceWorkerRegistration.js
-
-// const isLocalhost = Boolean(
-//   window.location.hostname === "localhost" ||
-//     // [::1] is the IPv6 localhost address.
-//     window.location.hostname === "[::1]" ||
-//     // 127.0.0.0/8 sont considérées comme localhost pour IPv4.
-//     window.location.hostname.match(
-//       /^127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/
-//     )
-// );
-
-// export function register(config) {
-//   if ("serviceWorker" in navigator) {
-//     window.addEventListener("load", () => {
-//       console.log("====================================");
-//       console.log(process.env.PUBLIC_URL);
-//       console.log("====================================");
-//       // const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
-
-//       const swUrl = `http://localhost:3000/service-worker.js`;
-
-//       if (false) {
-//         // Ceci fonctionne en localhost
-//         checkValidServiceWorker(swUrl, config);
-
-//         // Ajoute un logging supplémentaire pour localhost
-//         navigator.serviceWorker.ready.then(() => {
-//           console.log(
-//             "This web app is being served cache-first by a service worker. To learn more, visit https://cra.link/PWA"
-//           );
-//         });
-//       } else {
-//         // Enregistre le service worker normalement
-//         registerValidSW(swUrl, config);
-//       }
-//     });
-//   }
-// }
-
-// function registerValidSW(swUrl, config) {
-//   navigator.serviceWorker
-//     .register(swUrl)
-//     .then((registration) => {
-//       registration.onupdatefound = () => {
-//         const installingWorker = registration.installing;
-//         if (installingWorker == null) {
-//           return;
-//         }
-//         installingWorker.onstatechange = () => {
-//           if (installingWorker.state === "installed") {
-//             console.log("====================================");
-//             console.log("installed");
-//             console.log(config);
-
-//             console.log("====================================");
-//             if (navigator.serviceWorker.controller) {
-//               // Nouveau contenu disponible
-//               console.log(
-//                 "New content is available and will be used when all tabs for this page are closed. See https://cra.link/PWA."
-//               );
-
-//               if (config && config.onUpdate) {
-//                 config.onUpdate(registration);
-//               }
-//             } else {
-//               // Contenu précaché pour une utilisation hors ligne
-//               console.log("Content is cached for offline use.");
-
-//               if (config && config.onSuccess) {
-//                 config.onSuccess(registration);
-//               }
-//             }
-//           }
-//         };
-//       };
-//     })
-//     .catch((error) => {
-//       console.error("Error during service worker registration:", error);
-//     });
-// }
-
-// function checkValidServiceWorker(swUrl, config) {
-//   // Vérifie si le service worker peut être trouvé. Si ce n'est pas le cas, recharge la page.
-//   fetch(swUrl, {
-//     headers: { "Service-Worker": "script" },
-//   })
-//     .then((response) => {
-//       // Assure que le service worker existe et que nous obtenons vraiment un fichier JS.
-//       const contentType = response.headers.get("content-type");
-//       if (
-//         response.status === 404 ||
-//         (contentType != null && contentType.indexOf("javascript") === -1)
-//       ) {
-//         // Aucun service worker trouvé. Probablement une application différente. Recharge la page.
-//         navigator.serviceWorker.ready.then((registration) => {
-//           registration.unregister().then(() => {
-//             window.location.reload();
-//           });
-//         });
-//       } else {
-//         registerValidSW(swUrl, config);
-//       }
-//     })
-//     .catch(() => {
-//       console.log(
-//         "No internet connection found. App is running in offline mode."
-//       );
-//     });
-// }
-
-// export function unregister() {
-//   if ("serviceWorker" in navigator) {
-//     navigator.serviceWorker.ready
-//       .then((registration) => {
-//         registration.unregister();
-//       })
-//       .catch((error) => {
-//         console.error(error.message);
-//       });
-//   }
-// }

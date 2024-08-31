@@ -42,7 +42,7 @@ const HeroSection = () => {
                   {/* ****** Ajoutit image t3 hero ****** */}
                   <div className='imgStyle'>
                     <Ratio>
-                      <embed src={"/images/Innovation-pana.png"} />
+                      <embed src={headerimg} />
                     </Ratio>
                   </div>
                   {/* <img className="hero-shape-purple" src="/assets/img/why/why-shape-orange.png" alt="hero-shape-purple" /> */}
