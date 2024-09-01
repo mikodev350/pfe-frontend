@@ -19,7 +19,6 @@ const addOrUpdateLessonInIndexedDB = async (lesson) => {
       module: lesson.module ? lesson.module : null,
       updatedAt: lesson.updatedAt,
       createdAt: lesson.createdAt,
-      version: lesson.version || 1,
     });
   } else {
     await db.lessons.update(lesson.id, lesson);
@@ -27,53 +26,62 @@ const addOrUpdateLessonInIndexedDB = async (lesson) => {
 };
 
 // Fonction pour récupérer les leçons
+// Function to fetch lessons
 export const fetchLessons = async (page, token, search = "", moduleId) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/lessons`, {
-      params: {
-        _page: page,
-        _limit: 5,
-        _q: search,
-        module: moduleId,
-      },
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  if (navigator.onLine) {
+    try {
+      // Fetch data from server
+      const response = await axios.get(`${API_BASE_URL}/lessons`, {
+        params: {
+          _page: page,
+          _limit: 5,
+          _q: search,
+          module: moduleId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    await db.transaction("rw", db.lessons, async () => {
-      for (const lesson of response.data.data) {
-        await addOrUpdateLessonInIndexedDB(lesson);
-      }
-    });
+      // Store fetched data in IndexedDB
+      await db.transaction("rw", db.lessons, async () => {
+        for (const lesson of response.data.data) {
+          await addOrUpdateLessonInIndexedDB(lesson);
+        }
+      });
 
-    return {
-      data: response.data.data,
-      totalPages: Math.ceil(response.data.meta.pagination.total / 5),
-    };
-  } catch (error) {
-    console.error("Error fetching lessons:", error);
-
-    const localData = await db.lessons
-      .where("module")
-      .equals(Number(moduleId))
-      .filter((lesson) => lesson.nom.includes(search))
-      .offset((page - 1) * 5)
-      .limit(5)
-      .toArray();
-
-    const totalLocalDataCount = await db.lessons
-      .where("module")
-      .equals(Number(moduleId))
-      .filter((lesson) => lesson.nom.includes(search))
-      .count();
-
-    return {
-      data: localData,
-      totalPages: Math.ceil(totalLocalDataCount / 5),
-    };
+      // Return fetched data
+      return {
+        data: response.data.data,
+        totalPages: Math.ceil(response.data.meta.pagination.total / 5),
+      };
+    } catch (error) {
+      console.error("Error fetching lessons from server:", error);
+      // Fallback to fetching from IndexedDB if there was an error
+    }
   }
+
+  // Offline scenario or fallback if server fetch fails
+  console.log("Fetching lessons from IndexedDB (offline mode)");
+  const localData = await db.lessons
+    .where("module")
+    .equals(Number(moduleId))
+    .filter((lesson) => lesson.nom.includes(search))
+    .offset((page - 1) * 5)
+    .limit(5)
+    .toArray();
+
+  const totalLocalDataCount = await db.lessons
+    .where("module")
+    .equals(Number(moduleId))
+    .filter((lesson) => lesson.nom.includes(search))
+    .count();
+
+  return {
+    data: localData,
+    totalPages: Math.ceil(totalLocalDataCount / 5),
+  };
 };
 
 // Fonction pour créer une leçon

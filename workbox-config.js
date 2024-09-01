@@ -1,38 +1,42 @@
 module.exports = {
   globDirectory: "build/",
-  globPatterns: ["**/*.{js,css,html,png,jpg,jpeg,gif,svg,eot,ttf,woff,woff2}"],
-  swDest: "build/service-worker.js",
-  clientsClaim: true,
-  skipWaiting: true,
+  globPatterns: [
+    "**/*.{html,js,css}", // Inclure les fichiers HTML, JS, CSS pour precaching
+    "static/media/*.{jpg,png,svg,mp4,mp3,pdf}", // Inclure les fichiers multimédias dans le precache
+  ],
+  swDest: "public/service-worker.js",
   runtimeCaching: [
     {
-      urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+      urlPattern: ({ request }) => request.mode === "navigate",
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "pages",
+        networkTimeoutSeconds: 10, // Utiliser le réseau, mais revenir au cache après 10 secondes si le réseau n'est pas disponible
+      },
+    },
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|mp4|mp3|pdf)$/,
       handler: "CacheFirst",
       options: {
-        cacheName: "images",
+        cacheName: "resource-files",
         expiration: {
-          maxEntries: 30,
+          maxEntries: 100,
           maxAgeSeconds: 30 * 24 * 60 * 60, // 30 jours
         },
       },
     },
     {
-      urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+      urlPattern: /\.(?:html|js|css)$/,
       handler: "StaleWhileRevalidate",
       options: {
-        cacheName: "google-fonts-stylesheets",
+        cacheName: "static-resources",
       },
     },
     {
-      urlPattern: /^https:\/\/api\.example\.com/,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-cache",
-        expiration: {
-          maxEntries: 30,
-          maxAgeSeconds: 5 * 60, // 5 minutes
-        },
-      },
+      urlPattern: /\/api\//,
+      handler: "NetworkOnly", // Ne pas mettre en cache les requêtes API
     },
   ],
+  skipWaiting: true,
+  clientsClaim: true,
 };

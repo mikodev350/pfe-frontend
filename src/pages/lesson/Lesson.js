@@ -164,7 +164,7 @@ const Lesson = () => {
     return () => {
       window.removeEventListener("online", handleOnline);
     };
-  }, [token, queryClient, isSyncing]);
+  }, [token, isSyncing]);
 
   const handleEdit = (lesson) => {
     setInitialData(lesson);

@@ -37,7 +37,7 @@ function registerValidSW(swUrl, config) {
             if (navigator.serviceWorker.controller) {
               // Nouveau contenu disponible; notifier l'utilisateur
               console.log(
-                "Nouveau contenu disponible et sera utilisé après la fermeture de tous les onglets de cette page. Voir https://cra.link/PWA."
+                "Nouveau contenu disponible et sera utilisé après la fermeture de tous les onglets de cette page."
               );
 
               if (config && config.onUpdate) {

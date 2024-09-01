@@ -93,68 +93,63 @@ const addOrUpdateModuleInIndexedDB = async (module) => {
 // };
 
 export const fetchModules = async (page, token, search = "", parcoursId) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/modules`, {
-      params: {
-        _page: page,
-        _limit: 5,
-        _q: search,
-        parcour: parcoursId,
-      },
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log("response.data.data");
+  if (navigator.onLine) {
+    try {
+      // Fetch data from server
+      const response = await axios.get(`${API_BASE_URL}/modules`, {
+        params: {
+          _page: page,
+          _limit: 5,
+          _q: search,
+          parcour: parcoursId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Modules fetched from server:", response.data.data);
 
-    console.log(response.data.data);
-    // Insertion dans IndexedDB
-    await db.transaction("rw", db.modules, async () => {
-      for (const module of response.data.data) {
-        await addOrUpdateModuleInIndexedDB(module);
-      }
-    });
+      // Store fetched data in IndexedDB
+      await db.transaction("rw", db.modules, async () => {
+        for (const module of response.data.data) {
+          await addOrUpdateModuleInIndexedDB(module);
+        }
+      });
 
-    return {
-      data: response.data.data,
-      totalPages: Math.ceil(response.data.meta.pagination.total / 5),
-    };
-  } catch (error) {
-    console.error("Error fetching modules:", error);
-
-    console.log("====================================");
-    console.log("recupertation du parcours id pour test ");
-    console.log("====================================");
-    console.log(parcoursId);
-    console.log("====================================");
-    console.log("====================================");
-    // Récupération depuis IndexedDB en cas d'erreur
-    const localData = await db.modules
-      .where("parcour")
-      .equals(Number(parcoursId))
-      .filter((module) => module.nom.includes(search))
-      .offset((page - 1) * 5)
-      .limit(5)
-      .toArray();
-
-    const totalLocalDataCount = await db.modules
-      .where("parcour")
-      .equals(Number(parcoursId))
-      .filter((module) => module.nom.includes(search))
-      .count();
-
-    console.log("====================================");
-    console.log("after localData ");
-    console.log("====================================");
-    console.log(localData);
-    console.log("====================================");
-    console.log("====================================");
-    return {
-      data: localData,
-      totalPages: Math.ceil(totalLocalDataCount / 5),
-    };
+      // Return fetched data
+      return {
+        data: response.data.data,
+        totalPages: Math.ceil(response.data.meta.pagination.total / 5),
+      };
+    } catch (error) {
+      console.error("Error fetching modules from server:", error);
+      // Fallback to fetching from IndexedDB if there was an error
+    }
   }
+
+  // Offline scenario or fallback if server fetch fails
+  console.log("Fetching modules from IndexedDB (offline mode)");
+  const localData = await db.modules
+    .where("parcour")
+    .equals(Number(parcoursId))
+    .filter((module) => module.nom.includes(search))
+    .offset((page - 1) * 5)
+    .limit(5)
+    .toArray();
+
+  const totalLocalDataCount = await db.modules
+    .where("parcour")
+    .equals(Number(parcoursId))
+    .filter((module) => module.nom.includes(search))
+    .count();
+
+  console.log("Modules fetched from IndexedDB:", localData);
+
+  return {
+    data: localData,
+    totalPages: Math.ceil(totalLocalDataCount / 5),
+  };
 };
 /***************************************************************************************/
 // export const createModule = async (moduleData, token) => {
