@@ -1,3 +1,6 @@
+const PUBLIC_VAPID_KEY =
+  "BHzzIlXlO1atGV5DucjYMeWz5bNrnsiYyEWdsL17zLzSenrZelA0OQmm4xSYF9WARk9wJ9S0_SW2RV_4dJERwBM";
+
 // Vérifie si l'application est en localhost
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
@@ -6,6 +9,37 @@ const isLocalhost = Boolean(
       /^127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/
     )
 );
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+async function sendPushNotification() {
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+  });
+
+  await fetch("http://localhost:1337/api/subscribe", {
+    method: "POST",
+    body: JSON.stringify(subscription),
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  console.log("Push Subscription sent to the server...");
+}
 
 export function register(config) {
   if ("serviceWorker" in navigator) {
@@ -27,6 +61,10 @@ function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      console.log("Service Worker registered.");
+      // Envoyer la notification push après l'enregistrement du service worker
+      sendPushNotification();
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {

@@ -6,3 +6,4 @@ export const SETTINGS = "SETTINGS";
 
 //export Api back end
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+export const PUBLIC_VAPID_KEY = process.env.PUBLIC_VAPID_KEY;

@@ -1142,50 +1142,59 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
 };
 
 // Fonction pour récupérer les ressources et les stocker dans IndexedDB
+// Function to fetch resources and store them in IndexedDB
 export const fetchResources = async (page, pageSize, searchValue, token) => {
-  try {
-  
-    const response = await axios.get(`${API_BASE_URL}/resources`, {
-      params: {
-        page,
-        pageSize,
-        _q: searchValue,
-      },
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  if (navigator.onLine) {
+    try {
+      // Fetch resources from the server
+      const response = await axios.get(`${API_BASE_URL}/resources`, {
+        params: {
+          page,
+          pageSize,
+          _q: searchValue,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    console.log(response)
-    console.log("Fetched resources:", response.data.data);
+      console.log("Fetched resources from server:", response.data.data);
 
-    // await db.transaction("rw", db.resources, async () => {
-      for (const resource of response.data.data) {
-        await addOrUpdateResourceInIndexedDB(resource);
-      }
-    // });
+      // Store fetched data in IndexedDB
+      await db.transaction("rw", db.resources, async () => {
+        for (const resource of response.data.data) {
+          await addOrUpdateResourceInIndexedDB(resource);
+        }
+      });
 
-    return {
-      data: response.data.data,
-      totalPages: Math.ceil(response.data.total / pageSize),
-    };
-  } catch (error) {
-    console.error("Error fetching resources:", error);
-
-    const localData = await db.resources
-      .filter((resource) => resource.nom.includes(searchValue))
-      .offset((page - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
-
-    const totalLocalDataCount = await db.resources
-      .filter((resource) => resource.nom.includes(searchValue))
-      .count();
-
-    return {
-      data: localData,
-      totalPages: Math.ceil(totalLocalDataCount / pageSize),
-    };
+      // Return fetched data
+      return {
+        data: response.data.data,
+        totalPages: Math.ceil(response.data.total / pageSize),
+      };
+    } catch (error) {
+      console.error("Error fetching resources from server:", error);
+      // Fallback to fetching from IndexedDB if there was an error
+    }
   }
+
+  // Offline scenario or fallback if server fetch fails
+  console.log("Fetching resources from IndexedDB (offline mode)");
+  const localData = await db.resources
+    .filter((resource) => resource.nom.includes(searchValue))
+    .offset((page - 1) * pageSize)
+    .limit(pageSize)
+    .toArray();
+
+  const totalLocalDataCount = await db.resources
+    .filter((resource) => resource.nom.includes(searchValue))
+    .count();
+
+  console.log("Resources fetched from IndexedDB:", localData);
+
+  return {
+    data: localData,
+    totalPages: Math.ceil(totalLocalDataCount / pageSize),
+  };
 };
