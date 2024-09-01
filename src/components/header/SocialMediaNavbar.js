@@ -77,31 +77,33 @@ const styles = {
   customDropdown: {
     cursor: "pointer",
     position: "absolute",
-    backgroundColor: "#fff",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+    backgroundColor: "#f0f4f8", // Couleur de fond douce
+    boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
     padding: "10px",
     borderRadius: "10px",
-    width: "250px",
+    width: "270px",
     zIndex: 1000,
     right: 0,
-    maxHeight: "400px", // Augmente la hauteur maximale
-    overflowY: "auto", // Active le défilement vertical
-    border: "1px solid #e0e0e0", // Ajoute une bordure légère
+    maxHeight: "500px",
+    overflowY: "auto",
+    border: "1px solid #e0e0e0",
   },
   dropdownItem: {
-    padding: "10px",
+    padding: "12px",
     textDecoration: "none",
-    color: "#10266f",
+    color: "#333",
     display: "flex",
     alignItems: "center",
     fontSize: "0.9rem",
     borderRadius: "8px",
     margin: "5px 0",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     transition: "background-color 0.3s ease",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.1)", // Ombre douce
+    border: "1px solid #e0e0e0",
   },
   dropdownItemHover: {
-    backgroundColor: "#e6f2fb", // Change la couleur au survol
+    backgroundColor: "#e6f2fb",
   },
   notificationIcon: {
     marginRight: "10px",
@@ -110,6 +112,8 @@ const styles = {
   },
   notificationText: {
     flex: 1,
+    fontWeight: "bold", // Nom de l'expéditeur en gras
+    fontSize: "1rem",
   },
   notificationTime: {
     fontSize: "0.8rem",
@@ -266,35 +270,41 @@ function SocialMediaNavbar({ onFilterChange }) {
             {isNotificationsOpen && (
               <div style={styles.customDropdown}>
                 {notifications.map((notification) => (
-                  <Link
-                    to={
-                      "/" +
-                      "dashboard" +
-                      notification.redirect_url +
-                      `?notif_id=${notification.id}`
-                    }
-                    key={notification.id}
-                    style={styles.dropdownItem}
-                    className="dropdown-item"
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundColor =
-                        styles.dropdownItemHover.backgroundColor)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor =
-                        styles.dropdownItem.backgroundColor)
-                    }
-                  >
-                    <FaEnvelope style={styles.notificationIcon} />
-                    <span style={styles.notificationText}>
-                      {notification?.expediteur?.username +
-                        " " +
-                        notification?.notifText}
-                    </span>
-                    <small style={styles.notificationTime}>
-                      {notification.time}
-                    </small>
-                  </Link>
+                  <span key={notification.id} onc>
+                    <Link
+                      to={
+                        "/" +
+                        "dashboard" +
+                        notification.redirect_url +
+                        `?notif_id=${notification.id}`
+                      }
+                      style={styles.dropdownItem}
+                      // onClick={() => {
+                      //   handleNotificationClick(notification.id); // Appelle la fonction ici
+                      // }}
+                      className="dropdown-item"
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          styles.dropdownItemHover.backgroundColor)
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          styles.dropdownItem.backgroundColor)
+                      }
+                      o
+                    >
+                      <span style={styles.notificationText}>
+                        <FaEnvelope style={styles.notificationIcon} />
+
+                        {notification?.expediteur?.username}
+                        <br />
+                        {notification?.notifText}
+                      </span>
+                      <small style={styles.notificationTime}>
+                        {notification.time}
+                      </small>
+                    </Link>
+                  </span>
                 ))}
               </div>
             )}

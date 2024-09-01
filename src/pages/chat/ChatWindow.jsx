@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import Select from "react-select";
 import AddParticipantModal from "../../components/add-participant-modal/AddParticipantModal";
 import { FaUserPlus, FaUserMinus } from "react-icons/fa";
+import { notifyUser } from "../../util/PopUpNotification";
 
 const API_BASE_URL = "http://localhost:1337";
 

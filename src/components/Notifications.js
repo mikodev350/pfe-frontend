@@ -7,6 +7,7 @@ import {
   setSeenStatusNotification,
 } from "../redux/features/notification-slice";
 import { useSearchParams } from "react-router-dom";
+// import { notifyUser } from "../util/PopUpNotification";
 
 export default function Notification() {
   // const dispatch = useSelector(state => state.socket);
@@ -27,7 +28,7 @@ export default function Notification() {
   useEffect(async () => {
     if (localStorage.getItem("token")) {
       const result = await fetchNotifications(1);
-
+      console.log("fetchNotifications");
       dispatch(
         setNotifications({
           notifications: result.notifications,

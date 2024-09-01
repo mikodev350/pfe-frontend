@@ -12,6 +12,7 @@ import {
 } from "../../redux/features/notification-slice";
 import { useSearchParams } from "react-router-dom";
 import { useQueryClient } from "react-query";
+import { notifyUser } from "../../util/PopUpNotification";
 
 export default function Socket() {
   const queryClient = useQueryClient();
@@ -50,6 +51,9 @@ export default function Socket() {
         toast.info(notification.username + " " + notification.notifText, {
           position: "top-left",
         });
+        notifyUser(
+          `${notification.username} + " " + ${notification.notifText}`
+        );
       });
 
       // Add event listener for 'newNotification' event
@@ -62,6 +66,7 @@ export default function Socket() {
           toast.info("jak message bitch", {
             position: "top-left",
           });
+          notifyUser("Vous avez resu une noveaux messsage");
         } else if (id === conversationId) {
           let data = await queryClient.getQueryData([
             "conversation",

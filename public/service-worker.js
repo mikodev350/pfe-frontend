@@ -99,16 +99,10 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  console.log("====================================");
-  console.log("pushh eventtt push");
-
-  console.log(event);
-  console.log("====================================");
   const data = event.data.json();
-
   const options = {
     body: data.body,
-    // icon: "/path-to-icon/icon.png", // chemin vers votre icône
+    icon: "./img/logo.png", // chemin vers votre icône
     // badge: "/path-to-badge/badge.png", // chemin vers votre badge
   };
 
