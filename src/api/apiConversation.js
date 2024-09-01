@@ -129,3 +129,20 @@ export const removeParticipant = async ({ conversationId, userId }) => {
     throw error;
   }
 };
+
+/**********************************************************/
+
+export const getIdOfConverstation = async (etudiantId) => {
+  try {
+    const response = await apiService.get(
+      `/fetch-conversation?etudiantId=${etudiantId}`
+    );
+    const { conversationId } = response.data;
+
+    // Vous pouvez ensuite utiliser cet ID pour naviguer vers la conversation ou pour d'autres actions
+    return conversationId;
+  } catch (error) {
+    console.error("Error fetching advanced search results:", error);
+    throw error;
+  }
+};

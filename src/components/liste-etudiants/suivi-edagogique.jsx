@@ -16,7 +16,7 @@ import {
   FiTrash2,
   FiHelpCircle,
 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   fetchStudents,
@@ -31,6 +31,7 @@ import { getToken } from "../../util/authUtils";
 import DevoirModal from "../DevoirModalSend/DevoirModal";
 import QuizModal from "../quiz-modal/QuizModal";
 import styled from "styled-components";
+import { getIdOfConverstation } from "../../api/apiConversation";
 
 const StyledTabs = styled(Tabs)`
   display: flex;
@@ -174,6 +175,8 @@ const styles = {
 };
 
 const SuiviPedagogique = () => {
+    const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -184,6 +187,7 @@ const SuiviPedagogique = () => {
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [assignmentType, setAssignmentType] = useState(""); // 'Devoir' ou 'Quiz'
   const [selectedStudentOrGroup, setSelectedStudentOrGroup] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const queryClient = useQueryClient();
   const token = React.useMemo(() => getToken(), []);
@@ -239,6 +243,27 @@ const SuiviPedagogique = () => {
     setSelectedMembers([]);
   };
 
+React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  const goTochat = async (etudiantId) => {
+    const reponse = await getIdOfConverstation(etudiantId)
+    if (windowWidth < 900) {
+      navigate(`/chat/${reponse}`);
+    } else {
+      navigate(`/chat?id=${reponse}`);
+    }
+
+  }
   const handleGroupNameChange = (e) => setGroupName(e.target.value);
   const handleMembersChange = (selectedOptions) =>
     setSelectedMembers(selectedOptions);
@@ -351,7 +376,7 @@ const SuiviPedagogique = () => {
                         </div>
                       </div>
                       <div style={styles.actions}>
-                        <Link to="/" style={styles.button} title="Message">
+                        <Link to="#" style={styles.button} onClick={()=>{goTochat(student.id)}} title="Message">
                           <FiMessageSquare size={20} />
                         </Link>
                         <Button
