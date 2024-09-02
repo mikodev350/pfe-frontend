@@ -3,14 +3,9 @@ import {
   Navbar,
   Nav,
   Container,
-  Navbar as BootstrapNavbar,
 } from "react-bootstrap";
-import { Button, Link as ScrollLink } from "react-scroll";
 import styled from "styled-components";
 import Hamburger from "hamburger-react";
-
-// ******* affichier Logo ******
-
 import { Link as ReactScrollLink } from "react-scroll";
 import { Link as RouterLink } from "react-router-dom";
 import useOnClickOutside from "../../util/useOnClickOutside";
@@ -24,18 +19,17 @@ const StyledSidebar = styled.div`
   width: 260px;
   padding: 20px;
   height: 100vh;
-  background-color: #10266f; /* Conserve la couleur existante */
+  background-color: #10266f;
   color: #ffffff;
   transition: right 0.3s ease-in-out, background-color 0.3s ease-in-out;
   box-shadow: ${(props) => (props.open ? "0px 0px 15px rgba(0, 0, 0, 0.5)" : "none")};
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
 
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     width: 0;
@@ -51,11 +45,10 @@ const StyledSidebar = styled.div`
     transition: color 0.3s ease-in-out;
 
     &:hover {
-      color: #ffb352; /* Couleur d'accentuation survolée */
+      color: #ffb352;
     }
   }
 `;
-
 
 const NavbarCustom = styled(Navbar)`
   position: fixed !important;
@@ -69,7 +62,7 @@ const NavbarCustom = styled(Navbar)`
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 `;
 
-const ButtonStyled = styled(Button)`
+const ButtonStyled = styled.button`
   background-color: ${(props) => (props.second ? "white" : "#2180D0")};
   border-radius: 20px;
   color: ${(props) => (props.second ? "black" : "white")};
@@ -129,9 +122,9 @@ const AnimatedScrollLink = styled(ReactScrollLink)`
   }
 `;
 
-
 const CustomNavbar = () => {
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isFirstClick, setIsFirstClick] = React.useState(true);
 
   React.useEffect(() => {
     const toggleVisibility = () => {
@@ -162,21 +155,27 @@ const CustomNavbar = () => {
 
     window.addEventListener("resize", handleResize);
 
-    // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
+  const handleLinkClick = (event, path) => {
+    if (isFirstClick) {
+      event.preventDefault();
+      setIsFirstClick(false);
+      window.location.href = path; // Force a full page reload
+    }
+  };
+
   return (
     <>
       <NavbarCustom isVisible={isVisible}>
         <Container style={{ position: "relative" }}>
-          
-                    <RouterLink to="http://localhost:3000">
-          <Navbar.Brand >
-            <img src={"/img/logo.png"} alt="Easy Learn Logo" height={"45px"} />
-          </Navbar.Brand>
+          <RouterLink to="/">
+            <Navbar.Brand>
+              <img src={"/img/logo.png"} alt="Easy Learn Logo" height={"45px"} />
+            </Navbar.Brand>
           </RouterLink>
 
           {windowWidth < 900 ? (
@@ -197,65 +196,66 @@ const CustomNavbar = () => {
             </div>
           ) : (
             <>
-              {" "}
               <Nav className="mr-auto">
-                <AnimatedScrollLink smooth={true} duration={500} to="why">Pourquoi</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="testimonial">Rejoindre</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="services">Services</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="proud">Équipe</AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="why">
+                  Pourquoi
+                </AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="testimonial">
+                  Rejoindre
+                </AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="services">
+                  Services
+                </AnimatedScrollLink>
+                <AnimatedScrollLink smooth={true} duration={500} to="proud">
+                  Équipe
+                </AnimatedScrollLink>
               </Nav>
               <Navbar.Toggle />
               <Navbar.Collapse className="justify-content-end">
                 <Nav className="nav_btn">
-                  <ButtonStyled
-                    variant="primary"
-                    second={true}
-                    className="button-Login  w-100"
-                  >
-                    <RouterLink to="/signup">S'inscrire</RouterLink>
+                  <ButtonStyled variant="primary" second={true}>
+                    <RouterLink to="/signup" onClick={(e) => handleLinkClick(e, "/signup")}>
+                      S'inscrire
+                    </RouterLink>
                   </ButtonStyled>
-
-                  
-      <ButtonStyled variant="primary" className="button-Login w-100">
-            <RouterLink to="/login" className="w-100">
-
-        Se&nbsp;connecter
-            </RouterLink>
-
-      </ButtonStyled>
+                  <ButtonStyled variant="primary">
+                    <RouterLink to="/login" onClick={(e) => handleLinkClick(e, "/login")}>
+                      Se&nbsp;connecter
+                    </RouterLink>
+                  </ButtonStyled>
                 </Nav>
               </Navbar.Collapse>
             </>
           )}
         </Container>
       </NavbarCustom>
-      <div
-        style={{
-          position: "relative",
-        }}
-        ref={sidebar}
-      >
+      <div ref={sidebar}>
         <StyledSidebar open={isExpanded}>
-          {" "}
-          <AnimatedRouterLink to="http://localhost:3000/" white={true}>
+          <AnimatedRouterLink to="/" white={true} onClick={(e) => handleLinkClick(e, "/")}>
             Accueille
           </AnimatedRouterLink>
           <br />
-           <AnimatedScrollLink smooth={true} duration={500} to="why">Pourquoi</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="testimonial" white={true}>Rejoindre</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="services" white={true}>Services</AnimatedScrollLink>
-                <AnimatedScrollLink smooth={true} duration={500} to="proud" white={true}>Équipe</AnimatedScrollLink>
-          <AnimatedRouterLink to="/login" white={true}>
+          <AnimatedScrollLink smooth={true} duration={500} to="why">
+            Pourquoi
+          </AnimatedScrollLink>
+          <AnimatedScrollLink smooth={true} duration={500} to="testimonial" white={true}>
+            Rejoindre
+          </AnimatedScrollLink>
+          <AnimatedScrollLink smooth={true} duration={500} to="services" white={true}>
+            Services
+          </AnimatedScrollLink>
+          <AnimatedScrollLink smooth={true} duration={500} to="proud" white={true}>
+            Équipe
+          </AnimatedScrollLink>
+          <AnimatedRouterLink to="/login" white={true} onClick={(e) => handleLinkClick(e, "/login")}>
             {"Se\u00A0connecter"}
           </AnimatedRouterLink>
-          <AnimatedRouterLink to="/signup" white={true}>
+          <AnimatedRouterLink to="/signup" white={true} onClick={(e) => handleLinkClick(e, "/signup")}>
             S'inscrire
           </AnimatedRouterLink>
         </StyledSidebar>
       </div>
     </>
-    //
-    //
   );
 };
 

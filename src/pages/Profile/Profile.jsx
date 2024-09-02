@@ -7,7 +7,7 @@ import Experience from "./Experience";
 import Education from "./Education";
 import { fetchMyProfile, fetchUserProfile } from "../../api/apiProfile";
 import { getToken } from "../../util/authUtils";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import "./Profile.css";
 

@@ -102,7 +102,7 @@ self.addEventListener("push", (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: "./img/logo.png", // chemin vers votre icône
+    icon: "./img/logo without name .png", // chemin vers votre icône
     // badge: "/path-to-badge/badge.png", // chemin vers votre badge
   };
 

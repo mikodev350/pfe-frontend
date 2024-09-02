@@ -324,22 +324,21 @@ function SocialMediaNavbar({ onFilterChange }) {
             </div>
             {isProfileOpen && (
               <div style={styles.customDropdown} className="dropdown-menu show">
-                <a
-                  href="#"
+                <Link
+                  to="/dashboard/my-profile"
                   className="dropdown-item"
                   style={styles.dropdownItem}
                 >
                   <FaUser /> Profile
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="/settings/information-account"
                   className="dropdown-item"
                   style={styles.dropdownItem}
                 >
                   <FaCog /> Settings
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <span
                   className="dropdown-item"
                   style={styles.dropdownItem}
                   onClick={() => {
@@ -348,7 +347,7 @@ function SocialMediaNavbar({ onFilterChange }) {
                   }}
                 >
                   <FaSignOutAlt /> Logout
-                </a>
+                </span>
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Container, Col, Row ,Button} from "react-bootstrap";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import SearchForm from "../../components/searchForm/SearchForm";
 import ResourceTable from "../../components/resourceTable/ResourceTable";
 import styled from "styled-components";
@@ -60,17 +60,24 @@ const StyledTitle = styled.h2`
 
 const Resource = () => {
   const [searchValue, setSearchValue] = useState("");
+const [isFirstClick, setIsFirstClick] = useState(true);
 
   const handleSearch = async (value) => {
     setSearchValue(value);
   };
-
+const handleLinkClick = (event, path) => {
+  if (isFirstClick) {
+    event.preventDefault();
+    setIsFirstClick(false);
+    window.location.href = path; // Force un rechargement complet de la page
+  }
+};
  return (
     <Container>
       <StyledTitle>Ressources</StyledTitle>
       <Row>
         <Col xs={12} md={6}>
-          <Link to={`/dashboard/new-resource`}>
+          <Link to={`/dashboard/new-resource`} onClick={(e) => handleLinkClick(e, '/dashboard/new-resource')} >
             <GradientButton>
               Ajouter une ressource
             </GradientButton>

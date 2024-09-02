@@ -12,22 +12,16 @@ const StyledSidebar = styled.div`
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   top: 50px;
   width: 220px;
-  height: calc(
-    100vh - 50px
-  ); /* Ajuster la hauteur pour qu'elle corresponde à la hauteur de la fenêtre */
+  height: calc(100vh - 50px);
   background-color: #10266f;
   color: #ffffff;
   z-index: 28;
   left: ${(props) => (props.expanded ? "0" : "-260px")};
   transition: left 0.3s ease;
-  // overflow-y: auto; /* Activer le défilement vertical */
-  //overflow-x: hidden; /* Cacher le défilement horizontal */
-  /* Hide scrollbar for all browsers */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
-    /* WebKit browsers like Chrome, Safari */
     width: 0;
     height: 0;
   }
@@ -77,7 +71,6 @@ const StyledSidebar = styled.div`
       overflow: hidden;
       text-overflow: ellipsis;
       transition: opacity 0.3s ease;
-      //opacity: ${(props) => (props.expanded ? 1 : 0)};
       color: #ffffff;
     }
   }
@@ -98,23 +91,22 @@ const StyledSidebar = styled.div`
 
 const SidebarDesktop = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isFirstClick, setIsFirstClick] = useState(true);
 
   const sidebar = React.useRef(null);
 
   const [isExpanded, setIsExpanded] = useState(null);
   const [expandedEvaluations, setExpandedEvaluations] = useState(false);
-  const [expandedCollaborations, setExpandedCollaborations] = useState(false); // Ajout de l'état pour "Collaborations"
+  const [expandedCollaborations, setExpandedCollaborations] = useState(false);
   const [currentRoute] = useStorage({ key: "type" });
   useOnClickOutside(sidebar, () => {
     if (windowWidth < 900) {
       setIsExpanded(false);
     }
   });
-  // if (
-  //   typeof currentRoute === "string" &&
-  //   routesSide.hasOwnProperty(currentRoute)
-  // ) {
+
   const menus = routesSide[currentRoute];
+
   React.useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -122,11 +114,11 @@ const SidebarDesktop = () => {
 
     window.addEventListener("resize", handleResize);
 
-    // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
   React.useEffect(() => {
     if (windowWidth < 900) {
       setIsExpanded(false);
@@ -137,8 +129,18 @@ const SidebarDesktop = () => {
 
   const toggleEvaluations = () => setExpandedEvaluations(!expandedEvaluations);
   const toggleCollaborations = () =>
-    setExpandedCollaborations(!expandedCollaborations); // Fonction de basculement pour "Collaborations"
+    setExpandedCollaborations(!expandedCollaborations);
+
+  const handleLinkClick = (event, path) => {
+    if (isFirstClick) {
+      event.preventDefault();
+      setIsFirstClick(false);
+      window.location.href = path; // Force un rechargement complet de la page
+    }
+  };
+
   if (isExpanded === null) return null;
+
   return (
     <div
       style={{
@@ -146,12 +148,7 @@ const SidebarDesktop = () => {
       }}
       ref={sidebar}
     >
-      <StyledSidebar
-        className={`sidebar-container ${isExpanded ? "expanded" : ""}`}
-        // onMouseEnter={handleMouseEnter}
-
-        expanded={isExpanded}
-      >
+      <StyledSidebar expanded={isExpanded}>
         {windowWidth < 900 && (
           <div
             style={{
@@ -169,7 +166,7 @@ const SidebarDesktop = () => {
           </div>
         )}
 
-        <div className="flex-column nav-menu mt-5 ">
+        <div className="flex-column nav-menu mt-5">
           {menus.map((menu, key) => (
             <React.Fragment key={key}>
               {menu.name === "Évaluations" ? (
@@ -190,7 +187,11 @@ const SidebarDesktop = () => {
                   >
                     {menu.subRoutes.map((subRoute, subKey) => (
                       <Nav.Item key={subKey} className="nav-item">
-                        <NavLink to={subRoute.route} className="nav-link">
+                        <NavLink
+                          to={subRoute.route}
+                          className="nav-link"
+                          onClick={(e) => handleLinkClick(e, subRoute.route)}
+                        >
                           {subRoute.icon &&
                             React.createElement(subRoute.icon, {
                               className: "sidebar-icon",
@@ -219,7 +220,11 @@ const SidebarDesktop = () => {
                   >
                     {menu.subRoutes.map((subRoute, subKey) => (
                       <Nav.Item key={subKey} className="nav-item">
-                        <NavLink to={subRoute.route} className="nav-link">
+                        <NavLink
+                          to={subRoute.route}
+                          className="nav-link"
+                          onClick={(e) => handleLinkClick(e, subRoute.route)}
+                        >
                           {subRoute.icon &&
                             React.createElement(subRoute.icon, {
                               className: "sidebar-icon",
@@ -232,7 +237,11 @@ const SidebarDesktop = () => {
                 </>
               ) : (
                 <Nav.Item className="nav-item">
-                  <NavLink to={menu.route} className="nav-link">
+                  <NavLink
+                    to={menu.route}
+                    className="nav-link"
+                    onClick={(e) => handleLinkClick(e, menu.route)}
+                  >
                     {menu.icon &&
                       React.createElement(menu.icon, {
                         className: "sidebar-icon",
@@ -247,7 +256,6 @@ const SidebarDesktop = () => {
       </StyledSidebar>
     </div>
   );
-  // }
 };
 
 export default SidebarDesktop;

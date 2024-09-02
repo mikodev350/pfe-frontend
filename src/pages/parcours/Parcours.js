@@ -8,6 +8,7 @@ import styled from "styled-components";
 
 const Parcours = () => {
   // Styled Button with Gradient Background
+
   const GradientButton = styled(Button)`
     background: linear-gradient(135deg, #10266f, #3949ab);
     border: 2px solid #10266f; /* Border matching the input */
@@ -59,11 +60,19 @@ const Parcours = () => {
     border-bottom: 2px solid #3949ab;
     padding-bottom: 0.5rem;
   `;
+  const [isFirstClick, setIsFirstClick] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const token = React.useMemo(() => getToken(), []);
 
   const handleSearch = async (value) => {
     setSearchValue(value);
+  };
+  const handleLinkClick = (event, path) => {
+    if (isFirstClick) {
+      event.preventDefault();
+      setIsFirstClick(false);
+      window.location.href = path; // Force un rechargement complet de la page
+    }
   };
 
   return (
@@ -72,7 +81,10 @@ const Parcours = () => {
       <Row>
         <Col xs={12} md={6}>
           <span>
-            <Link to={`/dashboard/new-parcour`}>
+            <Link
+              to={`/dashboard/new-parcour`}
+              onClick={(e) => handleLinkClick(e, "/dashboard/new-parcour")}
+            >
               <GradientButton>Ajouter</GradientButton>
             </Link>
           </span>

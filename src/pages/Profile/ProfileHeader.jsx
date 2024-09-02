@@ -204,7 +204,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
       {status.isMyProfile && (
           <div className="d-flex justify-content-end position-relative mb-3">
 
-        <Link to="/dashboard/edit-profile">
+        <a href="/dashboard/edit-profile">
            <OverlayTrigger
               placement="left"
               overlay={<Tooltip id="edit-profile-tooltip">Modifier le profile</Tooltip>}
@@ -213,7 +213,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
                 <FaEdit />
               </EditButton>
             </OverlayTrigger>
-        </Link>
+        </a>
           </div>
 
       )}

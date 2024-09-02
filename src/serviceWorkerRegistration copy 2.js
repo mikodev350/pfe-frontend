@@ -28,12 +28,6 @@ function urlBase64ToUint8Array(base64String) {
 async function sendPushNotification() {
   try {
     const registration = await navigator.serviceWorker.ready;
-
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      throw new Error("Permission not granted for Notification");
-    }
-
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
@@ -48,7 +42,7 @@ async function sendPushNotification() {
     });
     console.log("Push Subscription sent to the server...");
   } catch (error) {
-    console.error("Failed to subscribe to push notifications:", error);
+    console.error("Failed to send push subscription:", error);
   }
 }
 
@@ -73,6 +67,7 @@ function registerValidSW(swUrl, config) {
     .register(swUrl)
     .then((registration) => {
       console.log("Service Worker registered.");
+
       // Envoyer la notification push après l'enregistrement du service worker
       sendPushNotification();
 
@@ -84,7 +79,6 @@ function registerValidSW(swUrl, config) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === "installed") {
             if (navigator.serviceWorker.controller) {
-              // Nouveau contenu disponible; notifier l'utilisateur
               console.log(
                 "Nouveau contenu disponible et sera utilisé après la fermeture de tous les onglets de cette page."
               );
@@ -93,7 +87,6 @@ function registerValidSW(swUrl, config) {
                 config.onUpdate(registration);
               }
             } else {
-              // Contenu précaché pour une utilisation hors ligne
               console.log(
                 "Contenu mis en cache pour une utilisation hors ligne."
               );
@@ -115,7 +108,6 @@ function registerValidSW(swUrl, config) {
 }
 
 function checkValidServiceWorker(swUrl, config) {
-  // Vérifie si le service worker peut être trouvé. Sinon, recharge la page.
   fetch(swUrl, {
     headers: { "Service-Worker": "script" },
   })
@@ -125,14 +117,12 @@ function checkValidServiceWorker(swUrl, config) {
         response.status === 404 ||
         (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
-        // Aucun service worker trouvé, probablement une application différente. Recharge la page.
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
             window.location.reload();
           });
         });
       } else {
-        // Enregistre le service worker normalement
         registerValidSW(swUrl, config);
       }
     })

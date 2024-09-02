@@ -28,9 +28,20 @@ const StyledIconButton = styled.div`
     transform: translateY(-3px); /* Slight lift on hover/focus */
   }
 `;
+
 export default function TableIconeResource({ id, dataLabel }) {
+  const [isFirstClick, setIsFirstClick] = React.useState(true);
+
   const token = React.useMemo(() => getToken(), []);
   const queryClient = useQueryClient();
+
+  const handleLinkClick = (event, path) => {
+    if (isFirstClick) {
+      event.preventDefault();
+      setIsFirstClick(false);
+      window.location.href = path; // Force un rechargement complet de la page
+    }
+  };
 
   const mutation = useMutation(() => deleteResource(id, token), {
     onSuccess: () => {
@@ -65,13 +76,19 @@ export default function TableIconeResource({ id, dataLabel }) {
       data-label={dataLabel}
       style={{ alignItems: "center", display: "flex", gap: "10px" }}
     >
-      <Link to={`/dashboard/resource-preview/${id}`}>
+      <Link
+        to={`/dashboard/resource-preview/${id}`}
+        onClick={(e) => handleLinkClick(e, `/dashboard/resource-preview/${id}`)}
+      >
         <StyledIconButton>
           <BiDetail size={23} />
         </StyledIconButton>
       </Link>
 
-      <Link to={`/dashboard/update-resource/${id}`}>
+      <Link
+        to={`/dashboard/update-resource/${id}`}
+        onClick={(e) => handleLinkClick(e, `/dashboard/update-resource/${id}`)}
+      >
         <StyledIconButton>
           <BiEdit size={24} />
         </StyledIconButton>
