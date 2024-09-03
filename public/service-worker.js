@@ -21,6 +21,7 @@ self.addEventListener("install", (event) => {
         "/static/js/bundle.js",
         "/static/js/main.f33b2338.js",
         "/dashboard/assignments",
+        "dashboard/home",
         "/dashboard/communaute/amis",
         "/dashboard/communaute/coaching",
         "/dashboard/communaute/enseignants",
