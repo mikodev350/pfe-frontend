@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+const OFFLINE_REQUESTS_CACHE = "offline-requests";
 
 class Parcour {
   constructor(

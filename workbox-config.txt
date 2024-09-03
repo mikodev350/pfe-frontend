@@ -40,3 +40,9 @@ module.exports = {
   skipWaiting: true,
   clientsClaim: true,
 };
+
+
+
+
+
+//chrome://inspect/#devices

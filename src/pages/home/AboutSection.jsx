@@ -5,6 +5,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/mousewheel';
 import 'swiper/css/autoplay';
+
+import  IconProfile from "./images/teacher.png"
 import { Navigation, Pagination, Mousewheel, Autoplay, A11y } from 'swiper/modules';
 
 // Import des icônes de react-icons
@@ -199,21 +201,21 @@ const TestimonialSection = () => {
             <ProfileCard
               name="Bouda Malek Nourhane"
               position="Software Engineer"
-              imgSrc="./assets/img/why/teacher.png"
+              imgSrc={IconProfile}
             />
           </SwiperSlide>
           <SwiperSlide>
             <ProfileCard
               name="Beneissa Sarah"
               position="IT Engineer"
-              imgSrc="./assets/img/why/teacher.png"
+              imgSrc={IconProfile}
             />
           </SwiperSlide>
           <SwiperSlide>
             <ProfileCard
               name="Kheznadar Meriem"
               position="IT Engineer"
-              imgSrc="./assets/img/why/teacher.png"
+              imgSrc={IconProfile}
             />
           </SwiperSlide>
         </Swiper>
