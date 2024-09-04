@@ -7,9 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 // import ResourceDetails from "../resourceDetail/ResourceDetails"; // Assurez-vous que le chemin est correct
 import { getToken } from "../../util/authUtils";
 import ResourceDetails from "./resourceDetail";
-
+// dashboard
 const ResourcePreviewPageWithToken = () => {
-  alert("je suiiss laaaa  mother fucckkerrrr ")
   const { token } = useParams();
   const [resource, setResource] = useState(null);
   const [loading, setLoading] = useState(true);
