@@ -247,10 +247,10 @@ const CustomNavbar = () => {
           <AnimatedScrollLink smooth={true} duration={500} to="proud" white={true}>
             Équipe
           </AnimatedScrollLink>
-          <AnimatedRouterLink to="/login" white={true} onClick={(e) => handleLinkClick(e, "/login")}>
+          <AnimatedRouterLink to="/login" white={true} >
             {"Se\u00A0connecter"}
           </AnimatedRouterLink>
-          <AnimatedRouterLink to="/signup" white={true} onClick={(e) => handleLinkClick(e, "/signup")}>
+          <AnimatedRouterLink to="/signup" white={true} >
             S'inscrire
           </AnimatedRouterLink>
         </StyledSidebar>

@@ -91,14 +91,12 @@ const StyledSidebar = styled.div`
 
 const SidebarDesktop = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [isFirstClick, setIsFirstClick] = useState(true);
-
-  const sidebar = React.useRef(null);
-
   const [isExpanded, setIsExpanded] = useState(null);
   const [expandedEvaluations, setExpandedEvaluations] = useState(false);
   const [expandedCollaborations, setExpandedCollaborations] = useState(false);
   const [currentRoute] = useStorage({ key: "type" });
+
+  const sidebar = React.useRef(null);
   useOnClickOutside(sidebar, () => {
     if (windowWidth < 900) {
       setIsExpanded(false);
@@ -130,14 +128,6 @@ const SidebarDesktop = () => {
   const toggleEvaluations = () => setExpandedEvaluations(!expandedEvaluations);
   const toggleCollaborations = () =>
     setExpandedCollaborations(!expandedCollaborations);
-
-  const handleLinkClick = (event, path) => {
-    if (isFirstClick) {
-      event.preventDefault();
-      setIsFirstClick(false);
-      window.location.href = path; // Force un rechargement complet de la page
-    }
-  };
 
   if (isExpanded === null) return null;
 
@@ -187,11 +177,7 @@ const SidebarDesktop = () => {
                   >
                     {menu.subRoutes.map((subRoute, subKey) => (
                       <Nav.Item key={subKey} className="nav-item">
-                        <NavLink
-                          to={subRoute.route}
-                          className="nav-link"
-                          onClick={(e) => handleLinkClick(e, subRoute.route)}
-                        >
+                        <NavLink to={subRoute.route} className="nav-link">
                           {subRoute.icon &&
                             React.createElement(subRoute.icon, {
                               className: "sidebar-icon",
@@ -220,11 +206,7 @@ const SidebarDesktop = () => {
                   >
                     {menu.subRoutes.map((subRoute, subKey) => (
                       <Nav.Item key={subKey} className="nav-item">
-                        <NavLink
-                          to={subRoute.route}
-                          className="nav-link"
-                          onClick={(e) => handleLinkClick(e, subRoute.route)}
-                        >
+                        <NavLink to={subRoute.route} className="nav-link">
                           {subRoute.icon &&
                             React.createElement(subRoute.icon, {
                               className: "sidebar-icon",
@@ -237,11 +219,7 @@ const SidebarDesktop = () => {
                 </>
               ) : (
                 <Nav.Item className="nav-item">
-                  <NavLink
-                    to={menu.route}
-                    className="nav-link"
-                    onClick={(e) => handleLinkClick(e, menu.route)}
-                  >
+                  <NavLink to={menu.route} className="nav-link">
                     {menu.icon &&
                       React.createElement(menu.icon, {
                         className: "sidebar-icon",

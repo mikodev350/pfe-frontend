@@ -9,8 +9,39 @@ self.addEventListener("install", (event) => {
       console.log("[Service Worker] Mise en cache des ressources initiales");
       return cache.addAll([
         "/", // Exemple de fichiers dynamiques à cacher
+        "/SignUpStyle.css",
+        "/css/customHome.css",
         "/index.html",
+        "/login",
+        "/login.css",
+        "/manifest.json",
+        "/service-worker.js",
+        "/signup",
+        "/static/css/main.0204a804.css",
         "/static/js/bundle.js",
+        "/static/js/main.f33b2338.js",
+        "/dashboard/assignments",
+        "/dashboard/communaute/amis",
+        "/dashboard/communaute/coaching",
+        "/dashboard/communaute/enseignants",
+        "/dashboard/communaute/invitations",
+        "/dashboard/devoirs",
+        "/dashboard/my-profile",
+        "/dashboard/new-parcour",
+        "/dashboard/new-resource",
+        "/dashboard/notes",
+        "/dashboard/parcours",
+        "/dashboard/quizzes",
+        "/dashboard/resources",
+        "/dashboard/suivi-pedagogique",
+        "/settings/change-password",
+        "/ajax/libs/ace/1.4.2/ace.js",
+        "/ajax/libs/ace/1.4.2/mode-html.js",
+        "/ajax/libs/ace/1.4.2/theme-idle_fingers.js",
+        "/ajax/libs/js-beautify/1.14.4/beautify-html.min.js",
+        "/ajax/libs/js-beautify/1.14.4/beautify.min.js",
+        "/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA-a1PiLA.woff2",
+        "/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxK.woff2",
       ]);
     })
   );
@@ -102,7 +133,7 @@ self.addEventListener("push", (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: "./img/logo.png", // chemin vers votre icône
+    icon: "./img/logo without name .png", // chemin vers votre icône
     // badge: "/path-to-badge/badge.png", // chemin vers votre badge
   };
 

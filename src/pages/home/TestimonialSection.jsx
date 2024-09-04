@@ -4,8 +4,8 @@ import Ratio from "react-bootstrap/Ratio";
 import "./TestimonialStyle.css";
 import { BsCheckCircleFill } from "react-icons/bs"; // Icône de validation
 
-import Learning from "./images/Learning-pana.png";
-import LearningAuther from "./images/Webinar-pana.png";
+// import Learning from "./images/Learning-pana.png";
+// import LearningAuther from "./images/Webinar-pana.png";
 
 const TestimonialSection = () => {
   const [index, setIndex] = useState(0);
@@ -31,7 +31,7 @@ const TestimonialSection = () => {
                 <div  className="display-slide" style={{ width: 440, height: 530 }}>
                   <div className="testimonial_img1 ml-3">
                     <Ratio>
-                      <embed src={Learning} />
+                      <img src={`./assets/img/Learning-pana.png`} alt ="Learning-pana.png"/>
                     </Ratio>
                   </div>
                 </div>
@@ -107,7 +107,7 @@ const TestimonialSection = () => {
               <div className="col-md-5 ml-50 ">
                 <div  className="display-slide"style={{ width: 450, height: 500 }} >
                   <Ratio className="testimonial_img2 ml-45">
-                    <embed src={LearningAuther} />
+                    <img src={`./assets/img/Webinar-pana.png`} alt="Webinar-pana.png" />
                   </Ratio>
                 </div>
               </div>
