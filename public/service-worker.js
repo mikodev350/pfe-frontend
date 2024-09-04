@@ -73,6 +73,26 @@ self.addEventListener("fetch", (event) => {
   const method = event.request.method;
   const requestUrl = new URL(event.request.url);
 
+  if (event.request.method !== "GET") {
+    const clonedRequest = event.request.clone();
+
+    event.respondWith(
+      fetch(event.request).catch(async () => {
+        // Mise en cache de la requête en cas d'échec réseau
+        await cacheRequestForLater(clonedRequest);
+
+        // Enregistrer une tâche de synchronisation pour tenter la requête plus tard
+        self.registration.sync.register("sync-requests");
+
+        // Retourner une réponse pour indiquer que la requête a été mise en file d'attente
+        return new Response(
+          "Requête mise en file d'attente pour synchronisation.",
+          { status: 202 }
+        );
+      })
+    );
+  }
+
   // Gérer les requêtes de fichiers multimédias
   if (
     requestUrl.pathname.endsWith(".jpg") ||
@@ -139,49 +159,151 @@ self.addEventListener("push", (event) => {
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-// async function cacheRequestForLater(request) {
-//   console.log("====================================");
-//   console.log("i am in the request cacheRequestForLater");
-//   console.log("====================================");
-//   try {
-//     // Cloner la requête pour accéder à son contenu
-//     const clonedRequest = request.clone();
+async function cacheRequestForLater(request) {
+  console.log("====================================");
+  console.log("i am in the request cacheRequestForLater");
+  console.log("====================================");
+  try {
+    // Cloner la requête pour accéder à son contenu
+    const clonedRequest = request.clone();
 
-//     // Lire le corps de la requête sous forme de texte
-//     const body = await clonedRequest.text();
+    // Lire le corps de la requête sous forme de texte
+    const body = await clonedRequest.text();
 
-//     // Construire les données à stocker
-//     const requestData = {
-//       url: clonedRequest.url,
-//       method: clonedRequest.method,
-//       headers: [...clonedRequest.headers.entries()],
-//       body: body, // Stocker le corps sous forme de chaîne de caractères
-//     };
+    // Construire les données à stocker
+    const requestData = {
+      url: clonedRequest.url,
+      method: clonedRequest.method,
+      headers: [...clonedRequest.headers.entries()],
+      body: body, // Stocker le corps sous forme de chaîne de caractères
+    };
 
-//     // Utiliser une clé unique basée sur l'URL et un timestamp
-//     const cacheKey = clonedRequest.url + "?" + Date.now();
+    // Utiliser une clé unique basée sur l'URL et un timestamp
+    const cacheKey = clonedRequest.url + "?" + Date.now();
 
-//     // Stocker les données dans le cache sous forme de JSON stringifié
-//     const cache = await caches.open(OFFLINE_REQUESTS_CACHE);
-//     await cache.put(cacheKey, new Response(JSON.stringify(requestData)));
+    // Stocker les données dans le cache sous forme de JSON stringifié
+    const cache = await caches.open(OFFLINE_REQUESTS_CACHE);
+    await cache.put(cacheKey, new Response(JSON.stringify(requestData)));
 
-//     console.log(
-//       "[Service Worker] Requête POST mise en cache pour synchronisation ultérieure :",
-//       clonedRequest.url
-//     );
+    console.log(
+      "[Service Worker] Requête POST mise en cache pour synchronisation ultérieure :",
+      clonedRequest.url
+    );
 
-//     return new Response(
-//       "Requête mise en file d'attente pour synchronisation.",
-//       { status: 202 }
-//     );
-//   } catch (error) {
-//     console.error("Erreur lors de la mise en cache de la requête :", error);
-//     return new Response("Erreur lors de la mise en cache de la requête.", {
-//       status: 500,
-//     });
-//   }
-// }
+    return new Response(
+      "Requête mise en file d'attente pour synchronisation.",
+      { status: 202 }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la mise en cache de la requête :", error);
+    return new Response("Erreur lors de la mise en cache de la requête.", {
+      status: 500,
+    });
+  }
+}
 
+async function syncOfflineRequests() {
+  try {
+    console.log("Ouverture du cache des requêtes en attente...");
+    const cache = await caches.open(OFFLINE_REQUESTS_CACHE);
+
+    console.log("Récupération des clés de requêtes stockées...");
+    const requests = await cache.keys();
+    console.log(`Nombre de requêtes trouvées: ${requests.length}`);
+
+    // Itérer sur chaque requête stockée
+    for (const request of requests) {
+      // Extraire les données de la requête stockée
+
+      const response = await cache.match(request);
+      const data = await response.json();
+      // Reconstituer les options de la requête
+      const fetchOptions = {
+        method: data.method,
+        headers: new Headers(data.headers),
+        body: data.body, // Repasser le corps stocké
+      };
+      try {
+        // Exécuter la requête avec fetch
+        const networkResponse = await fetch(data.url, fetchOptions);
+        // Si la requête réussit, supprimer du cache
+        if (networkResponse.ok) {
+          console.log(
+            "[Service Worker] Requête synchronisée avec succès :",
+            data.url
+          );
+          await cache.delete(request); // Supprimer la requête du cache après succès
+        } else {
+          console.error(
+            "[Service Worker] Échec de la synchronisation de la requête :",
+            data.url,
+            networkResponse.status
+          );
+        }
+      } catch (error) {
+        console.error(
+          "[Service Worker] Erreur lors de la synchronisation de la requête :",
+          error
+        );
+        // La requête restera dans le cache pour une tentative de synchronisation ultérieure
+      }
+    }
+  } catch (error) {
+    console.error(
+      "[Service Worker] Erreur lors de la synchronisation des requêtes :",
+      error
+    );
+  }
+}
+
+async function cacheRequestForLater(request) {
+  console.log("====================================");
+  console.log("i am in the request cacheRequestForLater");
+  console.log("====================================");
+  try {
+    // Cloner la requête pour accéder à son contenu
+    const clonedRequest = request.clone();
+
+    // Lire le corps de la requête sous forme de texte
+    const body = await clonedRequest.text();
+
+    // Construire les données à stocker
+    const requestData = {
+      url: clonedRequest.url,
+      method: clonedRequest.method,
+      headers: [...clonedRequest.headers.entries()],
+      body: body, // Stocker le corps sous forme de chaîne de caractères
+    };
+
+    // Utiliser une clé unique basée sur l'URL et un timestamp
+    const cacheKey = clonedRequest.url + "?" + Date.now();
+
+    // Stocker les données dans le cache sous forme de JSON stringifié
+    const cache = await caches.open(OFFLINE_REQUESTS_CACHE);
+    await cache.put(cacheKey, new Response(JSON.stringify(requestData)));
+
+    console.log(
+      "[Service Worker] Requête POST mise en cache pour synchronisation ultérieure :",
+      clonedRequest.url
+    );
+
+    return new Response(
+      "Requête mise en file d'attente pour synchronisation.",
+      { status: 202 }
+    );
+  } catch (error) {
+    console.error("Erreur lors de la mise en cache de la requête :", error);
+    return new Response("Erreur lors de la mise en cache de la requête.", {
+      status: 500,
+    });
+  }
+}
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-requests") {
+    event.waitUntil(syncOfflineRequests());
+  }
+});
 /********************************************************************************************************************************-****************************************************************************************************************************/
 // async function cacheRequestForLater(request) {
 //   console.log("====================================");

@@ -9,6 +9,7 @@ import { getToken } from "../../util/authUtils";
 import ResourceDetails from "./resourceDetail";
 
 const ResourcePreviewPageWithToken = () => {
+  alert("je suiiss laaaa  mother fucckkerrrr ")
   const { token } = useParams();
   const [resource, setResource] = useState(null);
   const [loading, setLoading] = useState(true);
