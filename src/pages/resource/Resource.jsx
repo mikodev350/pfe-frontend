@@ -65,19 +65,13 @@ const [isFirstClick, setIsFirstClick] = useState(true);
   const handleSearch = async (value) => {
     setSearchValue(value);
   };
-const handleLinkClick = (event, path) => {
-  if (isFirstClick) {
-    event.preventDefault();
-    setIsFirstClick(false);
-    window.location.href = path; // Force un rechargement complet de la page
-  }
-};
+
  return (
     <Container>
       <StyledTitle>Ressources</StyledTitle>
       <Row>
         <Col xs={12} md={6}>
-          <Link to={`/dashboard/new-resource`} onClick={(e) => handleLinkClick(e, '/dashboard/new-resource')} >
+          <Link to={`/dashboard/new-resource`}  >
             <GradientButton>
               Ajouter une ressource
             </GradientButton>

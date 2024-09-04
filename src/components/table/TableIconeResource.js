@@ -78,7 +78,7 @@ export default function TableIconeResource({ id, dataLabel }) {
     >
       <Link
         to={`/dashboard/resource-preview/${id}`}
-        onClick={(e) => handleLinkClick(e, `/dashboard/resource-preview/${id}`)}
+        // onClick={(e) => handleLinkClick(e, `/dashboard/resource-preview/${id}`)}
       >
         <StyledIconButton>
           <BiDetail size={23} />
@@ -87,7 +87,7 @@ export default function TableIconeResource({ id, dataLabel }) {
 
       <Link
         to={`/dashboard/update-resource/${id}`}
-        onClick={(e) => handleLinkClick(e, `/dashboard/update-resource/${id}`)}
+        // onClick={(e) => handleLinkClick(e, `/dashboard/update-resource/${id}`)}
       >
         <StyledIconButton>
           <BiEdit size={24} />
