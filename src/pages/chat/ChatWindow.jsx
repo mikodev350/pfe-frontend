@@ -59,10 +59,6 @@ const AvatarWithName = (participants, type, id, title, imageUrl) => {
 
 const ChatWindow = ({
   id,
-  friend,
-  onSendMessage,
-  currentUserId,
-  onBackToList,
 }) => {
   const [searchParams] = useSearchParams();
   const [showImageModal, setShowImageModal] = useState(false);

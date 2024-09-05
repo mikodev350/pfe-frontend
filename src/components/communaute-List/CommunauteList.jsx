@@ -1,16 +1,21 @@
-import React from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchAcceptedInvitationFriend,  } from '../../api/apiInvitation';
+
+
+import React, { useState } from "react";
+import ListGroup from "react-bootstrap/ListGroup";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { getIdOfConverstation } from "../../api/apiConversation";
+import { getToken } from "../../util/authUtils";
+import { FiMessageSquare, FiUserMinus } from "react-icons/fi";
+import Swal from "sweetalert2";
+import { fetchAcceptedInvitationFriend } from "../../api/apiInvitation";
+
+
 import {
   cancelFriendRequest,
 } from "../../api/apiFriendRequest";
-import ListGroup from 'react-bootstrap/ListGroup';
-import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import { FiMessageSquare, FiUserMinus } from 'react-icons/fi';
-import Swal from 'sweetalert2';
-import { getToken } from '../../util/authUtils';
-
 const styles = {
   card: {
     backgroundColor: '#f1f1f1',
@@ -64,10 +69,12 @@ const styles = {
     transition: 'color 0.2s ease',
   },
 };
-
+// Function to list friends
 const AmisList = () => {
+  const navigate = useNavigate();  // Use navigate for redirection
   const queryClient = useQueryClient();
   const token = getToken();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const { data: friends, isLoading, isError } = useQuery(
     ['acceptedRelations', 'AMIS'],
@@ -86,6 +93,20 @@ const AmisList = () => {
     }
   );
 
+  // Handle chat redirection
+  const goToChat = async (friendId) => {
+    try {
+      const conversationId = await getIdOfConverstation(friendId);
+      if (windowWidth < 900) {
+        navigate(`/chat/${conversationId}`);  // Mobile version
+      } else {
+        navigate(`/chat?id=${conversationId}`);  // Desktop version
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la conversation", error);
+    }
+  };
+
   const handleRemoveFriend = (friendId) => {
     Swal.fire({
       title: 'Êtes-vous sûr de vouloir retirer cet ami?',
@@ -98,6 +119,19 @@ const AmisList = () => {
       }
     });
   };
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   if (isLoading) return <div>Chargement...</div>;
   if (isError) return <div>Erreur lors du chargement des données.</div>;
@@ -117,14 +151,17 @@ const AmisList = () => {
               </div>
               <div style={styles.name}>{friend.destinataire.username}</div>
               <div style={styles.actions}>
+                {/* Clickable chat icon */}
                 <Button
                   variant="link"
                   style={styles.button}
-                  onClick={() => alert(`Message à ${friend.destinataire.username}`)}
+                  onClick={() => goToChat(friend.destinataire.id)}  // Redirect to chat when clicked
                   title="Envoyer un message"
                 >
                   <FiMessageSquare size={20} />
                 </Button>
+
+                {/* Remove friend button */}
                 <Button
                   variant="link"
                   style={{ ...styles.button, color: '#dc3545' }}
@@ -144,3 +181,20 @@ const AmisList = () => {
 };
 
 export default AmisList;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

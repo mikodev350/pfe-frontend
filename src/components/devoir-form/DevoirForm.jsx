@@ -6,9 +6,12 @@ import RichTextEditor from "../richTextEditor/RichTextEditor";
 import { createDevoir, updateDevoir } from "../../api/apiDevoir";
 import { getToken } from "../../util/authUtils";
 import { useQueryClient } from "react-query";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 import styled from "styled-components";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
+// Validation schema using Yup
 const validationSchema = Yup.object({
   titre: Yup.string().required("Le titre du devoir est requis"),
   description: Yup.string().required("La description du devoir est requise"),
@@ -46,11 +49,12 @@ const GradientButton = styled(Button)`
   }
 `;
 
-export default function DevoirForm({ initialData, onClose, isEdit }) {
+export default function DevoirForm({ initialData, isEdit }) {
   const { id } = useParams(); // Récupère l'ID du devoir si on est en mode modification
   const [description, setDescription] = useState(initialData?.description || "");
   const token = getToken();
   const queryClient = useQueryClient();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const formik = useFormik({
     initialValues: {
@@ -62,12 +66,19 @@ export default function DevoirForm({ initialData, onClose, isEdit }) {
       try {
         if (isEdit) {
           await updateDevoir(id, values, token);
+          toast.success("Le devoir a été mis à jour avec succès!");
         } else {
           await createDevoir(values, token);
+          toast.success("Nouveau devoir créé avec succès!");
         }
         queryClient.invalidateQueries("devoirs"); // Recharger la liste des devoirs après modification
-        onClose();
+
+        // Navigate to the list of devoirs after success
+        setTimeout(() => {
+          navigate("/dashboard/devoirs"); // Redirect to the list of devoirs
+        }, 1500); // Delay to allow toast to show
       } catch (error) {
+        toast.error("Erreur lors de la soumission du devoir. Veuillez réessayer.");
         console.error("Erreur lors de la soumission du formulaire:", error);
       }
     },
@@ -89,44 +100,49 @@ export default function DevoirForm({ initialData, onClose, isEdit }) {
   };
 
   return (
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col md={8}>
-          <Form onSubmit={formik.handleSubmit}>
-            <Form.Group controlId="titre">
-              <Form.Label>Titre du Devoir</Form.Label>
-              <Form.Control
-                type="text"
-                name="titre"
-                value={formik.values.titre}
-                onChange={formik.handleChange}
-                isInvalid={!!formik.errors.titre}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.titre}
-              </Form.Control.Feedback>
-            </Form.Group>
+    <>
+      <ToastContainer /> {/* Toastify container for notifications */}
+      <Container>
+        <Row className="justify-content-md-center">
+          <Col md={8}>
+            <Form onSubmit={formik.handleSubmit}>
+              <Form.Group controlId="titre">
+                <Form.Label>Titre du Devoir</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="titre"
+                  value={formik.values.titre}
+                  onChange={formik.handleChange}
+                  isInvalid={!!formik.errors.titre}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.titre}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-            <Form.Group controlId="description">
-              <Form.Label>Description du Devoir</Form.Label>
-              <RichTextEditor
-                initialValue={description}
-                getValue={handleDescriptionChange}
-                isUpdate={isEdit}
-              />
-              {formik.errors.description && (
-                <div className="text-danger">{formik.errors.description}</div>
-              )}
-            </Form.Group>
-            
-            <div class="d-flex justify-content-center">
-            <GradientButton type="submit" className="mt-3">
-              {isEdit ? "Mettre à Jour le Devoir" : "Ajouter le Devoir"}
-            </GradientButton>
-            </div>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+              <Form.Group controlId="description">
+                <Form.Label>Description du Devoir</Form.Label>
+                <RichTextEditor
+                  initialValue={description}
+                  getValue={handleDescriptionChange}
+                  isUpdate={isEdit}
+                />
+                {formik.errors.description && (
+                  <div className="text-danger">
+                    {formik.errors.description}
+                  </div>
+                )}
+              </Form.Group>
+              
+              <div className="d-flex justify-content-center">
+                <GradientButton type="submit" className="mt-3">
+                  {isEdit ? "Mettre à Jour le Devoir" : "Ajouter le Devoir"}
+                </GradientButton>
+              </div>
+            </Form>
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }

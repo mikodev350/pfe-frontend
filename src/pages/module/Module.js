@@ -207,11 +207,13 @@ const Module = () => {
           <SearchForm searchValue={searchValue} onSearch={handleSearch} />
         </Col>
       </Row>
-      <ModuleTable
-        searchValue={searchValue}
-        idParcours={idParcours}
-        token={token}
-      />
+      <div style={{ marginTop: "15px" }}>
+        <ModuleTable
+          searchValue={searchValue}
+          idParcours={idParcours}
+          token={token}
+        />
+      </div>
       <ModelModule
         show={showModal}
         handleClose={() => setShowModal(false)}

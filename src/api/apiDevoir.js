@@ -116,9 +116,6 @@ export const fetchAssignations = async (
     TypeElement: TypeElement,
     etudantId: IdEtudiant,
   };
-  console.log("params");
-
-  console.log(params);
   const token = getToken();
   const response = await axios.get(`${API_BASE_URL}/assignations`, {
     headers: {
@@ -155,13 +152,18 @@ export const fetchOneDevoir = async (id, token) => {
 // / Fonction pour supprimer une assignation
 export const deleteAssignation = async (
   id,
+  IdDevoirOrQuiz,
   groupId,
   TypeElement,
-  type,
-  token
+  type
 ) => {
   try {
+    const token = getToken();
+    console.log();
+
     const params = {
+      id: id,
+      IdDevoirOrQuiz: IdDevoirOrQuiz,
       groupId: groupId,
       TypeElement: TypeElement,
       type: type,
@@ -175,6 +177,8 @@ export const deleteAssignation = async (
     });
 
     return response.data;
+
+    return true;
   } catch (error) {
     console.error("Failed to delete assignation", error);
     throw new Error("Failed to delete assignation");

@@ -8,6 +8,7 @@ import PaginationComponent from '../../components/pagination/Pagination';
 import { fetchDevoirs, deleteDevoir } from '../../api/apiDevoir';
 import { getToken } from '../../util/authUtils';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';  // Import SweetAlert
 
 // Styled Button with Gradient Background
 const GradientButton = styled(Button)`
@@ -131,8 +132,37 @@ const AllDevoirs = ({ onEdit, onAdd }) => {
   );
 
   const handleDelete = (id) => {
-    deleteMutation.mutate(id);
-  };
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Vous ne pourrez pas annuler cette action !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          Swal.fire(
+            'Supprimé !',
+            'Le devoir a été supprimé avec succès.',
+            'success'
+          );
+        },
+        onError: () => {
+          Swal.fire(
+            'Erreur !',
+            "Une erreur s'est produite lors de la suppression du devoir.",
+            'error'
+          );
+        },
+      });
+    }
+  });
+};
+
 
   const handleSearch = async (value) => {
     setSearchValue(value);

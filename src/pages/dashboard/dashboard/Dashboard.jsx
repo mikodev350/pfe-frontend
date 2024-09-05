@@ -3,7 +3,6 @@ import Layout from "../../../components/layout/Layout";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Resource from "../../resource/Resource";
 import AddResource from "../../add-resource/AddResource";
-import ResourceDetail from "../../resourceDetail/resourceDetail";
 import AddPathwayForm from "../../../components/add-parcours/AddPathwayForm";
 import Parcours from "../../parcours/Parcours";
 import Module from "../../module/Module";
@@ -11,7 +10,6 @@ import Lesson from "../../lesson/Lesson";
 import UpdatePathwayForm from "../../../components/update-parcours/updatePathwayForm";
 import UpdateResource from "../../update-resource/updateResource";
 import CreateProfile from "../../create-profile/createProfile";
-import ResourcePreviewPage from "../../resourcePreviewPage/ResourcePreviewPage";
 import AddEducation from "../../add-education/AddEducation";
 import AddExperience from "../../add-experience/AddExperience";
 import DashboardProfile from "../../dashboard-profile/DashboardProfile";
@@ -32,7 +30,6 @@ import AssignmentList from "../../../components/assignment-list/assignmentList";
 import AssignmentDetail from "../../../components/assignment-detail/assignmentDetail";
 import AssignmentSubmit from "../../../components/assignment-submit/AssignmentSubmit";
 import AllAssignationsDevoir from "../../../components/all-assignations-devoir/AllAssignationsDevoir";
-import CommunauteList from "../../../components/communaute-List/CommunauteList";
 import ListeDesEnseignants from "../../../components/communaute-proffesseur/ListeDesEnseignants";
 import AmisList from "../../../components/communaute-List/CommunauteList";
 import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
@@ -65,7 +62,7 @@ function Dashboard() {
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
-        <Route path="resource-detail/:resouceId" element={<ResourceDetail />} />
+        {/* <Route path="resource-detail/:resouceId" element={<ResourceDetail />} /> */}
         <Route path="custom-profile" element={<CreateProfile />} />
         <Route path="edit-profile" element={<DashboardProfile />} />
         <Route path="add-education" element={<AddEducation />} />

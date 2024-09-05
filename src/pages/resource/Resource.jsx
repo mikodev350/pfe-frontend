@@ -81,7 +81,9 @@ const [isFirstClick, setIsFirstClick] = useState(true);
           <SearchForm searchValue={searchValue} onSearch={handleSearch} />
         </Col>
       </Row>
-      <ResourceTable searchValue={searchValue} />
+      <div style={{marginTop:"15px"}}>
+              <ResourceTable searchValue={searchValue} />
+      </div>
     </Container>
   );
 };

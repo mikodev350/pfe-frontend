@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, Col, Row, Button, Modal, Carousel, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Viewer } from '@react-pdf-viewer/core';
+
+
 import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 import styled from 'styled-components';
@@ -124,6 +127,63 @@ const NoteTitle = styled.p`
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+const PdfViewer = ({ pdfUrl }) => {
+  const [blobUrl, setBlobUrl] = useState(null);
+
+  useEffect(() => {
+    // Fonction pour télécharger le PDF en tant que Blob
+    const fetchPdfAsBlob = async () => {
+      try {
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+
+        // Créer une URL Blob pour afficher le PDF
+        const url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+      } catch (error) {
+        console.error('Erreur lors du téléchargement du PDF', error);
+      }
+    };
+
+    // Appeler la fonction de téléchargement
+    fetchPdfAsBlob();
+
+    // Nettoyer l'URL blob lorsqu'il n'est plus utilisé
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [pdfUrl]);
+
+  if (!blobUrl) {
+    return <p>Chargement du PDF...</p>; // Afficher un message pendant le chargement
+  }
+
+  return (
+    <iframe
+      src={blobUrl}
+      width="100%"
+      height="600px"
+      frameBorder="0"
+      title="PDF Viewer"
+      style={{ border: 'none' }}
+    ></iframe>
+  );
+};
+
 const ResourceDetails = ({ resource , isFromLink, token}) => {
   const [show, setShow] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -209,7 +269,7 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
         }
 
         if (resource.pdf) {
-          const pdfUrl = resource.pdf.url;
+          const pdfUrl = `http://localhost:1337${resource.pdf.url}`;
           setCachedPDF({ url: pdfUrl });
         }
       } else {
@@ -245,7 +305,12 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
         }
 
         if (resource.pdf) {
+                                       console.log("resource.pdf")
+
+                             console.log(resource.pdf)
+
                    const pdf = navigator.onLine ? `http://localhost:1337${resource.pdf?.url}` :  (resource.pdf.url|| resource?.pdf);
+               
 
           const cachedUrl = await fetchMediaFromCache(pdf);
           setCachedPDF({ url: cachedUrl || resource.pdf.url });
@@ -283,7 +348,47 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
 
   const renderPDF = (pdf) => {
     if (!pdf || !pdf.url) return null;
-    return <embed src={pdf.url} width="100%" height="500px" type="application/pdf" />;
+    
+    if(navigator.onLine) { return (     
+       <PdfViewer pdfUrl={pdf.url} />
+)}else{
+
+  return (
+        <div className="mt-4">
+          <h3>PDF</h3>
+          <iframe
+      src={pdf.url}
+      width="100%"
+      height="600px"
+      frameBorder="0"
+      title="PDF Viewer"
+      style={{ border: 'none' }}
+    ></iframe>
+    </div>
+      );
+
+}
+   
+  // return (
+  //   <iframe 
+  //     src={`http://localhost:1337${pdf.url}`} 
+  //     width="100%" 
+  //     height="500px"
+  //     frameBorder="0"
+
+  //   >
+  //   </iframe>
+  // );
+//  return( <div style={{ width: '100%', height: '500px' }}>
+//       <iframe
+//         src={`http://localhost:1337${pdf.url}`}
+//         width="100%"
+//         height="100%"
+//         style={{ border: 'none' }}
+//         title="PDF Viewer"
+//       />
+//     </div>)
+    // return (<embed src={`http://localhost:1337${pdf.url}`} width="100%" height="500px" type="application/pdf" />);
   };
 
   const renderBlobImages = () => {
@@ -331,11 +436,29 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
   };
 
   const renderBlobPDF = () => {
+        console.log("Blob PDF Object:", blobObject.pdf);
+
+    console.log("------------blobObject.pdf-- offligneee ---------------------------------");
+    console.log(blobObject.pdf);
+        console.log("------------blobObject-- offligneee ---------------------------------")
+        console.log(blobObject);
+    console.log("------------------------------------------------------");
+
     if (blobObject.pdf) {
+      console.log(blobObject.pdf);
+      
       return (
         <div className="mt-4">
           <h3>PDF</h3>
-          <embed src={blobObject.pdf} width="100%" height="500px" type="application/pdf" />
+ <iframe
+      src={blobObject.pdf}
+      width="100%"
+      height="600px"
+      frameBorder="0"
+      title="PDF Viewer"
+      style={{ border: 'none' }}
+    ></iframe>          
+          <PdfViewer  pdfUrl={blobObject.pdf}/>
         </div>
       );
     }

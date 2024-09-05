@@ -67,13 +67,6 @@ const Parcours = () => {
   const handleSearch = async (value) => {
     setSearchValue(value);
   };
-  const handleLinkClick = (event, path) => {
-    if (isFirstClick) {
-      event.preventDefault();
-      setIsFirstClick(false);
-      window.location.href = path; // Force un rechargement complet de la page
-    }
-  };
 
   return (
     <Container>
@@ -81,10 +74,7 @@ const Parcours = () => {
       <Row>
         <Col xs={12} md={6}>
           <span>
-            <Link
-              to={`/dashboard/new-parcour`}
-              onClick={(e) => handleLinkClick(e, "/dashboard/new-parcour")}
-            >
+            <Link to={`/dashboard/new-parcour`}>
               <GradientButton>Ajouter</GradientButton>
             </Link>
           </span>

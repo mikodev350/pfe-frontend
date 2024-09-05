@@ -4,6 +4,11 @@ import Select from 'react-select';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { FiTrash2 } from 'react-icons/fi'; // Import de l'icône d'édition
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 import {
   fetchForModelDevoirs,
   createAssignation,
@@ -91,19 +96,27 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
     ({ entityData, token }) => createAssignation(entityData, token, "DEVOIR"), {
       onSuccess: () => {
         queryClient.invalidateQueries([assignmentType]);
+              toast.success("Le devoir a été assigné avec succès.");
+
         handleClose();
       },
       onError: (error) => {
+              toast.error("Erreur lors de l'assignation du devoir.");
+
         console.error('Erreur lors de la création de l\'assignation:', error);
       },
   });
 
   const deleteMutation = useMutation(
-    (assignationId) => deleteAssignation(assignationId, groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", assignmentType, token), {
+    (assignationId,devoirId) => deleteAssignation(assignationId,devoirId,groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", assignmentType), {
       onSuccess: () => {
         queryClient.invalidateQueries(['assignations', groupId, assignmentType]);
+                toast.success("L'assignation a été supprimée avec succès.");
+
       },
       onError: (error) => {
+                toast.error("Erreur lors de la suppression de l'assignation.");
+
         console.error('Erreur lors de la suppression de l\'assignation:', error);
       },
   });
@@ -112,10 +125,31 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
     setSelectedAssignments(selectedOptions);
   };
 
-  const handleDelete = (assignationId) => {
-    deleteMutation.mutate(assignationId);
-  };
+  // const handleDelete = (assignationId) => {
+  //   deleteMutation.mutate(assignationId);
+  // };
 
+  const handleDelete = (assignationId,devoirId) => {
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Vous ne pourrez pas annuler cette action !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteMutation.mutate(assignationId,devoirId);
+      Swal.fire(
+        'Supprimé!',
+        'L\'assignation a été supprimée.',
+        'success'
+      );
+    }
+  });
+};
   const onSubmit = () => {
     const entity = selectedStudentOrGroup;
     const entityData = entity.membres
@@ -149,6 +183,8 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
   if (errorAssignations) return <p>Erreur lors du chargement des assignations: {errorAssignations.message}</p>;
 
   return (
+    <>
+    <ToastContainer />
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title style={styles.modalTitle}>Assigner un {assignmentType}</Modal.Title>
@@ -178,7 +214,7 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
                       <Button
                         variant="link"
                         style={styles.deleteButton}
-                        onClick={() => handleDelete(assignment.id)}
+                        onClick={() => handleDelete(assignment.id,assignment.devoirId)}
                         title="Supprimer"
                       >
                         <FiTrash2 size={20} />
@@ -260,6 +296,7 @@ const DevoirModal = ({ show, handleClose, selectedStudentOrGroup, assignmentType
         </Button>
       </Modal.Footer>
     </Modal>
+    </>
   );
 };
 

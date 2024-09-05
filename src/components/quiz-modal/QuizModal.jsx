@@ -7,8 +7,9 @@ import { getToken } from '../../util/authUtils';
 import { getQuizzes } from '../../api/apiQuiz';
 import { FiTrash2 } from 'react-icons/fi';
 import {  createAssignation, deleteAssignation, fetchAssignations } from '../../api/apiDevoir';
-
-
+import Swal from 'sweetalert2';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -65,7 +66,10 @@ const QuizModal = ({ show, handleClose, selectedStudentOrGroup, groupId }) => {
   //   return response;
   // };
 
-/*************************************************************************************/
+  /**************************************************************************************************************/ 
+
+  
+/************************************************************************************************************************/
 const fetchAssignationsWithLogic = async (groupId, token) => {
   if (!selectedStudentOrGroup) return [];
 
@@ -95,30 +99,68 @@ const fetchAssignationsWithLogic = async (groupId, token) => {
     ({ entityData, token }) => createAssignation(entityData, token,"QUIZ"), {
       onSuccess: () => {
         queryClient.invalidateQueries(['quiz']);
+        toast.success("Le quiz a été assigné avec succès.");
         handleClose();
+
       },
       onError: (error) => {
+                toast.error('Erreur lors de l\'assignation du quiz.');
+
         console.error('Erreur lors de la création de l\'assignation:', error);
       },
   });
 
-  const deleteMutation = useMutation(
-    (assignationId) => deleteAssignation(assignationId, groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", token), {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['assignationsQuiz', groupId]);
-      },
-      onError: (error) => {
-        console.error('Erreur lors de la suppression de l\'assignation:', error);
-      },
-  });
+const deleteMutation = useMutation(
+  ({ assignationId, quizId }) => deleteAssignation(assignationId, quizId, groupId, selectedStudentOrGroup.membres ? "GROUP" : "INDIVIDUEL", "QUIZ"), {
+    onSuccess: () => {
+      // Invalide la bonne clé de requête
+      queryClient.invalidateQueries(['assignationsQuiz', groupId]);
+              toast.success('Le quiz a été supprimé avec succès.');
+
+    },
+    onError: (error) => {
+              toast.error('Erreur lors de la suppression du quiz.');
+
+      console.error('Erreur lors de la suppression de l\'assignation:', error);
+    },
+  }
+);
+
 
   const handleQuizChange = (selectedOptions) => {
     setSelectedQuizzes(selectedOptions);
   };
 
-  const handleDelete = (assignationId) => {
-    deleteMutation.mutate(assignationId);
-  };
+  /******************************************************************************************************/ 
+  // const handleDelete = (assignationId) => {
+  //   deleteMutation.mutate(assignationId);
+  // };
+
+  // Fonction de suppression avec SweetAlert
+const handleDelete = (assignationId, quizId) => {
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Vous ne pourrez pas annuler cette action !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Oui, supprimer',
+    cancelButtonText: 'Annuler'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Utilisation d'un objet pour passer assignationId et quizId
+      deleteMutation.mutate({ assignationId, quizId });
+      Swal.fire(
+        'Supprimé!',
+        'Le quiz a été supprimé avec succès.',
+        'success'
+      );
+    }
+  });
+};
+
+  /**********************************************************************************************************************/ 
 
   const onSubmit = () => {
     const entity = selectedStudentOrGroup;
@@ -151,7 +193,8 @@ const fetchAssignationsWithLogic = async (groupId, token) => {
   if (errorQuizzes) return <p>Erreur lors du chargement des quiz: {errorQuizzes.message}</p>;
   if (errorAssignations) return <p>Erreur lors du chargement des assignations: {errorAssignations.message}</p>;
 
-  return (
+  return (<>
+  <ToastContainer />
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title style={styles.modalTitle}>Assigner un Quiz</Modal.Title>
@@ -170,7 +213,7 @@ const fetchAssignationsWithLogic = async (groupId, token) => {
                     <Button
                       variant="link"
                       style={styles.deleteButton}
-                      onClick={() => handleDelete(quiz.id)}
+                      onClick={() => handleDelete(quiz.id,quiz.quizzId)}
                       title="Supprimer"
                     >
                       <FiTrash2 size={20} />
@@ -254,6 +297,7 @@ const fetchAssignationsWithLogic = async (groupId, token) => {
         </Button>
       </Modal.Footer>
     </Modal>
+    </>
   );
 };
 

@@ -188,12 +188,14 @@ const Lesson = () => {
           <SearchForm searchValue={searchValue} onSearch={handleSearch} />
         </Col>
       </Row>
-      <LessonTable
-        searchValue={searchValue}
-        token={token}
-        moduleId={idModule}
-        onEditLesson={handleEdit}
-      />
+      <div style={{ marginTop: "15px" }}>
+        <LessonTable
+          searchValue={searchValue}
+          token={token}
+          moduleId={idModule}
+          onEditLesson={handleEdit}
+        />
+      </div>
       <ModelLesson
         show={showModal}
         handleClose={handleClose}

@@ -20,6 +20,7 @@ import {
   fetchGroupConversations,
   fetchPrivateConversations,
 } from "../../api/apiConversation";
+import Retour from "../../components/retour-arriere/Retour";
 
 const API_BASE_URL = "http://localhost:1337";
 const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
@@ -27,6 +28,7 @@ const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
 const AvatarWithName = (participants, type, id, title) => {
   let imageUrl = "";
   let name = title;
+  console.log(type);
 
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);
@@ -38,9 +40,10 @@ const AvatarWithName = (participants, type, id, title) => {
         ? API_BASE_URL + user.profil.photoProfil.url
         : "http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg";
     } else {
-      imageUrl = "http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg";
+      imageUrl = API_BASE_URL;
     }
   } else if (type === "GROUP") {
+
     imageUrl = GROUP_IMAGE_URL;
   }
 
@@ -54,14 +57,18 @@ const AvatarWithName = (participants, type, id, title) => {
 
 const ChatApp = () => {
   const [searchParams] = useSearchParams();
+  const idFromUrl = searchParams.get("id"); // Get the ID from the URL
+  const [selectedConversation, setSelectedConversation] = useState(idFromUrl || null); // Set initial conversation if id exists in URL
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  const navigate = useNavigate();
+
   React.useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
+    
     window.addEventListener("resize", handleResize);
 
     // Clean up the event listener on component unmount
@@ -70,29 +77,21 @@ const ChatApp = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
+  // Handle showing the conversation and updating the URL
   const handleShowConversation = (id) => {
     setSelectedConversation(id);
     if (windowWidth < 900) {
-      navigate(`/chat/${id}`);
+      navigate(`/chat/${id}`);  // For small screens, use dynamic URL
     } else {
-      navigate(`/chat?id=${id}`);
+      navigate(`/chat?id=${id}`);  // For larger screens, use query param
     }
   };
 
-  const {
-    isLoading: isLoadingPrivate,
-    data: dataPrivate,
-    error: errorPrivate,
-  } = useQuery(["privateConversations"], fetchPrivateConversations);
+  // Fetch private and group conversations
+  const { isLoading: isLoadingPrivate, data: dataPrivate, error: errorPrivate } = useQuery(["privateConversations"], fetchPrivateConversations);
+  const { isLoading: isLoadingGroup, data: dataGroup, error: errorGroup } = useQuery(["groupConversations"], fetchGroupConversations);
 
-  const {
-    isLoading: isLoadingGroup,
-    data: dataGroup,
-    error: errorGroup,
-  } = useQuery(["groupConversations"], fetchGroupConversations);
-
-  if (isLoadingPrivate || isLoadingGroup) return <div>Loading...</div>;
+  if (isLoadingPrivate || isLoadingGroup) return <div><loader /></div>;
   if (errorPrivate || errorGroup) return <div>Error...</div>;
 
   return (
@@ -100,11 +99,11 @@ const ChatApp = () => {
       <Helmet>
         <link rel="stylesheet" type="text/css" href="/css/chatStyle.css" />
       </Helmet>
-      <Layout fullcontent={false}  backgroundColorIdentification={false}>
+      <Layout fullcontent={false} backgroundColorIdentification={false}>
         <StyledContainer>
+          <Retour />
           <Row>
             <Col md={3}>
-              
               <StyledTabs defaultActiveKey="private">
                 <StyledTab eventKey="private" title="Private">
                   <StyledListGroup>
@@ -115,7 +114,7 @@ const ChatApp = () => {
                       >
                         {AvatarWithName(
                           item.participants,
-                          item.type,
+                          "PRIVATE",
                           dataPrivate?.currentUserId
                         )}
                       </StyledListGroupItem>
@@ -125,10 +124,10 @@ const ChatApp = () => {
                 <StyledTab eventKey="group" title="Group">
                   <StyledListGroup>
                     <CreateModelGroupe
-                show={showCreateGroupModal}
-                handleClose={() => setShowCreateGroupModal(false)}
-              />
-              <br/>
+                      show={showCreateGroupModal}
+                      handleClose={() => setShowCreateGroupModal(false)}
+                    />
+                    <br />
                     {dataGroup?.conversations?.map((item) => (
                       <StyledListGroupItem
                         key={item.id}
@@ -136,7 +135,7 @@ const ChatApp = () => {
                       >
                         {AvatarWithName(
                           item.participants,
-                          item.type,
+                          "GROUP",
                           dataGroup?.currentUserId,
                           item.titre // Pass the title for group conversations
                         )}
@@ -149,7 +148,7 @@ const ChatApp = () => {
             {windowWidth > 800 && (
               <Col md={8}>
                 {selectedConversation ? (
-                  <ChatWindow id={searchParams.get("id")} />
+                  <ChatWindow id={selectedConversation || searchParams.get("id")} />
                 ) : (
                   <PlaceholderText>
                     Select a conversation to start chatting
@@ -158,7 +157,6 @@ const ChatApp = () => {
               </Col>
             )}
           </Row>
-      
         </StyledContainer>
       </Layout>
     </>

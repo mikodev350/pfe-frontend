@@ -79,6 +79,9 @@ const IconContainer = styled.div`
 `;
 
 const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
+  console.log("====================================");
+  console.log(LessonTable);
+  console.log("====================================");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const [totalPages, setTotalPages] = useState(1);
@@ -212,8 +215,8 @@ const LessonTable = ({ searchValue, token, moduleId, onEditLesson }) => {
                   <LessonTitle>{item.nom}</LessonTitle>
                   <LessonText>
                     <strong>Date :</strong>{" "}
-                    {item.createdAt
-                      ? format(parseISO(item.createdAt), "dd-MM-yyyy")
+                    {item.publishedAt
+                      ? format(parseISO(item.publishedAt), "dd-MM-yyyy")
                       : "N/A"}
                   </LessonText>
                 </LessonDetails>

@@ -54,93 +54,93 @@ const DashboardProfile = () => {
   return (
     <Container className="container-dashboard">
       <StyledCard>
-      <h1 className="mb-4 text-center">Mon profil</h1>
-      <Row className="mb-4 justify-content-center">
-        <Col className="text-center mb-2" xs={12} md={3}>
-          <StyledLink to="/dashboard/add-experience">
-            Ajouter Expérience
-          </StyledLink>
-        </Col>
-        <Col className="text-center mb-2" xs={12} md={3}>
-          <StyledLink to="/dashboard/add-education">
-            Ajouter Éducation
-          </StyledLink>
-        </Col>
-        <Col className="text-center mb-2" xs={12} md={3}>
-          <StyledLink to="/dashboard/custom-profile">
-            Gérer Profil
-          </StyledLink>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12} className="mb-4">
-          <h2 className="table-title">Expériences Professionnelles</h2>
-          <StyledTable striped bordered hover responsive>
-            <thead className="table-header">
-              <tr>
-                <StyledTh>Entreprise</StyledTh>
-                <StyledTh>Titre du Poste</StyledTh>
-                <StyledTh>Années</StyledTh>
-                <StyledTh>Action</StyledTh>
-              </tr>
-            </thead>
-            <tbody>
-              {experiences.map((exp, index) => (
-                <tr key={index}>
-                  <StyledTd>{exp.entreprise}</StyledTd>
-                  <StyledTd>{exp.titrePoste}</StyledTd>
-                  <StyledTd>{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</StyledTd>
-                  <StyledTd>
-                    <div className="d-flex justify-content-center">
-                      <StyledLink to={`/dashboard/update-experience/${exp.id}`} variant="success">
-                        <FaEdit />  Modifier
-                      </StyledLink>
-                      <CustomButton variant="danger" onClick={() => handleDeleteExperience(exp.id)}>
-                        <FaTrashAlt />  supprimer
-                      </CustomButton>
-                    </div>
-                  </StyledTd>
+        <h1 className="mb-4 text-center">Mon profil</h1>
+        <Row className="mb-4 justify-content-center">
+          <Col className="text-center mb-2" xs={12} md={3}>
+            <StyledLink to="/dashboard/add-experience">
+              Ajouter Expérience
+            </StyledLink>
+          </Col>
+          <Col className="text-center mb-2" xs={12} md={3}>
+            <StyledLink to="/dashboard/add-education">
+              Ajouter Éducation
+            </StyledLink>
+          </Col>
+          <Col className="text-center mb-2" xs={12} md={3}>
+            <StyledLink to="/dashboard/custom-profile">
+              Gérer Profil
+            </StyledLink>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12} className="mb-4">
+            <h2 className="table-title">Expériences Professionnelles</h2>
+            <StyledTable striped bordered hover responsive>
+              <thead className="table-header">
+                <tr>
+                  <StyledTh>Entreprise</StyledTh>
+                  <StyledTh>Titre du Poste</StyledTh>
+                  <StyledTh>Années</StyledTh>
+                  <StyledTh>Action</StyledTh>
                 </tr>
-              ))}
-            </tbody>
-          </StyledTable>
-        </Col>
-        <Col md={12} className="mb-4">
-          <h2 className="table-title">Formations Académiques</h2>
-          <StyledTable striped bordered hover responsive>
-            <thead className="table-header">
-              <tr>
-                <StyledTh>École</StyledTh>
-                <StyledTh>Diplôme</StyledTh>
-                <StyledTh>Années</StyledTh>
-                <StyledTh>Action</StyledTh>
-              </tr>
-            </thead>
-            <tbody>
-              {educations.map((edu, index) => (
-                <tr key={index}>
-                  <StyledTd>{edu.ecole}</StyledTd>
-                  <StyledTd>{edu.diplome}</StyledTd>
-                  <StyledTd>{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</StyledTd>
-                  <StyledTd>
-                    <div className="d-flex justify-content-center">
-                      <StyledLink to={`/dashboard/update-education/${edu.id}`} variant="success">
-                        <FaEdit /> Modifier
-                      </StyledLink>
-                      <CustomButton variant="danger" onClick={() => handleDeleteEducation(edu.id)}>
-                        <FaTrashAlt /> Supprimer
-                      </CustomButton>
-                    </div>
-                  </StyledTd>
+              </thead>
+              <tbody>
+                {experiences.map((exp, index) => (
+                  <tr key={index}>
+                    <StyledTd>{exp.entreprise}</StyledTd>
+                    <StyledTd>{exp.titrePoste}</StyledTd>
+                    <StyledTd>{`${exp.dateDebut} - ${exp.dateFin || 'Présent'}`}</StyledTd>
+                    <StyledTd>
+                      <div className="d-flex justify-content-center">
+                        <StyledLink to={`/dashboard/update-experience/${exp.id}`} variant="success">
+                          <FaEdit size={14} />  Modifier
+                        </StyledLink>
+                        <CustomButton variant="danger" onClick={() => handleDeleteExperience(exp.id)}>
+                          <FaTrashAlt size={14} />  Supprimer
+                        </CustomButton>
+                      </div>
+                    </StyledTd>
+                  </tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </Col>
+          <Col md={12} className="mb-4">
+            <h2 className="table-title">Formations Académiques</h2>
+            <StyledTable striped bordered hover responsive>
+              <thead className="table-header">
+                <tr>
+                  <StyledTh>École</StyledTh>
+                  <StyledTh>Diplôme</StyledTh>
+                  <StyledTh>Années</StyledTh>
+                  <StyledTh>Action</StyledTh>
                 </tr>
-              ))}
-            </tbody>
-          </StyledTable>
-        </Col>
-      </Row>
-      <Row className="justify-content-center">
-        <CustomButton variant="danger" className="mt-4">Supprimer Mon Compte</CustomButton>
-      </Row>
+              </thead>
+              <tbody>
+                {educations.map((edu, index) => (
+                  <tr key={index}>
+                    <StyledTd>{edu.ecole}</StyledTd>
+                    <StyledTd>{edu.diplome}</StyledTd>
+                    <StyledTd>{`${edu.dateDebut} - ${edu.dateFin || 'Présent'}`}</StyledTd>
+                    <StyledTd>
+                      <div className="d-flex justify-content-center">
+                        <StyledLink to={`/dashboard/update-education/${edu.id}`} variant="success">
+                          <FaEdit size={14} />  Modifier
+                        </StyledLink>
+                        <CustomButton variant="danger" onClick={() => handleDeleteEducation(edu.id)}>
+                          <FaTrashAlt size={14} />  Supprimer
+                        </CustomButton>
+                      </div>
+                    </StyledTd>
+                  </tr>
+                ))}
+              </tbody>
+            </StyledTable>
+          </Col>
+        </Row>
+        <Row className="justify-content-center">
+          <CustomButton variant="danger" className="mt-4">Supprimer Mon Compte</CustomButton>
+        </Row>
       </StyledCard>
     </Container>
   );
@@ -155,14 +155,15 @@ const StyledCard = styled.div`
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
+
 const StyledLink = styled(Link)`
   display: inline-block;
-  padding: 5px 12px;  /* Smaller padding for a more compact size */
-  margin: 0 5px;  /* Consistent margin */
+  padding: 5px 12px;
+  margin: 0 5px;
   border-radius: 50px;
   text-align: center;
   font-weight: bold;
-  font-size: 14px;  /* Smaller font size */
+  font-size: 14px;
   color: white;
   text-decoration: none;
   background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
@@ -176,18 +177,18 @@ const StyledLink = styled(Link)`
 `;
 
 const CustomButton = styled.button`
-  padding: 5px 12px;  /* Matching padding with StyledLink */
+  padding: 5px 12px;
   border-radius: 50px;
   border: 2px solid ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
   background-color: ${props => props.variant === 'danger' ? '#ff4d4d' : props.variant === 'success' ? '#FFB352' : '#10266f'};
   color: #ffffff;
   font-weight: bold;
-  font-size: 14px;  /* Matching font size with StyledLink */
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;  /* Adjusted gap to match size */
-  margin: 0 5px;  /* Consistent margin */
+  gap: 5px;
+  margin: 0 5px;
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
@@ -195,7 +196,6 @@ const CustomButton = styled.button`
     color: white;
   }
 `;
-
 
 const StyledTable = styled(Table)`
   th,

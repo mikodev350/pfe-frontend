@@ -5,6 +5,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteQuiz, getQuizzes } from "../../../api/apiQuiz";
+import Swal from "sweetalert2";
 
 // Styled Components
 const GradientButton = styled(Button)`
@@ -72,7 +73,18 @@ const ActionIcon = styled.div`
     color: #ff4c4c;
   }
 `;
-
+const StyledTitle = styled.h2`
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #10266f;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 2px solid #3949ab;
+  padding-bottom: 0.5rem;
+`;
 const StyledTable = styled(Table)`
   margin-top: 20px;
   border-collapse: separate;
@@ -146,21 +158,43 @@ export default function Quizzes() {
     navigate(`/dashboard/quiz`);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteQuiz({
-        token: localStorage.getItem("token"),
-        id: id,
-      });
-      setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
-    } catch (error) {
-      console.error("Échec de la suppression du quiz", error);
-    }
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Êtes-vous sûr ?",
+      text: "Vous ne pourrez pas annuler cette action !",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteQuiz({
+            token: localStorage.getItem("token"),
+            id: id,
+          });
+          setQuizzes(quizzes.filter((quiz) => quiz.id !== id)); // Mise à jour de l'état local après suppression
+          Swal.fire(
+            "Supprimé !",
+            "Le quiz a été supprimé avec succès.",
+            "success"
+          );
+        } catch (error) {
+          Swal.fire(
+            "Erreur !",
+            "Une erreur s'est produite lors de la suppression du quiz.",
+            "error"
+          );
+        }
+      }
+    });
   };
 
   return (
     <>
-      <h3>Mes Quiz</h3>
+      <StyledTitle>Mes Quiz</StyledTitle>
       <GradientButton
         variant="primary"
         onClick={onHandleNewQuiz}

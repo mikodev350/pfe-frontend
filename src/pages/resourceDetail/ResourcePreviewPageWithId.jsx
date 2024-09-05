@@ -6,6 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ResourceDetails from "./resourceDetail";
 import { getToken } from "../../util/authUtils";
+import Loader from "../../components/loader/Loader";
+import Retour from "../../components/retour-arriere/Retour";
 
 const ResourcePreviewPageWithId = () => {
   const { id } = useParams();
@@ -41,10 +43,10 @@ const ResourcePreviewPageWithId = () => {
       {loading ? (
         <div className="text-center">
           <Spinner animation="border" variant="primary" />
-          <p>Chargement...</p>
+          <><Loader/></>
         </div>
       ) : (
-        resource ? <ResourceDetails resource={resource} /> : <p>Ressource introuvable</p>
+        resource ? <>      <Retour /><ResourceDetails resource={resource} /></> : <p>Ressource introuvable</p>
       )}
     </Container>
   );

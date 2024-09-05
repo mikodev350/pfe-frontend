@@ -194,109 +194,6 @@ export default function UpdateResource() {
     return () => window.removeEventListener("online", handleOnline);
   }, [token, queryClient]);
 
-  // const formik = useFormik({
-  //   initialValues: {
-  //     nom: "",
-  //     format: "",
-  //     parcours: [],
-  //     modules: [],
-  //     lessons: [],
-  //     note: "",
-  //     youtubeLink: "",
-  //     images: [],
-  //     audio: "",
-  //     pdf: "",
-  //     video: "",
-  //     link: "",
-  //     bookReference: "",
-  //   },
-  //   validationSchema: validationSchema,
-  //   onSubmit: async (values) => {
-  //     try {
-  //       // Upload new images
-  //       const newImages = await Promise.all(images.filter(image => image.raw).map(async (image) => {
-  //         if (!navigator.onLine) {        
-
-  //           const id = await addFileInToIndexedDB(image.preview, image.raw);
-  //           return { id, offline: true };
-  //         } else {
-  //           const uploadedImage = await uploadFile(image.raw, token);
-  //           return { id: uploadedImage[0].id };
-  //         }
-  //       }));
-  //       const existingImages = images.filter(image => !image.raw).map(image => ({ id: image.id }));
-  //       values.images = [...existingImages, ...newImages];
-
-  //       // Set audio file
-  //       if (audioFile.raw) {
-  //         if (!navigator.onLine) {
-  //           const id = await addFileInToIndexedDB(audioFile.preview, audioFile.raw);
-  //           values.audio = { id, offline: true };
-  //         } else {
-  //           const uploadedAudio = await uploadFile(audioFile.raw, token);
-  //           values.audio = { preview: uploadedAudio[0].url, id: uploadedAudio[0].id };
-  //         }
-  //       } else if (audioFile.id) {
-  //         values.audio = { preview: audioFile.preview, id: audioFile.id };
-  //       } else {
-  //         values.audio = null;
-  //       }
-
-  //       // Set pdf file
-  //       if (pdfFile.raw) {
-  //         if (!navigator.onLine) {
-  //           const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
-  //           values.pdf = { id, offline: true };
-  //         } else {
-  //           const uploadedPdf = await uploadFile(pdfFile.raw, token);
-  //           values.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
-  //         }
-  //       } else if (pdfFile.id) {
-  //         values.pdf = { preview: pdfFile.preview, id: pdfFile.id };
-  //       } else {
-  //         values.pdf = null;
-  //       }
-
-  //       // Set video file
-  //       if (videoFile.raw) {
-  //         if (!navigator.onLine) {
-  //           const id = await addFileInToIndexedDB(videoFile.preview, videoFile.raw);
-  //           values.video = { id, offline: true };
-  //         } else {
-  //           const uploadedVideo = await uploadFile(videoFile.raw, token);
-  //           values.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
-  //         }
-  //       } else if (videoFile.id) {
-  //         values.video = { preview: videoFile.preview, id: videoFile.id };
-  //       } else {
-  //         values.video = null;
-  //       }
-
-  //       // Filter out undefined images
-  //       values.images = values.images.filter(image => image !== undefined);
-
-  //       const response = await updateResource(id, values, token);
-  //       if (response && response.data) {
-  //         console.log("Resource updated successfully:", response);
-  //         formik.resetForm();
-  //         setImages([]);
-  //         setAudioFile({ preview: "", id: null, raw: null });
-  //         setPdfFile({ preview: "", id: null, raw: null });
-  //         setVideoFile({ preview: "", id: null, raw: null });
-  //         setLink("");
-  //         setBookReference("");
-  //         setDisplayLinkInput(false);
-  //         setDisplayBookInput(false);
-  //       } else {
-  //         throw new Error("Failed to update resource");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error updating resource:", error);
-  //     }
-  //   },
-  // });
-
-
   const formik = useFormik({
   initialValues: {
     nom: "",
@@ -519,6 +416,8 @@ useEffect(() => {
 
       const resource = await getResourceById(id, token);
 
+      console.log(resource);
+      
       let cachedImages = [];
       let cachedAudioUrl = null;
       let cachedPdfUrl = null;
@@ -536,27 +435,34 @@ useEffect(() => {
         cachedPdfUrl = await fetchMediaFromCache(resource.pdf?.url || resource.pdf);
         cachedVideoUrl = await fetchMediaFromCache(resource.video?.url || resource.video);
       } else {
-        cachedImages = resource.images.map(image => ({ preview: image.url, id: image.id, raw: null }));
+        cachedImages = resource.images ? resource.images.map(image => ({ preview: image.url, id: image.id, raw: null })): null;
         cachedAudioUrl = resource.audio ? resource.audio.url : null;
         cachedPdfUrl = resource.pdf ? resource.pdf.url : null;
         cachedVideoUrl = resource.video ? resource.video.url : null;
       }
 
-      formik.setValues({
-        nom: resource.nom,
-        format: resource.format,
-        parcours: resource.parcours.map((p) => p.id),
-        modules: resource.modules.map((m) => m.id),
-        lessons: resource.lessons.map((l) => l.id),
-        note: resource.note,
-        youtubeLink: resource.youtubeLink,
-        images: cachedImages,
-        audio: cachedAudioUrl ? { preview: cachedAudioUrl, id: resource.audio.id, raw: null } : null,
+      
+      if (cachedPdfUrl && !cachedPdfUrl.startsWith('blob')) {
+        // If not in blob format, fetch the file and convert to blob
+        const response = await fetch(`http://localhost:1337${cachedPdfUrl}`);
+        const blob = await response.blob();
+        cachedPdfUrl = URL.createObjectURL(blob);
+      }
+        formik.setValues({
+          nom: resource.nom || "",
+          format: resource.format || "",
+          parcours: resource.parcours ? resource.parcours.map((p) => p.id) : [],
+          modules: resource.modules ? resource.modules.map((m) => m.id) : [],
+          lessons: resource.lessons ? resource.lessons.map((l) => l.id) : [],
+          note: resource.note || "",
+          youtubeLink: resource.youtubeLink || "",
+          images: resource.images || [],
+          audio: resource.audio ? resource.audio.url : "",
         pdf: cachedPdfUrl ? { preview: cachedPdfUrl, id: resource.pdf.id, raw: null } : null,
-        video: cachedVideoUrl ? { preview: cachedVideoUrl, id: resource.video.id, raw: null } : null,
-        link: resource.link || "",
-        bookReference: resource.bookReference || "",
-      });
+          video: resource.video ? resource.video.url : "",
+          link: resource.link || "",
+          bookReference: resource.bookReference || "",
+        });
 
       if (cachedImages) setImages(cachedImages);
       if (cachedAudioUrl) setAudioFile({ preview: cachedAudioUrl, id: resource.audio.id, raw: null });
