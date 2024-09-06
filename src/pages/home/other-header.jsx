@@ -160,13 +160,6 @@ const CustomNavbar = () => {
     };
   }, []);
 
-  const handleLinkClick = (event, path) => {
-    if (isFirstClick) {
-      event.preventDefault();
-      setIsFirstClick(false);
-      window.location.href = path; // Force a full page reload
-    }
-  };
 
   return (
     <>
@@ -214,12 +207,12 @@ const CustomNavbar = () => {
               <Navbar.Collapse className="justify-content-end">
                 <Nav className="nav_btn">
                   <ButtonStyled variant="primary" second={true}>
-                    <RouterLink to="/signup" onClick={(e) => handleLinkClick(e, "/signup")}>
+                    <RouterLink to="/signup" >
                       S'inscrire
                     </RouterLink>
                   </ButtonStyled>
                   <ButtonStyled variant="primary">
-                    <RouterLink to="/login" onClick={(e) => handleLinkClick(e, "/login")}>
+                    <RouterLink to="/login" >
                       Se&nbsp;connecter
                     </RouterLink>
                   </ButtonStyled>
@@ -231,7 +224,7 @@ const CustomNavbar = () => {
       </NavbarCustom>
       <div ref={sidebar}>
         <StyledSidebar open={isExpanded}>
-          <AnimatedRouterLink to="/" white={true} onClick={(e) => handleLinkClick(e, "/")}>
+          <AnimatedRouterLink to="/" white={true} >
             Accueille
           </AnimatedRouterLink>
           <br />

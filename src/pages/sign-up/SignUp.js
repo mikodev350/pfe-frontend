@@ -134,7 +134,7 @@ const SignUp = () => {
             {windowWidth > 900 && (
               <Col md={6} className="image-signup p-0">
                 <img
-                  src={signImage}
+                  src={"./assets/img/Sign up-rafiki.png"}
                   alt="Login Illustration"
                   className="background-image w-150"
                 />

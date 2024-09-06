@@ -13,14 +13,14 @@ export function checkNotificationPermission() {
   }
 }
 
-async function triggerNotification(endpoint, message) {
+async function triggerNotification(endpoint, message, url) {
   try {
     await fetch("http://localhost:1337/api/subscribe/notify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ endpoint, message }), // Envoie l'endpoint au backend pour déclencher la notification
+      body: JSON.stringify({ endpoint, message, url }), // Envoie l'endpoint au backend pour déclencher la notification
     });
   } catch (error) {
     console.error("Failed to trigger notification:", error);
@@ -39,7 +39,7 @@ export async function getUserSubscription() {
 }
 
 // ici pour notifier utiisateur ancec le pop Up
-export async function notifyUser(message) {
+export async function notifyUser(message, url) {
   // Vérifiez si les notifications sont autorisées
   const isAllowed = await checkNotificationPermission();
 
@@ -51,7 +51,7 @@ export async function notifyUser(message) {
       // Déclenchez la notification
 
       const messagePush = message;
-      await triggerNotification(endpoint, messagePush);
+      await triggerNotification(endpoint, messagePush, url);
     } else {
       console.log("L'utilisateur n'est pas abonné aux notifications.");
     }

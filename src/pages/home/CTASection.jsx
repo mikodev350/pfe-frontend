@@ -60,7 +60,7 @@ const CTASection = () => {
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <FaMobileAlt className="cta__icon" style={{ marginRight: '8px' }} />
-                  Installer l'application
+                  installer maintenant
                   <FaDownload style={{ marginLeft: '8px' }} />
                 </a>
               </div>

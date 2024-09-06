@@ -131,16 +131,19 @@ const styles = {
   },
 };
 
-const messages = [
-  { id: 1, text: "Message 1" },
-  { id: 2, text: "Message 2" },
-];
-
 function SocialMediaNavbar({ onFilterChange }) {
   const { notifications, total_count, total_new_messages } = useAppSelector(
     (state) => state.notification
   );
 
+  // Gérer la redirection pour les messages
+  const handleMessageClick = () => {
+    if (windowWidth < 900) {
+      navigate("/conversations");
+    } else {
+      navigate("/chat");
+    }
+  };
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
@@ -221,35 +224,18 @@ function SocialMediaNavbar({ onFilterChange }) {
           <ButtonSearchFormDetail onFilterChange={onFilterChange} />
 
           {/* Message Icon with count */}
-          <div style={{ position: "relative" }} ref={messageDropdownRef}>
+          <div style={{ position: "relative" }}>
             <div
               style={{
                 ...styles.navIcon,
-                ...(isMessageHovered ? styles.navIconHover : {}),
               }}
-              onClick={() => handleOpenDropDown("messages")}
-              onMouseEnter={() => setIsMessageHovered(true)}
-              onMouseLeave={() => setIsMessageHovered(false)}
+              onClick={handleMessageClick} // Rediriger vers /chat ou /conversations
             >
               <FaEnvelope />
               {total_new_messages > 0 && (
                 <Badge style={styles.badge}>{total_new_messages}</Badge>
               )}
             </div>
-            {isMessagesOpen && (
-              <div style={styles.customDropdown} className="dropdown-menu show">
-                {messages.map((message) => (
-                  <a
-                    key={message.id}
-                    href="#"
-                    className="dropdown-item"
-                    style={styles.dropdownItem}
-                  >
-                    {message.text}
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
 
           <div style={{ position: "relative" }} ref={notificationDropdownRef}>

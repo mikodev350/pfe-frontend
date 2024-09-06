@@ -9,7 +9,7 @@ import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import initializeCriticalData from "../../hooks/initializeCriticalData";
 import loginStyle from "./login.css";
-import loginImage from "./img/Mobile login-cuate.png"; // Importation de l'image
+// import loginImage from "./img/Mobile login-cuate.png"; // Importation de l'image
 
 // Schéma de validation du formulaire
 const LoginSchema = Yup.object().shape({
@@ -104,7 +104,7 @@ const Login = () => {
               {windowWidth > 900 && (
                 <Col md={6} className="image-login">
                   <img
-                    src={loginImage}
+                    src={"./assets/img/Mobile login-cuate.png"}
                     alt="Login Illustration"
                     className="image-style w-100"
                   />

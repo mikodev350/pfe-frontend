@@ -47,8 +47,12 @@ const ActionsWrapper = styled.div`
   gap: 15px;
 
   @media (max-width: 768px) {
-    justify-content: center;
+    justify-content: space-around;
     margin-top: 10px;
+  }
+
+  @media (max-width: 576px) {
+    gap: 10px;
   }
 `;
 
@@ -73,6 +77,7 @@ const ActionIcon = styled.div`
     color: #ff4c4c;
   }
 `;
+
 const StyledTitle = styled.h2`
   font-size: 2.5rem;
   font-weight: bold;
@@ -85,6 +90,7 @@ const StyledTitle = styled.h2`
   border-bottom: 2px solid #3949ab;
   padding-bottom: 0.5rem;
 `;
+
 const StyledTable = styled(Table)`
   margin-top: 20px;
   border-collapse: separate;
@@ -95,6 +101,8 @@ const StyledTable = styled(Table)`
     color: #ffffff;
     font-weight: bold;
     text-align: center;
+    padding: 10px;
+    min-width: 120px;
   }
 
   tbody tr {
@@ -110,26 +118,27 @@ const StyledTable = styled(Table)`
 
     td {
       vertical-align: middle;
-      text-align: center;
+      text-align: center !important; /* Aligner tout à droite */
+      padding: 15px;
+      min-width: 120px;
+      white-space: nowrap; /* Empêche le chevauchement du texte */
+    }
+
+    td[data-label="Titre"] {
+      text-align: left; /* Aligner le titre à gauche */
+      padding-left: 20px;
+      padding-right: 10px;
+    }
+
+    td[data-label="Total de Questions"],
+    td[data-label="Actions"] {
+      text-align: right; /* Aligner à droite les valeurs et actions */
+      padding-left: 10px;
+      padding-right: 20px;
     }
 
     &:nth-child(even) {
       background-color: #f8f9fa;
-    }
-  }
-
-  @media (max-width: 768px) {
-    tbody td {
-      display: block;
-      text-align: right;
-      padding: 10px 15px;
-    }
-
-    tbody td::before {
-      content: attr(data-label);
-      float: left;
-      font-weight: bold;
-      text-transform: uppercase;
     }
   }
 `;

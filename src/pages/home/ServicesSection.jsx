@@ -1,122 +1,122 @@
-import React from 'react';
-import { FaBook, FaRoute, FaEnvelope, FaChalkboardTeacher, FaBell, FaUser, FaSearch, FaChartPie, FaEdit } from 'react-icons/fa';
+import React, { useRef } from 'react';
+import { FaBook, FaRoute, FaEnvelope, FaChalkboardTeacher, FaBell, FaUser, FaSearch, FaChartPie, FaEdit, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 // Définir les styles en tant que variables JavaScript
 const servicesItemStyle = {
- 
-  // height: '100%',
   display: 'flex',
-   flexDirection: 'column',
-  // justifyContent: 'space-between',
-   margin: '0 10px',
-  padding: '20px',
-  // fontSize:16,
-   borderRadius: '18px',
+  flexDirection: 'column',
+  justifyContent: 'center', // Centrer verticalement
+  alignItems: 'center', // Centrer horizontalement
+  margin: '0 10px', // Garder les marges des cartes
+  padding: '20px', // Taille initiale des cartes
+  borderRadius: '18px',
   textAlign: 'center',
-  // flex: '0 0 auto',
-  // width: '90px',
   boxShadow: 'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px',
-  maxWidth:200,
-  minWidth:200,
-  transition: 'transform 0.3s ease-in-out', // Ajout d'une transition
-
-  
-}
-const servicesItemHoverStyle = {
-  transform: 'scale(1.05)', // Effet d'agrandissement
+  flex: '0 0 auto', // Taille des cartes non ajustée
+  maxWidth: '200px',
+  minWidth: '200px',
+  transition: 'transform 0.3s ease-in-out',
 };
 const serviceIconStyle = {
-  fontSize: '2em',
+  fontSize: '2em', // Taille des icônes gardée
   marginBottom: '10px',
- 
 };
-
 const serviceTitleStyle = {
-  fontSize: '1.2em',
+  fontSize: '1.2em', // Taille des titres gardée
   marginBottom: '10px',
-  
 };
-
 const serviceLinkStyle = {
   display: 'inline-flex',
   alignItems: 'center',
-  fontSize: '1em',
+  fontSize: '1em', // Taille du texte des liens gardée
   color: 'inherit',
   textDecoration: 'none',
-  
 };
 
+// Modifier le style pour masquer la barre de défilement et gérer le débordement
 const scrollContainerStyle = {
-   display: 'flex',
-  overflowX: 'auto',
-  // whiteSpace: 'nowrap',
-   padding: '10px 0',
-   scrollBehavior: 'smooth',
-  scrollbarWidth: 'none',
-  msOverflowStyle: 'none',
-  
+  display: 'flex',
+  flexWrap: 'nowrap', // Éviter le retour à la ligne
+  justifyContent: 'flex-start', // Aligner les éléments sur la gauche
+  alignItems: 'center', // Centrer verticalement
+  overflowX: 'hidden', // Masquer la barre de défilement
+  padding: '10px 0',
+  scrollBehavior: 'smooth',
+  scrollbarWidth: 'none', // Masquer la barre de défilement pour Firefox
 };
 
-// Styles pour le conteneur du défilement
+// Masquer la barre de défilement pour Chrome, Safari et Edge
 const scrollContainerWebkitStyle = {
   ...scrollContainerStyle,
   '&::-webkit-scrollbar': {
-    display: 'none',
+    display: 'none', // Masquer la barre de défilement pour Webkit
   },
+};
+
+// Styles pour les flèches de défilement, AUGMENTER leur taille
+const arrowStyle = {
+  fontSize: '3em', // Augmenter la taille des flèches
+  cursor: 'pointer',
+  padding: '10px',
+  color: '#10266f', // Assurez-vous qu'elles sont bien visibles
+  margin: '0 20px', // Espacement entre les flèches et les cartes
 };
 
 // Styles pour la section de titre
 const sectionTitleWrapperStyle = {
-  padding: '20px 0', // Réduit le padding pour minimiser l'espace
-  marginBottom: '30px', // Réduit la marge inférieure pour minimiser l'espace
+  padding: '20px 0',
+  marginBottom: '30px',
   textAlign: 'center',
   display: 'flex',
   alignItems: 'center',
-  flexDirection: 'column'
+  flexDirection: 'column',
 };
-
 const sectionTitleStyle = {
   fontSize: '2.5em',
   fontWeight: 'bold',
-  color: '#10266f', // Utilisation du bleu foncé
-  marginBottom: '15px', // Réduit la marge inférieure pour minimiser l'espace
+  color: '#10266f',
+  marginBottom: '15px',
 };
-
 const sectionSubtitleStyle = {
   fontSize: '1.2em',
-  // color: '#1e80c9', // Utilisation du bleu moyen
-  marginBottom: '20px', // Réduit la marge inférieure pour minimiser l'espace
-    maxWidth: '700px',
-
-};
-
-const sectionDescriptionStyle = {
-  fontSize: '1em',
-  color: '#59bcf3', // Utilisation du bleu clair
+  marginBottom: '20px',
   maxWidth: '700px',
-  margin: '0 auto',
 };
 
 const ServicesSection = () => {
+  const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    scrollContainerRef.current.scrollBy({
+      left: -300, // Ajuster la vitesse du défilement
+      behavior: 'smooth',
+    });
+  };
+
+  const scrollRight = () => {
+    scrollContainerRef.current.scrollBy({
+      left: 300, // Ajuster la vitesse du défilement
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <section className="services__area pt-80 pb-40" >
+    <section className="services__area pt-80 pb-40">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-xxl-5">
-            <div className="section__title-wrapper section-padding mb-60  text-center" style={sectionTitleWrapperStyle}>
-              <h2 className="section__title mb-15" style={sectionTitleStyle} >
+            <div className="section__title-wrapper section-padding mb-60 text-center" style={sectionTitleWrapperStyle}>
+              <h2 className="section__title mb-15" style={sectionTitleStyle}>
                 Découvrez les fonctionnalités de <span className="yellow-bg">EasyLearn <img src="./assets/img/yellow-bg-2.png" alt="" /></span>
               </h2>
-              <p style={sectionSubtitleStyle}>Avec EasyLearn, profitez d'une expérience d'apprentissage enrichie grâce à nos outils innovants et faciles à utiliser. Découvrez les fonctionnalités clés qui rendent notre application unique et efficace pour tous vos besoins éducatifs.</p>
-              <div style={sectionDescriptionStyle}>
-                {/* Optionnel : Vous pouvez ajouter une description plus détaillée ici si nécessaire */}
-              </div>
+              <p style={sectionSubtitleStyle}>Avec EasyLearn, profitez d'une expérience d'apprentissage enrichie grâce à nos outils innovants et faciles à utiliser.</p>
             </div>
           </div>
         </div>
-        <div className="services__scroll-container mb-90" style={scrollContainerStyle}>
-          <div className="services__items" style={{ display: 'flex', flexDirection: 'row', ...scrollContainerWebkitStyle }}>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#10266f'}}>
+        <div className="services__scroll-container mb-90" style={{ display: 'flex', alignItems: 'center' }}>
+          <FaChevronLeft style={arrowStyle} onClick={scrollLeft} />
+          <div className="services__items" ref={scrollContainerRef} style={scrollContainerStyle}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#10266f' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaBook />
               </div>
@@ -127,7 +127,7 @@ const ServicesSection = () => {
                 <p>Créez, gérez et partagez des documents, vidéos et autres ressources pédagogiques.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#1e80c9'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#1e80c9' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaRoute />
               </div>
@@ -138,7 +138,7 @@ const ServicesSection = () => {
                 <p>Suivez des parcours d'apprentissage structurés pour une progression optimale.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#59bcf3'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#59bcf3' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaEnvelope />
               </div>
@@ -149,7 +149,7 @@ const ServicesSection = () => {
                 <p>Communiquez facilement avec des messages privés ou de groupe.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#eea129'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#eea129' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaChalkboardTeacher />
               </div>
@@ -160,7 +160,7 @@ const ServicesSection = () => {
                 <p>Suivez et évaluez les progrès des apprenants, avec des feedbacks personnalisés.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#10266f'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#10266f' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaEdit />
               </div>
@@ -171,7 +171,7 @@ const ServicesSection = () => {
                 <p>Soumettez et corrigez des travaux sous forme de quiz facilement.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#1e80c9'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#1e80c9' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaBell />
               </div>
@@ -182,7 +182,7 @@ const ServicesSection = () => {
                 <p>Recevez des notifications pour les nouvelles ressources, messages, et événements.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#59bcf3'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#59bcf3' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaUser />
               </div>
@@ -193,7 +193,7 @@ const ServicesSection = () => {
                 <p>Personnalisez votre profil avec vos informations et préférences.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#eea129'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#eea129' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaSearch />
               </div>
@@ -204,7 +204,7 @@ const ServicesSection = () => {
                 <p>Trouvez rapidement des ressources et utilisateurs avec des filtres avancés.</p>
               </div>
             </div>
-            <div className="services__item" style={{...servicesItemStyle, backgroundColor: '#10266f'}}>
+            <div className="services__item" style={{ ...servicesItemStyle, backgroundColor: '#10266f' }}>
               <div className="services__icon" style={serviceIconStyle}>
                 <FaChartPie />
               </div>
@@ -216,6 +216,7 @@ const ServicesSection = () => {
               </div>
             </div>
           </div>
+          <FaChevronRight style={arrowStyle} onClick={scrollRight} />
         </div>
       </div>
     </section>

@@ -498,6 +498,29 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
             {isLocalUpdate ? renderBlobVideo() : renderVideo(cachedVideo)}
             {isLocalUpdate ? renderBlobAudio() : renderAudio(cachedAudio)}
             {isLocalUpdate ? renderBlobPDF() : renderPDF(cachedPDF)}
+             {resource.referenceLivre && (
+                <InfoCard>
+                  <InfoTitle>Référence du Livre:</InfoTitle>
+                  <InfoContent>{resource.referenceLivre}</InfoContent>
+                </InfoCard>
+              )}
+
+              {resource.link && (
+                <InfoCard>
+
+                      <InfoTitle>Lien :</InfoTitle>
+
+    <a
+      href={resource.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: "#007bff", textDecoration: "underline", cursor: "pointer" }}
+    >
+      {resource.link}
+    </a>
+   </InfoCard>
+)}
+
 {
   isLocalUpdate ? (
     <div className="mt-4">
@@ -522,12 +545,7 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
   )
 }
 
-            {resource.link && (
-              <div className="mt-4">
-                <h3>Lien</h3>
-                <a href={resource.link} target="_blank" rel="noopener noreferrer">{resource.link}</a>
-              </div>
-            )}
+  
           </Col>
         </Row>
         <Row className="mt-4">

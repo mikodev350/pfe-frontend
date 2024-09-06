@@ -18,6 +18,8 @@ const StyledSidebar = styled.div`
   z-index: 28;
   left: ${(props) => (props.expanded ? "0" : "-260px")};
   transition: left 0.3s ease;
+  padding-top: 20px;
+  overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
@@ -91,7 +93,7 @@ const StyledSidebar = styled.div`
 
 const SidebarDesktop = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [isExpanded, setIsExpanded] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(windowWidth >= 900);
   const [expandedEvaluations, setExpandedEvaluations] = useState(false);
   const [expandedCollaborations, setExpandedCollaborations] = useState(false);
   const [currentRoute] = useStorage({ key: "type" });
@@ -108,6 +110,11 @@ const SidebarDesktop = () => {
   React.useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
+      if (window.innerWidth >= 900) {
+        setIsExpanded(true);
+      } else {
+        setIsExpanded(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -116,14 +123,6 @@ const SidebarDesktop = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  React.useEffect(() => {
-    if (windowWidth < 900) {
-      setIsExpanded(false);
-    } else {
-      setIsExpanded(true);
-    }
-  }, [windowWidth]);
 
   const toggleEvaluations = () => setExpandedEvaluations(!expandedEvaluations);
   const toggleCollaborations = () =>
@@ -138,24 +137,25 @@ const SidebarDesktop = () => {
       }}
       ref={sidebar}
     >
-      <StyledSidebar expanded={isExpanded}>
-        {windowWidth < 900 && (
-          <div
-            style={{
-              position: "absolute",
-              left: "260px",
-              top: "10px",
-              zIndex: 12220,
-            }}
-          >
-            <Hamburger
-              toggled={isExpanded}
-              toggle={setIsExpanded}
-              color="#10266F"
-            />
-          </div>
-        )}
+      {windowWidth < 900 && (
+        <div
+          style={{
+            marginTop: "70px",
+            position: "fixed", // Assurez-vous qu'il est fixe
+            top: "10px", // Ajustez cette valeur pour qu'il soit en haut
+            left: "10px", // Placez-le où vous voulez horizontalement
+            zIndex: 12220, // Assurez-vous qu'il a un z-index élevé pour être au-dessus du contenu
+          }}
+        >
+          <Hamburger
+            toggled={isExpanded}
+            toggle={setIsExpanded}
+            color="#10266F"
+          />
+        </div>
+      )}
 
+      <StyledSidebar expanded={isExpanded}>
         <div className="flex-column nav-menu mt-5">
           {menus.map((menu, key) => (
             <React.Fragment key={key}>

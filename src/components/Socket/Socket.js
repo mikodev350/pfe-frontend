@@ -10,11 +10,13 @@ import {
   newNotification,
   newMessage,
 } from "../../redux/features/notification-slice";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "react-query";
 import { notifyUser } from "../../util/PopUpNotification";
 
 export default function Socket() {
+  const navigate = useNavigate(); // Utilise le hook useNavigate de React Router
+
   const queryClient = useQueryClient();
   const [searchQuery] = useSearchParams();
   const id = searchQuery.get("id");
@@ -47,12 +49,17 @@ export default function Socket() {
         // Play the audio file when a new notification is received
         // audio.play();
         const { notification } = data;
+
         dispatch(newNotification(notification));
-        toast.info(notification.username + " " + notification.notifText, {
-          position: "top-left",
-        });
+        toast.info(
+          notification.expediteur.username + " " + notification.notifText,
+          {
+            position: "top-left",
+          }
+        );
         notifyUser(
-          `${notification.username} + " " + ${notification.notifText}`
+          `${notification.expediteur.username}  ${notification.notifText}`,
+          `/dashboard${notification.redirect_url}`
         );
       });
 
@@ -62,9 +69,22 @@ export default function Socket() {
         // Play the audio file when a new notification is received
         // audio.play();
         if (!id) {
+          console.log("newMessage");
+
+          console.log(message);
           dispatch(newMessage());
-          toast.info("jak message bitch", {
+          toast.info("Vous avez resu une noveaux messsage", {
             position: "top-left",
+            onClick: () => {
+              // Vérifie la taille de la fenêtre avant la redirection
+              if (window.innerWidth < 990) {
+                // Si la fenêtre est petite, redirige vers /conversation
+                navigate(`/conversation/${conversationId}`);
+              } else {
+                // Sinon, redirige vers /chat avec l'ID de la conversation
+                navigate(`/chat?id=${conversationId}`);
+              }
+            },
           });
           notifyUser("Vous avez resu une noveaux messsage");
         } else if (id === conversationId) {

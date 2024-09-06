@@ -168,7 +168,7 @@ export default function UpdateResource() {
   const [pdfFile, setPdfFile] = useState({ preview: "", id: null, raw: null });
   const [videoFile, setVideoFile] = useState({ preview: "", id: null, raw: null });
   const [link, setLink] = useState("");
-  const [bookReference, setBookReference] = useState("");
+  const [referenceLivre, setReferenceLivre] = useState("");
   const [displayLinkInput, setDisplayLinkInput] = useState(false);
   const [displayBookInput, setDisplayBookInput] = useState(false);
 
@@ -208,7 +208,7 @@ export default function UpdateResource() {
     pdf: "",
     video: "",
     link: "",
-    bookReference: "",
+    referenceLivre: "",
   },
   validationSchema: validationSchema,
   onSubmit: async (values) => {
@@ -280,7 +280,7 @@ export default function UpdateResource() {
         setPdfFile({ preview: "", id: null, raw: null });
         setVideoFile({ preview: "", id: null, raw: null });
         setLink("");
-        setBookReference("");
+        setReferenceLivre("");
         setDisplayLinkInput(false);
         setDisplayBookInput(false);
 
@@ -318,7 +318,7 @@ toast.error("Error updating resource. Please try again."); // Show error notific
   //         pdf: resource.pdf ? { preview: resource.pdf.url, id: resource.pdf.id, raw: null } : { preview: "", id: null, raw: null },
   //         video: resource.video ? { preview: resource.video.url, id: resource.video.id, raw: null } : { preview: "", id: null, raw: null },
   //         link: resource.link || "",
-  //         bookReference: resource.bookReference || "",
+  //         referenceLivre: resource.referenceLivre || "",
   //       });
 
   //       // Set states with the fetched data
@@ -327,7 +327,7 @@ toast.error("Error updating resource. Please try again."); // Show error notific
   //       if (resource.pdf) setPdfFile({ preview: resource.pdf.url, id: resource.pdf.id, raw: null });
   //       if (resource.video) setVideoFile({ preview: resource.video.url, id: resource.video.id, raw: null });
   //       if (resource.link) setLink(resource.link);
-  //       if (resource.bookReference) setBookReference(resource.bookReference);
+  //       if (resource.referenceLivre) setReferenceLivre(resource.referenceLivre);
 
   //       // Filter and set module options based on selected parcours
   //       const selectedParcoursIds = resource.parcours.map((p) => p.id);
@@ -380,7 +380,7 @@ toast.error("Error updating resource. Please try again."); // Show error notific
 //         pdf: cachedPdfUrl ? { preview: cachedPdfUrl, id: resource.pdf.id, raw: null } : null,
 //         video: cachedVideoUrl ? { preview: cachedVideoUrl, id: resource.video.id, raw: null } : null,
 //         link: resource.link || "",
-//         bookReference: resource.bookReference || "",
+//         referenceLivre: resource.referenceLivre || "",
 //       });
 
 //       if (cachedImages) setImages(cachedImages);
@@ -388,7 +388,7 @@ toast.error("Error updating resource. Please try again."); // Show error notific
 //       if (cachedPdfUrl) setPdfFile({ preview: cachedPdfUrl, id: resource.pdf.id, raw: null });
 //       if (cachedVideoUrl) setVideoFile({ preview: cachedVideoUrl, id: resource.video.id, raw: null });
 //       setLink(resource.link || "");
-//       setBookReference(resource.bookReference || "");
+//       setReferenceLivre(resource.referenceLivre || "");
 
 //       const selectedParcoursIds = resource.parcours.map((p) => p.id);
 //       const filteredModules = getModulesFromLocalStorage().filter((m) => selectedParcoursIds.includes(m.idparcour));
@@ -461,15 +461,16 @@ useEffect(() => {
         pdf: cachedPdfUrl ? { preview: cachedPdfUrl, id: resource.pdf.id, raw: null } : null,
           video: resource.video ? resource.video.url : "",
           link: resource.link || "",
-          bookReference: resource.bookReference || "",
+          referenceLivre: resource.referenceLivre || "",
         });
 
       if (cachedImages) setImages(cachedImages);
       if (cachedAudioUrl) setAudioFile({ preview: cachedAudioUrl, id: resource.audio.id, raw: null });
       if (cachedPdfUrl) setPdfFile({ preview: cachedPdfUrl, id: resource.pdf.id, raw: null });
       if (cachedVideoUrl) setVideoFile({ preview: cachedVideoUrl, id: resource.video.id, raw: null });
+
       setLink(resource.link || "");
-      setBookReference(resource.bookReference || "");
+      setReferenceLivre(resource.referenceLivre || "");
 
       const selectedParcoursIds = resource.parcours.map((p) => p.id);
       const filteredModules = getModulesFromLocalStorage().filter((m) => selectedParcoursIds.includes(m.idparcour));
@@ -580,8 +581,8 @@ const handleParcoursChange = (selectedParcours) => {
 
   const handleBookReferenceChange = (event) => {
     const value = event.target.value;
-    setBookReference(value);
-    formik.setFieldValue("bookReference", value);
+    setReferenceLivre(value);
+    formik.setFieldValue("referenceLivre", value);
     if (value) {
       setDisplayLinkInput(false);
     }
@@ -800,7 +801,7 @@ const handleParcoursChange = (selectedParcours) => {
       <Button
         onClick={() => handleClick("image")}
         className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
-        disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
+        disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || referenceLivre)}
       >
         <span>
           <FiImage size={35} />
@@ -820,7 +821,7 @@ const handleParcoursChange = (selectedParcours) => {
       <Button
         onClick={() => handleClick("audio")}
         className={`btn-tab-audio ${audioFile.preview ? "active-audio" : ""}`}
-        disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || bookReference)}
+        disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || referenceLivre)}
       >
         <span>
           <FiVolume2 size={35} />
@@ -839,7 +840,7 @@ const handleParcoursChange = (selectedParcours) => {
       <Button
         onClick={() => handleClick("pdf")}
         className={`btn-tab-googleDrive ${pdfFile.preview ? "active-googleDrive" : ""}`}
-        disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || bookReference)}
+        disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || referenceLivre)}
       >
         <span>
           <FiFile size={35} />
@@ -858,7 +859,7 @@ const handleParcoursChange = (selectedParcours) => {
       <Button
         onClick={() => handleClick("video")}
         className={`btn-tab-video ${videoFile.preview ? "active-video" : ""}`}
-        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || bookReference)}
+        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || referenceLivre)}
       >
         <span>
           <FiVideo size={35} />
@@ -879,8 +880,8 @@ const handleParcoursChange = (selectedParcours) => {
           setDisplayLinkInput(true);
           setDisplayBookInput(false);
         }}
-        className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || bookReference)}
+        className={`btn-tab-link ${displayLinkInput  || formik.values.link ? "active-link" : ""}`}
+        disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || referenceLivre)}
       >
         <span>
           <FiLink size={35} />
@@ -894,7 +895,7 @@ const handleParcoursChange = (selectedParcours) => {
           setDisplayBookInput(true);
           setDisplayLinkInput(false);
         }}
-        className={`btn-tab-book ${displayBookInput ? "active-book" : ""}`}
+        className={`btn-tab-book ${displayBookInput || formik.values.referenceLivre ? "active-book" : ""}`}
         disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || link)}
       >
         <span>
@@ -906,7 +907,7 @@ const handleParcoursChange = (selectedParcours) => {
 </Form.Group>
 
 
-            {displayLinkInput && (
+            {(displayLinkInput || formik.values.link) && (
               <Form.Group controlId="link">
                 <Form.Label>Lien externe</Form.Label>
                 <Form.Control
@@ -920,19 +921,22 @@ const handleParcoursChange = (selectedParcours) => {
               </Form.Group>
             )}
 
-            {displayBookInput && (
-              <Form.Group controlId="bookReference">
+            {(displayBookInput || formik.values.referenceLivre)  && (
+              <Form.Group controlId="referenceLivre">
                 <Form.Label>Référence du livre</Form.Label>
                 <Form.Control
                   type="text"
-                  name="bookReference"
-                  value={formik.values.bookReference}
+                  name="referenceLivre"
+                  value={formik.values.referenceLivre}
                   onChange={handleBookReferenceChange}
-                  isInvalid={!!formik.errors.bookReference}
+                  isInvalid={!!formik.errors.referenceLivre}
                 />
-                <Form.Control.Feedback type="invalid">{formik.errors.bookReference}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{formik.errors.referenceLivre}</Form.Control.Feedback>
               </Form.Group>
             )}
+
+
+            
 
     
 
@@ -1058,7 +1062,7 @@ const handleParcoursChange = (selectedParcours) => {
 //   const [pdfFile, setPdfFile] = useState({ preview: "", id: null, raw: null });
 //   const [videoFile, setVideoFile] = useState({ preview: "", id: null, raw: null });
 //   const [link, setLink] = useState("");
-//   const [bookReference, setBookReference] = useState("");
+//   const [referenceLivre, setReferenceLivre] = useState("");
 //   const [displayLinkInput, setDisplayLinkInput] = useState(false);
 //   const [displayBookInput, setDisplayBookInput] = useState(false);
 
@@ -1100,7 +1104,7 @@ const handleParcoursChange = (selectedParcours) => {
 //       pdf: "",
 //       video: "",
 //       link: "",
-//       bookReference: "",
+//       referenceLivre: "",
 //     },
 //     validationSchema: validationSchema,
 //     onSubmit: async (values) => {
@@ -1175,7 +1179,7 @@ const handleParcoursChange = (selectedParcours) => {
 //           setPdfFile({ preview: "", id: null, raw: null });
 //           setVideoFile({ preview: "", id: null, raw: null });
 //           setLink("");
-//           setBookReference("");
+//           setReferenceLivre("");
 //           setDisplayLinkInput(false);
 //           setDisplayBookInput(false);
 //         } else {
@@ -1210,7 +1214,7 @@ const handleParcoursChange = (selectedParcours) => {
 //           pdf: resource.pdf ? { preview: resource.pdf.url, id: resource.pdf.id, raw: null } : { preview: "", id: null, raw: null },
 //           video: resource.video ? { preview: resource.video.url, id: resource.video.id, raw: null } : { preview: "", id: null, raw: null },
 //           link: resource.link || "",
-//           bookReference: resource.bookReference || "",
+//           referenceLivre: resource.referenceLivre || "",
 //         });
 
 //         // Set states with the fetched data
@@ -1219,7 +1223,7 @@ const handleParcoursChange = (selectedParcours) => {
 //         if (resource.pdf) setPdfFile({ preview: resource.pdf.url, id: resource.pdf.id, raw: null });
 //         if (resource.video) setVideoFile({ preview: resource.video.url, id: resource.video.id, raw: null });
 //         if (resource.link) setLink(resource.link);
-//         if (resource.bookReference) setBookReference(resource.bookReference);
+//         if (resource.referenceLivre) setReferenceLivre(resource.referenceLivre);
 
 //         // Filter and set module options based on selected parcours
 //         const selectedParcoursIds = resource.parcours.map((p) => p.id);
@@ -1330,8 +1334,8 @@ const handleParcoursChange = (selectedParcours) => {
 
 //   const handleBookReferenceChange = (event) => {
 //     const value = event.target.value;
-//     setBookReference(value);
-//     formik.setFieldValue("bookReference", value);
+//     setReferenceLivre(value);
+//     formik.setFieldValue("referenceLivre", value);
 //     if (value) {
 //       setDisplayLinkInput(false);
 //     }
@@ -1437,7 +1441,7 @@ const handleParcoursChange = (selectedParcours) => {
 //                 <Button
 //                   onClick={() => handleClick("image")}
 //                   className={`btn-tab-images ${images.length > 0 ? "active-images" : ""}`}
-//                   disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || bookReference)}
+//                   disabled={!!(audioFile.preview || pdfFile.preview || videoFile.preview || link || referenceLivre)}
 //                 >
 //                   <span>
 //                     <FiImage size={35} />
@@ -1456,7 +1460,7 @@ const handleParcoursChange = (selectedParcours) => {
 //                 <Button
 //                   onClick={() => handleClick("audio")}
 //                   className={`btn-tab-audio ${audioFile.preview ? "active-audio" : ""}`}
-//                   disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || bookReference)}
+//                   disabled={!!(images.length > 0 || pdfFile.preview || videoFile.preview || link || referenceLivre)}
 //                 >
 //                   <span>
 //                     <FiVolume2 size={35} />
@@ -1474,7 +1478,7 @@ const handleParcoursChange = (selectedParcours) => {
 //                 <Button
 //                   onClick={() => handleClick("pdf")}
 //                   className={`btn-tab-googleDrive ${pdfFile.preview ? "active-googleDrive" : ""}`}
-//                   disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || bookReference)}
+//                   disabled={!!(audioFile.preview || images.length > 0 || videoFile.preview || link || referenceLivre)}
 //                 >
 //                   <span>
 //                     <FiFile size={35} />
@@ -1492,7 +1496,7 @@ const handleParcoursChange = (selectedParcours) => {
 //                 <Button
 //                   onClick={() => handleClick("video")}
 //                   className={`btn-tab-video ${videoFile.preview ? "active-video" : ""}`}
-//                   disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || bookReference)}
+//                   disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || link || referenceLivre)}
 //                 >
 //                   <span>
 //                     <FiVideo size={35} />
@@ -1513,7 +1517,7 @@ const handleParcoursChange = (selectedParcours) => {
 //                     setDisplayBookInput(false);
 //                   }}
 //                   className={`btn-tab-link ${displayLinkInput ? "active-link" : ""}`}
-//                   disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || bookReference)}
+//                   disabled={!!(audioFile.preview || images.length > 0 || pdfFile.preview || videoFile.preview || referenceLivre)}
 //                 >
 //                   <span>
 //                     <FiLink size={35} />
@@ -1552,16 +1556,16 @@ const handleParcoursChange = (selectedParcours) => {
 //             )}
 
 //             {displayBookInput && (
-//               <Form.Group controlId="bookReference">
+//               <Form.Group controlId="referenceLivre">
 //                 <Form.Label>Référence du livre</Form.Label>
 //                 <Form.Control
 //                   type="text"
-//                   name="bookReference"
-//                   value={formik.values.bookReference}
+//                   name="referenceLivre"
+//                   value={formik.values.referenceLivre}
 //                   onChange={handleBookReferenceChange}
-//                   isInvalid={!!formik.errors.bookReference}
+//                   isInvalid={!!formik.errors.referenceLivre}
 //                 />
-//                 <Form.Control.Feedback type="invalid">{formik.errors.bookReference}</Form.Control.Feedback>
+//                 <Form.Control.Feedback type="invalid">{formik.errors.referenceLivre}</Form.Control.Feedback>
 //               </Form.Group>
 //             )}
 

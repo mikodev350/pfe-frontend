@@ -1,6 +1,7 @@
 import React from "react";
 import { Accordion, Button, Col, Form, Row, Tab, Tabs } from "react-bootstrap";
 import { FaArrowLeft, FaRegTrashAlt } from "react-icons/fa";
+
 import Card from "react-bootstrap/Card";
 import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
 import {
@@ -14,7 +15,20 @@ import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import Retour from "../../../components/retour-arriere/Retour";
 
+const StyledTitle = styled.h2`
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #10266f;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 2px solid #3949ab;
+  padding-bottom: 0.5rem;
+`;
 const CardStylled = styled(Card)`
   background-color: #fff !important;
   border-radius: 12px;
@@ -245,10 +259,11 @@ export default function Quiz() {
   };
   return (
     <>
-      <GradientButton onClick={handleBackToQuiz}>
-        <FaArrowLeft /> Back
-      </GradientButton>
-      <h2>{id ? "Modifier le QUIZ" : "Ajouter un NOUVEAU QUIZ"}</h2>
+      <Retour />
+      <StyledTitle>
+        {id ? "Modifier le QUIZ" : "Ajouter un NOUVEAU QUIZ"}
+      </StyledTitle>
+
       <Form onSubmit={submit} style={{ paddingBottom: "200px" }}>
         <CardStylled style={{ marginBottom: "50px" }}>
           <Card.Body>

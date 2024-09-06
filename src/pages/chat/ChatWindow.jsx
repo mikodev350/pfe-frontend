@@ -637,16 +637,7 @@ const ItemText = styled.div`
 const ActionSection = styled.div`
   position: relative;
 `;
-const TextAreaStyled = styled.div`
-  background-color: white;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  @media (min-width: 778px) {
-    position: static;
-  }
-`;
+
 
 const ItemMessage = styled.div`
   display: grid;
@@ -655,15 +646,17 @@ const ItemMessage = styled.div`
   margin: 20px 0px 0px 0px;
   padding: 10px;
 `;
-
 const StyledCard = styled(Card)`
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2rem; /* Increase the font size */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+  width: 100%;  /* Prendre toute la largeur */
+  max-width: 100%; /* S'assurer que la carte occupe bien 100% */
+  height: 650px !important; 
+  margin: 0;  /* Supprimer les marges externes */
+  border-radius: 0; /* Supprimer les bords arrondis pour un look plein écran */
+  box-shadow: none; /* Supprimer l'ombre si non nécessaire */
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Prendre toute la hauteur de l'écran */
+  position: relative;
 `;
 
 const StyledCardHeader = styled(Card.Header)`
@@ -683,13 +676,37 @@ const IconContainer = styled.div`
 const StyledCardBody = styled(Card.Body)`
   background-color: #ffffff;  /* Fond blanc */
   padding: 20px;  /* Ajout de padding pour l'espacement interne */
-  // border-radius: 10px;  /* Bordures arrondies pour un look moderne */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Légère ombre pour donner de la profondeur */
+  flex-grow: 1;  /* Prendre l'espace restant */
+  overflow-y: auto;  /* Activer le défilement */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Légère ombre */
 `;
+
 
 const StyledCardFooter = styled(Card.Footer)`
   background-color: #ffffff;  /* Fond blanc */
   padding: 20px;  /* Ajout de padding pour l'espacement interne */
-  border-radius: 10px;  /* Bordures arrondies pour un look moderne */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);  /* Légère ombre pour donner de la profondeur */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
+
+  @media (max-width: 768px) {
+    position: sticky; /* Sticky seulement sur les téléphones */
+    bottom: 0;
+    z-index: 10;
+  }
+
+  @media (min-width: 769px) {
+    position: static; /* Comportement normal sur les écrans plus grands */
+  }
 `;
+
+
+const TextAreaStyled = styled.div`
+  background-color: white;
+  width: 100%;
+  padding: 10px;
+  position: sticky; /* Permet de rester collé au bas */
+  bottom: 0;
+  z-index: 10;
+  @media (min-width: 778px) {
+    position: static;
+}`;

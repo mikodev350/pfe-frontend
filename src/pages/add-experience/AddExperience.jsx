@@ -100,7 +100,7 @@ const AddExperience = () => {
         } else {
           response = await createExperience(values, token);
         }
-        navigate('/student/edit-profile');
+        navigate('/dashboard/edit-profile');
       } catch (error) {
         console.error('Error saving experience:', error);
       }

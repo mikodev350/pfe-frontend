@@ -1,21 +1,16 @@
-
-
 import React, { useState } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Importer Link
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getIdOfConverstation } from "../../api/apiConversation";
 import { getToken } from "../../util/authUtils";
 import { FiMessageSquare, FiUserMinus } from "react-icons/fi";
 import Swal from "sweetalert2";
-import { fetchAcceptedInvitationFriend } from "../../api/apiInvitation";
+import { fetchRelationFriends } from "../../api/apiInvitation";
+import { cancelFriendRequest } from "../../api/apiFriendRequest";
 
-
-import {
-  cancelFriendRequest,
-} from "../../api/apiFriendRequest";
 const styles = {
   card: {
     backgroundColor: '#f1f1f1',
@@ -68,8 +63,15 @@ const styles = {
     fontSize: '1.2rem',
     transition: 'color 0.2s ease',
   },
+  noFriendsCard: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    padding: '20px',
+    textAlign: 'center',
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
+  },
 };
-// Function to list friends
+
 const AmisList = () => {
   const navigate = useNavigate();  // Use navigate for redirection
   const queryClient = useQueryClient();
@@ -78,7 +80,7 @@ const AmisList = () => {
 
   const { data: friends, isLoading, isError } = useQuery(
     ['acceptedRelations', 'AMIS'],
-    () => fetchAcceptedInvitationFriend('AMIS')
+    () => fetchRelationFriends('AMIS')
   );
 
   const cancelFriendRequestMutation = useMutation(
@@ -140,61 +142,58 @@ const AmisList = () => {
     <div style={{ padding: '20px' }}>
       <Card style={styles.card}>
         <h3>Liste d'Amis</h3>
-        <ListGroup variant="flush">
-          {friends.map((friend, index) => (
-            <ListGroup.Item
-              key={index}
-              style={styles.listItem}
-            >
-              <div style={styles.iconContainer}>
-                <span>{friend.destinataire.username.charAt(0)}</span>
-              </div>
-              <div style={styles.name}>{friend.destinataire.username}</div>
-              <div style={styles.actions}>
-                {/* Clickable chat icon */}
-                <Button
-                  variant="link"
-                  style={styles.button}
-                  onClick={() => goToChat(friend.destinataire.id)}  // Redirect to chat when clicked
-                  title="Envoyer un message"
-                >
-                  <FiMessageSquare size={20} />
-                </Button>
 
-                {/* Remove friend button */}
-                <Button
-                  variant="link"
-                  style={{ ...styles.button, color: '#dc3545' }}
-                  onClick={() => handleRemoveFriend(friend.destinataire.id)}
-                  title="Retirer de la liste d'amis"
-                  disabled={cancelFriendRequestMutation.isLoading}
-                >
-                  <FiUserMinus size={20} />
-                </Button>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+        {/* Vérifie si la liste est vide */}
+        {friends.length === 0 ? (
+          <div style={styles.noFriendsCard}>
+            <h5>Aucun ami disponible</h5>
+            <p>Vous n'avez encore aucun ami dans votre liste.</p>
+          </div>
+        ) : (
+          <ListGroup variant="flush">
+            {friends.map((friend, index) => (
+              <ListGroup.Item
+                key={index}
+                style={styles.listItem}
+              >
+                <div style={styles.iconContainer}>
+                  <span>{friend.username.charAt(0)}</span>
+                </div>
+                
+                {/* Utiliser Link pour rediriger vers le profil */}
+                <Link to={`/dashboard/find-profil/${friend.id}`} style={styles.name}>
+                  {friend.username}
+                </Link>
+                
+                <div style={styles.actions}>
+                  {/* Clickable chat icon */}
+                  <Button
+                    variant="link"
+                    style={styles.button}
+                    onClick={() => goToChat(friend.id)}  // Redirect to chat when clicked
+                    title="Envoyer un message"
+                  >
+                    <FiMessageSquare size={20} />
+                  </Button>
+
+                  {/* Remove friend button */}
+                  <Button
+                    variant="link"
+                    style={{ ...styles.button, color: '#dc3545' }}
+                    onClick={() => handleRemoveFriend(friend.id)}
+                    title="Retirer de la liste d'amis"
+                    disabled={cancelFriendRequestMutation.isLoading}
+                  >
+                    <FiUserMinus size={20} />
+                  </Button>
+                </div>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
       </Card>
     </div>
   );
 };
 
 export default AmisList;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -195,7 +195,17 @@ const CustomButton = styled.button`
     background-color: ${props => props.variant === 'danger' ? '#ff3333' : props.variant === 'success' ? '#FFB352' : '#0a1d4b'};
     color: white;
   }
+
+  /* Media query pour les petits écrans */
+  @media (max-width: 768px) {
+    padding: 3px 8px; /* Réduire le padding */
+    font-size: 12px;  /* Réduire la taille de la police */
+    border-radius: 40px; /* Réduire la courbure */
+    gap: 3px; /* Réduire l'espace entre l'icône et le texte */
+  }
 `;
+
+
 
 const StyledTable = styled(Table)`
   th,

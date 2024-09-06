@@ -159,9 +159,7 @@ export const saveResource = async (resourceData, token) => {
   try {
     const userId = localStorage.getItem("userId");
 
-    console.log('====================================');
-    console.log(userId);
-    console.log('====================================');
+ 
     let parcoursData = [];
     let modulesData = [];
     let lessonsData = [];
@@ -557,7 +555,6 @@ isLocalUpload:true
         Authorization: `Bearer ${token}`,
       },
     });
-   console.log(response.data);
     
     return response.data;
   } catch (error) {

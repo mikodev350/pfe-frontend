@@ -1,9 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchAcceptedInvitationFriend,  } from '../../api/apiInvitation';
-import {
-  cancelFriendRequest,
-} from "../../api/apiFriendRequest";
+import { fetchAcceptedInvitationFriend } from '../../api/apiInvitation';
+import { cancelFriendRequest } from "../../api/apiFriendRequest";
 import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -63,6 +61,13 @@ const styles = {
     fontSize: '1.2rem',
     transition: 'color 0.2s ease',
   },
+  noTeachersCard: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    padding: '20px',
+    textAlign: 'center',
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.05)',
+  },
 };
 
 const TeacherList = () => {
@@ -105,39 +110,48 @@ const TeacherList = () => {
   return (
     <div style={{ padding: '20px' }}>
       <Card style={styles.card}>
-        <h3>Liste des Professeurs</h3>
-        <ListGroup variant="flush">
-          {teachers.map((teacher, index) => (
-            <ListGroup.Item
-              key={index}
-              style={styles.listItem}
-            >
-              <div style={styles.iconContainer}>
-                <span>{teacher.destinataire.username.charAt(0)}</span>
-              </div>
-              <div style={styles.name}>{teacher.destinataire.username}</div>
-              <div style={styles.actions}>
-                <Button
-                  variant="link"
-                  style={styles.button}
-                  onClick={() => alert(`Message à ${teacher.destinataire.username}`)}
-                  title="Envoyer un message"
-                >
-                  <FiMessageSquare size={20} />
-                </Button>
-                <Button
-                  variant="link"
-                  style={{ ...styles.button, color: '#dc3545' }}
-                  onClick={() => handleRemoveTeacher(teacher.destinataire.id)}
-                  title="Retirer de la liste des professeurs"
-                  disabled={cancelCoachingRequestMutation.isLoading}
-                >
-                  <FiUserMinus size={20} />
-                </Button>
-              </div>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+        <h3>Liste des coaches</h3>
+
+        {/* Vérifie si la liste des professeurs est vide */}
+        {teachers.length === 0 ? (
+          <div style={styles.noTeachersCard}>
+            <h5>Aucun professeur disponible</h5>
+            <p>Vous n'avez pas encore ajouté de professeur à votre liste.</p>
+          </div>
+        ) : (
+          <ListGroup variant="flush">
+            {teachers.map((teacher, index) => (
+              <ListGroup.Item
+                key={index}
+                style={styles.listItem}
+              >
+                <div style={styles.iconContainer}>
+                  <span>{teacher.destinataire.username.charAt(0)}</span>
+                </div>
+                <div style={styles.name}>{teacher.destinataire.username}</div>
+                <div style={styles.actions}>
+                  <Button
+                    variant="link"
+                    style={styles.button}
+                    onClick={() => alert(`Message à ${teacher.destinataire.username}`)}
+                    title="Envoyer un message"
+                  >
+                    <FiMessageSquare size={20} />
+                  </Button>
+                  <Button
+                    variant="link"
+                    style={{ ...styles.button, color: '#dc3545' }}
+                    onClick={() => handleRemoveTeacher(teacher.destinataire.id)}
+                    title="Retirer de la liste des professeurs"
+                    disabled={cancelCoachingRequestMutation.isLoading}
+                  >
+                    <FiUserMinus size={20} />
+                  </Button>
+                </div>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
       </Card>
     </div>
   );

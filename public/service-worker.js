@@ -133,8 +133,13 @@ self.addEventListener("push", (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: "./img/logo without name .png", // chemin vers votre icône
+    icon: "./img/icon-128x128.png", // chemin vers votre icône
+    data: {
+      url: `http://localhost:3000${data.url}`, // Lien de redirection à partir du push
+    },
   };
 
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
+
+/***************************************************************************************************/

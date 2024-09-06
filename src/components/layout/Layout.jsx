@@ -10,7 +10,7 @@ import {
   setFilterType,
   clearResults,
 } from "../../redux/features/search-slice";
-import { setRole, setType } from "../../redux/features/role-slice";
+import { setType } from "../../redux/features/role-slice";
 import SidebarDesktop from "../sideBar/SideBarDesktop/SidebarDesktop";
 import SideBarMobile from "../sideBar/sideBarMobile/SideBarMobile";
 import SocialMediaNavbar from "../header/SocialMediaNavbar";
@@ -19,6 +19,8 @@ import UserResults from "../search-results/UserResults";
 import ErrorPage from "../../pages/error-page/ErrorPage";
 import Retour from "../retour-arriere/Retour";
 import CustomNavbar from "../../pages/home/other-header";
+import { fetchDataAndStore } from "../../api/apiDataSelect";  // Import the data fetching function
+import { getToken } from "../../util/authUtils";
 
 const Layout = ({
   center,
@@ -72,6 +74,22 @@ const Layout = ({
     const storedRole = localStorage.getItem("role");
     let newType = type;
     let newRole = role;
+
+       const token = getToken();  // Get the token
+
+ // Appel de la fonction fetchDataAndStore pour récupérer et stocker les données
+    const fetchData = async () => {
+      try {
+        if (token) {
+          await fetchDataAndStore(token);  // Fetch data and store in localStorage
+          console.log("Données récupérées et stockées avec succès.");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données:", error);
+      }
+    };
+
+    fetchData();  // Call the fetchData function
 
     if (storedRole) {
       if (storedRole === "STUDENT") {

@@ -10,9 +10,9 @@ export const validationSchema = Yup.object().shape({
   format: Yup.string()
     .oneOf(["cours", "devoir", "ressource numérique"], "Invalid format")
     .required("Format is required"),
-  parcours: Yup.array().of(Yup.number()).required("Parcours is required"),
-  modules: Yup.array().of(Yup.number()).required("Module is required"),
-  lessons: Yup.array().of(Yup.number()).required("Lesson is required"),
+  parcours: Yup.array().of(Yup.number()), // No longer required
+  modules: Yup.array().of(Yup.number()), // No longer required
+  lessons: Yup.array().of(Yup.number()), // No longer required
   note: Yup.string()
     .test(
       "textLength",
