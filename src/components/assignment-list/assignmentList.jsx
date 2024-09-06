@@ -138,7 +138,8 @@ function AssignmentList() {
                                 </span>
                             </div>
                         )}
-                        <small style={{ color: '#6c757d' }}>Date limite: {assignment.date}</small>
+                        <small style={{ color: '#6c757d' }}></small>
+                        <br/>
                     </div>
                     <div style={styles.responsiveAlignment}>
                         {!isCompleted && (

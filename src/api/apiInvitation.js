@@ -41,10 +41,6 @@ export const fetchInvitations = async (type = "AMIS") => {
     },
   });
 
-  console.log("====================================");
-  console.log(`Fetched ${type} invitations:`, response.data);
-  console.log("====================================");
-
   return response.data;
 };
 export const acceptInvitation = async (token) => {

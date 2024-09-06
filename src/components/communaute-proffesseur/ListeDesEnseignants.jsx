@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { fetchAcceptedInvitationFriend } from '../../api/apiInvitation';
 import { cancelFriendRequest } from "../../api/apiFriendRequest";
@@ -8,6 +8,8 @@ import Button from 'react-bootstrap/Button';
 import { FiMessageSquare, FiUserMinus } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import { getToken } from '../../util/authUtils';
+import { getIdOfConverstation } from "../../api/apiConversation";
+import { useNavigate, Link } from 'react-router-dom';
 
 const styles = {
   card: {
@@ -71,8 +73,10 @@ const styles = {
 };
 
 const TeacherList = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const token = getToken();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const { data: teachers, isLoading, isError } = useQuery(
     ['acceptedRelations', 'COACHING'],
@@ -91,6 +95,30 @@ const TeacherList = () => {
     }
   );
 
+  const goToChat = async (teacherId) => {
+    Swal.fire({
+      title: 'Voulez-vous vraiment commencer une conversation?',
+      text: "Vous serez redirigé vers la page de chat.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, commencer',
+      cancelButtonText: 'Non, annuler',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const conversationId = await getIdOfConverstation(teacherId);
+          if (windowWidth < 900) {
+            navigate(`/chat/${conversationId}`);  // Mobile version
+          } else {
+            navigate(`/chat?id=${conversationId}`);  // Desktop version
+          }
+        } catch (error) {
+          Swal.fire('Erreur', 'Erreur lors de la récupération de la conversation.', 'error');
+        }
+      }
+    });
+  };
+
   const handleRemoveTeacher = (teacherId) => {
     Swal.fire({
       title: 'Êtes-vous sûr de vouloir retirer ce professeur?',
@@ -104,6 +132,18 @@ const TeacherList = () => {
     });
   };
 
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   if (isLoading) return <div>Chargement...</div>;
   if (isError) return <div>Erreur lors du chargement des données.</div>;
 
@@ -112,7 +152,6 @@ const TeacherList = () => {
       <Card style={styles.card}>
         <h3>Liste des coaches</h3>
 
-        {/* Vérifie si la liste des professeurs est vide */}
         {teachers.length === 0 ? (
           <div style={styles.noTeachersCard}>
             <h5>Aucun professeur disponible</h5>
@@ -128,12 +167,17 @@ const TeacherList = () => {
                 <div style={styles.iconContainer}>
                   <span>{teacher.destinataire.username.charAt(0)}</span>
                 </div>
-                <div style={styles.name}>{teacher.destinataire.username}</div>
+
+                {/* Use Link to go to the teacher's profile */}
+                <Link to={`/dashboard/find-profil/${teacher.destinataire.id}`} style={styles.name}>
+                  {teacher.destinataire.username}
+                </Link>
+
                 <div style={styles.actions}>
                   <Button
                     variant="link"
                     style={styles.button}
-                    onClick={() => alert(`Message à ${teacher.destinataire.username}`)}
+                    onClick={() => goToChat(teacher.destinataire.id)}
                     title="Envoyer un message"
                   >
                     <FiMessageSquare size={20} />

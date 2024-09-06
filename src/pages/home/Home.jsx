@@ -89,12 +89,13 @@ export default function Home() {
       <section id="about">
         <AboutSection />
       </section>
-      {/* ************ footer section ******* */}
       <section id="cta">
         <CTASection />
       </section>
       <br />
       <br />
+            {/* ************ footer section ******* */}
+
       <Footer />
       {isVisible && (
         <ButtonTop onClick={handleScrollToTop}>

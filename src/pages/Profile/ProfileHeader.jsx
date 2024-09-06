@@ -151,9 +151,11 @@ if (userRole === "TEACHER" && type === "TEACHER") {
             <Button
               variant="outline-light"
               onClick={() => handleSendRequest("AMIS")}
+                          style={{marginTop: "5px !important"}}
+
               className="custom-light-button"
             >
-              <MdPersonAddAlt size={19} /> Add Friend
+              <MdPersonAddAlt size={19} /> Ajouter comme ami
             </Button>
           )}
           {!status.coachingRequestSent && (
@@ -174,11 +176,12 @@ if (userRole === "TEACHER" && type === "TEACHER") {
       return (
         !status.friendRequestSent && (
           <Button
+            style={{marginTop: "5px !important"}}
             variant="outline-light"
             onClick={() => handleSendRequest("AMIS")}
             className="custom-light-button"
           >
-            <MdPersonAddAlt size={19} /> Add Friend
+            <MdPersonAddAlt size={19} /> Ajouter comme ami
           </Button>
         )
       );
@@ -446,7 +449,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
 //               onClick={() => handleSendRequest("AMIS")}
 //               className="custom-light-button"
 //             >
-//               <MdPersonAddAlt size={19} /> Add Friend
+//               <MdPersonAddAlt size={19} /> Ajouter comme ami
 //             </Button>
 //           )}
 //           {!status.coachingRequestSent && (
@@ -461,7 +464,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
 //         </>
 //       );
 //     } else if (userRole === "STUDENT" && type === "STUDENT") {
-//       // Affiche seulement "Add Friend" si les deux sont STUDENT
+//       // Affiche seulement "Ajouter comme ami" si les deux sont STUDENT
 //       return (
 //         !status.friendRequestSent && (
 //           <Button
@@ -469,7 +472,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
 //             onClick={() => handleSendRequest("AMIS")}
 //             className="custom-light-button"
 //           >
-//             <MdPersonAddAlt size={19} /> Add Friend
+//             <MdPersonAddAlt size={19} /> Ajouter comme ami
 //           </Button>
 //         )
 //       );

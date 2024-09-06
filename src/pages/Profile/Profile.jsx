@@ -10,6 +10,7 @@ import { getToken } from "../../util/authUtils";
 import { useParams } from "react-router-dom";
 
 import "./Profile.css";
+import Retour from "../../components/retour-arriere/Retour";
 
 export default function Profile() {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export default function Profile() {
 
   return (
     <>
+    <Retour />
       <ProfileHeader
         id={id}
         token={token}

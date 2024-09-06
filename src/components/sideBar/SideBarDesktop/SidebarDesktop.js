@@ -157,12 +157,74 @@ const SidebarDesktop = () => {
 
       <StyledSidebar expanded={isExpanded}>
         <div className="flex-column nav-menu mt-5">
-          {menus.map((menu, key) => (
-            <React.Fragment key={key}>
-              {menu.name === "Évaluations" ? (
-                <>
-                  <Nav.Item className="nav-item" onClick={toggleEvaluations}>
-                    <NavLink to="#" className="nav-link">
+          {menus &&
+            menus.length > 0 &&
+            menus.map((menu, key) => (
+              <React.Fragment key={key}>
+                {menu.name === "Évaluations" ? (
+                  <>
+                    <Nav.Item className="nav-item" onClick={toggleEvaluations}>
+                      <NavLink to="#" className="nav-link">
+                        {menu.icon &&
+                          React.createElement(menu.icon, {
+                            className: "sidebar-icon",
+                          })}
+                        <span className="icon-text">{menu.name}</span>
+                      </NavLink>
+                    </Nav.Item>
+                    <div
+                      className={`sub-menu-container ${
+                        expandedEvaluations ? "expanded" : ""
+                      }`}
+                    >
+                      {menu.subRoutes.map((subRoute, subKey) => (
+                        <Nav.Item key={subKey} className="nav-item">
+                          <NavLink to={subRoute.route} className="nav-link">
+                            {subRoute.icon &&
+                              React.createElement(subRoute.icon, {
+                                className: "sidebar-icon",
+                              })}
+                            <span className="icon-text">{subRoute.name}</span>
+                          </NavLink>
+                        </Nav.Item>
+                      ))}
+                    </div>
+                  </>
+                ) : menu.name === "Communauté" ? (
+                  <>
+                    <Nav.Item
+                      className="nav-item"
+                      onClick={toggleCollaborations}
+                    >
+                      <NavLink to="#" className="nav-link">
+                        {menu.icon &&
+                          React.createElement(menu.icon, {
+                            className: "sidebar-icon",
+                          })}
+                        <span className="icon-text">{menu.name}</span>
+                      </NavLink>
+                    </Nav.Item>
+                    <div
+                      className={`sub-menu-container ${
+                        expandedCollaborations ? "expanded" : ""
+                      }`}
+                    >
+                      {menu.subRoutes.map((subRoute, subKey) => (
+                        <Nav.Item key={subKey} className="nav-item">
+                          <NavLink to={subRoute.route} className="nav-link">
+                            {subRoute.icon &&
+                              React.createElement(subRoute.icon, {
+                                className: "sidebar-icon",
+                              })}
+                            <span className="icon-text">{subRoute.name}</span>
+                          </NavLink>
+                        </Nav.Item>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <Nav.Item className="nav-item">
+                    <NavLink to={menu.route} className="nav-link">
                       {menu.icon &&
                         React.createElement(menu.icon, {
                           className: "sidebar-icon",
@@ -170,66 +232,9 @@ const SidebarDesktop = () => {
                       <span className="icon-text">{menu.name}</span>
                     </NavLink>
                   </Nav.Item>
-                  <div
-                    className={`sub-menu-container ${
-                      expandedEvaluations ? "expanded" : ""
-                    }`}
-                  >
-                    {menu.subRoutes.map((subRoute, subKey) => (
-                      <Nav.Item key={subKey} className="nav-item">
-                        <NavLink to={subRoute.route} className="nav-link">
-                          {subRoute.icon &&
-                            React.createElement(subRoute.icon, {
-                              className: "sidebar-icon",
-                            })}
-                          <span className="icon-text">{subRoute.name}</span>
-                        </NavLink>
-                      </Nav.Item>
-                    ))}
-                  </div>
-                </>
-              ) : menu.name === "Communauté" ? (
-                <>
-                  <Nav.Item className="nav-item" onClick={toggleCollaborations}>
-                    <NavLink to="#" className="nav-link">
-                      {menu.icon &&
-                        React.createElement(menu.icon, {
-                          className: "sidebar-icon",
-                        })}
-                      <span className="icon-text">{menu.name}</span>
-                    </NavLink>
-                  </Nav.Item>
-                  <div
-                    className={`sub-menu-container ${
-                      expandedCollaborations ? "expanded" : ""
-                    }`}
-                  >
-                    {menu.subRoutes.map((subRoute, subKey) => (
-                      <Nav.Item key={subKey} className="nav-item">
-                        <NavLink to={subRoute.route} className="nav-link">
-                          {subRoute.icon &&
-                            React.createElement(subRoute.icon, {
-                              className: "sidebar-icon",
-                            })}
-                          <span className="icon-text">{subRoute.name}</span>
-                        </NavLink>
-                      </Nav.Item>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <Nav.Item className="nav-item">
-                  <NavLink to={menu.route} className="nav-link">
-                    {menu.icon &&
-                      React.createElement(menu.icon, {
-                        className: "sidebar-icon",
-                      })}
-                    <span className="icon-text">{menu.name}</span>
-                  </NavLink>
-                </Nav.Item>
-              )}
-            </React.Fragment>
-          ))}
+                )}
+              </React.Fragment>
+            ))}
         </div>
       </StyledSidebar>
     </div>
