@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Navbar, Nav, Container, Badge, NavbarBrand } from "react-bootstrap";
+import { Navbar, Nav, Container, Badge } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaBell,
@@ -138,11 +138,7 @@ function SocialMediaNavbar({ onFilterChange }) {
 
   // Gérer la redirection pour les messages
   const handleMessageClick = () => {
-    if (windowWidth < 900) {
-      navigate("/conversations");
-    } else {
-      navigate("/chat");
-    }
+    navigate("/chat");
   };
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);

@@ -135,7 +135,7 @@ export const fetchNotes = async () => {
 };
 
 /**************************************************************************************/
-export const fetchRecentAssignments = async () => {
+export const fetchRecentResources = async () => {
   try {
     const token = getToken();
 

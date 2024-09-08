@@ -176,9 +176,6 @@ const ModuleTable = ({ searchValue, idParcours, token }) => {
               <CustomCardBody>
                 <ModuleTitle>{item.nom}</ModuleTitle>
                 <ModuleText>
-                  <strong>Total de ressources :</strong>{" "}
-                  {item.totalResource ?? 0}
-                  <br />
                   <strong>Date :</strong>{" "}
                   {item.createdAt
                     ? format(parseISO(item.createdAt), "dd-MM-yyyy")

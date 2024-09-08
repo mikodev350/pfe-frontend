@@ -33,7 +33,6 @@ const SignUpSchema = Yup.object().shape({
   dateOfBirth: Yup.date().required("Date de naissance requise"),
   address: Yup.string().required("Adresse requise"),
   wilaya: Yup.string().required("Wilaya requise"),
-  postalCode: Yup.string().required("Code postal requis"),
   gender: Yup.string().required("Sexe requis"),
   type: Yup.string().required("Rôle requis"),
 });
@@ -51,7 +50,7 @@ const SignUp = () => {
     dateOfBirth: "",
     address: "",
     wilaya: "",
-    postalCode: "",
+
     gender: "",
     type: "",
   };
@@ -442,27 +441,7 @@ const SignUp = () => {
                             {errors.address}
                           </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="formPostalCode">
-                          <Form.Label className="ms-4">
-                            Code postal :
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            name="postalCode"
-                            value={values.postalCode}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className={
-                              touched.postalCode && errors.postalCode
-                                ? "is-invalid"
-                                : "border-1"
-                            }
-                            style={{ borderColor: "#1e7fc9c2" }}
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            {errors.postalCode}
-                          </Form.Control.Feedback>
-                        </Form.Group>
+
                         <Form.Group className="mb-3" controlId="formGender">
                           <Form.Label className="ms-4">Sexe :</Form.Label>
                           <Form.Control

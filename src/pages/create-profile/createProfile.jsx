@@ -101,6 +101,59 @@ const apiUpload = async (file, token) => {
 const userRole = localStorage.getItem("role")?.toUpperCase();
 
 // Fonction pour soumettre le formulaire
+// const submitForm = async (values, profile, token, isUpdate, profileId) => {
+//   try {
+//     let photoProfilId = profile.photoProfil ? profile.photoProfil.id : null;
+
+//     // Si la photo de profil a été modifiée, la télécharger
+//     if (profile.photoProfil && profile.photoProfil instanceof File) {
+//       const uploadedPhoto = await apiUpload(profile.photoProfil, token);
+//       photoProfilId = uploadedPhoto.id;
+//     }
+
+//     if (userRole === "TEACHER") {
+//       values.typeEtudes = "teacher";
+//       values.niveauEtudes = "rien";
+//     }
+//     const payload = {
+//       ...values,
+//       competences: values.competences.split(",").map((comp) => comp.trim()), // Convertir les compétences en tableau
+//       matieresEnseignees: values.matieresEnseignees.split(",").map((mat) => mat.trim()), // Convertir les matières enseignées en tableau
+//       photoProfil: photoProfilId,
+//     };
+
+//     if (values.typeEtudes === "continue") {
+//       payload.niveauEtudes = "";
+//       payload.niveauSpecifique = "";
+//       payload.specialite = "";
+//     } else if (values.typeEtudes === "académique") {
+//       payload.nomFormation = "";
+//     }
+
+//     const url = isUpdate ? `http://localhost:1337/api/profils/${profileId}` : "http://localhost:1337/api/profils";
+//     const method = isUpdate ? "PUT" : "POST";
+
+//     console.log("Payload:", payload); // Log du payload pour débogage
+
+//     const response = await axios({
+//       method,
+//       url,
+//       data: payload,
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     console.log("Profile saved:", response.data);
+//     alert("Profile saved successfully");
+//   } catch (error) {
+//     console.error("Error saving profile:", error);
+//     alert("Error saving profile");
+//   }
+// };
+
+// Fonction pour soumettre le formulaire
 const submitForm = async (values, profile, token, isUpdate, profileId) => {
   try {
     let photoProfilId = profile.photoProfil ? profile.photoProfil.id : null;
@@ -115,10 +168,16 @@ const submitForm = async (values, profile, token, isUpdate, profileId) => {
       values.typeEtudes = "teacher";
       values.niveauEtudes = "rien";
     }
+
+    // Convertir les compétences et matières enseignées en majuscules
     const payload = {
       ...values,
-      competences: values.competences.split(",").map((comp) => comp.trim()), // Convertir les compétences en tableau
-      matieresEnseignees: values.matieresEnseignees.split(",").map((mat) => mat.trim()), // Convertir les matières enseignées en tableau
+      competences: values.competences
+        .split(",")
+        .map((comp) => comp.trim().toUpperCase()), // Convertir en majuscules
+      matieresEnseignees: values.matieresEnseignees
+        .split(",")
+        .map((mat) => mat.trim().toUpperCase()), // Convertir en majuscules
       photoProfil: photoProfilId,
     };
 
@@ -129,6 +188,7 @@ const submitForm = async (values, profile, token, isUpdate, profileId) => {
     } else if (values.typeEtudes === "académique") {
       payload.nomFormation = "";
     }
+
 
     const url = isUpdate ? `http://localhost:1337/api/profils/${profileId}` : "http://localhost:1337/api/profils";
     const method = isUpdate ? "PUT" : "POST";
@@ -145,13 +205,13 @@ const submitForm = async (values, profile, token, isUpdate, profileId) => {
       },
     });
 
-    console.log("Profile saved:", response.data);
-    alert("Profile saved successfully");
+    // console.log("Profile saved:", response.data);
   } catch (error) {
     console.error("Error saving profile:", error);
     alert("Error saving profile");
   }
 };
+
 
 // Fonction pour récupérer le profil
 const fetchProfile = async (token) => {
@@ -271,6 +331,16 @@ const CreerProfil = () => {
     }
   }, []);
 
+
+   const handleCompetencesChange = (e) => {
+    const value = e.target.value.toUpperCase(); // Convert to uppercase
+    formik.setFieldValue("competences", value);
+  };
+
+  const handleMatieresEnseigneesChange = (e) => {
+    const value = e.target.value.toUpperCase(); // Convert to uppercase
+    formik.setFieldValue("matieresEnseignees", value);
+  };
   const token = useMemo(() => getToken(), []);
 
   const validationSchema =
@@ -336,7 +406,7 @@ const CreerProfil = () => {
   };
 
 return (
-    <Container fluid className="mt-5">
+    <Container fluid >
       <Row className="justify-content-center">
         <StyledCard>
           <StyledTitle>
@@ -495,7 +565,7 @@ return (
                 </>
               )}
 
-              {role === "TEACHER" && (
+              {userRole === "TEACHER" && (
                 <>
                   <FormGroupCustom controlId="matieresEnseignees">
                     <Form.Label>
@@ -505,7 +575,7 @@ return (
                       type="text"
                       name="matieresEnseignees"
                       value={formik.values.matieresEnseignees}
-                      onChange={formik.handleChange}
+                      onChange={handleMatieresEnseigneesChange}
                       placeholder="Ex: Mathématiques, Physique, Chimie"
                       isInvalid={!!formik.errors.matieresEnseignees}
                       className="form-control-custom"
@@ -582,7 +652,7 @@ return (
                   type="text"
                   name="competences"
                   value={formik.values.competences}
-                  onChange={formik.handleChange}
+                  onChange={handleCompetencesChange}
                   placeholder="Ex: HTML, CSS, JavaScript, Français"
                   isInvalid={!!formik.errors.competences}
                   className="form-control-custom"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, Col, Row, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Card, Col, Row, Button, Modal, Carousel, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Viewer } from '@react-pdf-viewer/core';
 
 
 import Zoom from 'react-medium-image-zoom';
@@ -7,8 +8,6 @@ import 'react-medium-image-zoom/dist/styles.css';
 import styled from 'styled-components';
 import { FaSave } from "react-icons/fa";
 import GenerateLinkButton from "../../components/GenerateLinkButton/GenerateLinkButton";
-import { toast, ToastContainer } from 'react-toastify';
-import { cloneResource } from "../../api/apiResource";
 const StyledCard = styled(Card)`
   background-color: #ffffff !important;
   border: 1px solid #ddd;
@@ -118,8 +117,12 @@ const Image = styled.img`
   }
 `;
 
-
-
+const NoteTitle = styled.p`
+  font-size: 1.5rem; /* Increases the font size */
+  font-weight: bold;
+  color: #10266F; /* Adjust the color to match your theme */
+  margin-bottom: 10px; /* Optional spacing */
+`;
 
 
 
@@ -204,17 +207,10 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
 
   const handleClose = () => setShow(false);
 
-  const handleSaveResource = async () => {
-    try {
-      const newResource = await cloneResource(resource.id, token);
-      toast.success("Ressource sauvegardée avec succès !");
-      console.log("New Resource:", newResource); // For debugging purposes
-    } catch (error) {
-      console.error("Error saving resource:", error);
-      toast.error("Error saving resource");
-    }
+  const handleSaveResource = () => {
+    console.log("Resource saved!");
+    // Implémenter la fonctionnalité de sauvegarde ici
   };
-
 
   const fetchMediaFromCache = async (url) => {
     console.log("-----------------------------------------------")
@@ -354,16 +350,12 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
     if (!pdf || !pdf.url) return null;
     
     if(navigator.onLine) { return (     
-
        <PdfViewer pdfUrl={pdf.url} />
-)}
-else{
+)}else{
 
   return (
         <div className="mt-4">
           <h3>PDF</h3>
-          <p> pdf de else</p> 
-          
           <iframe
       src={pdf.url}
       width="100%"
@@ -376,6 +368,27 @@ else{
       );
 
 }
+   
+  // return (
+  //   <iframe 
+  //     src={`http://localhost:1337${pdf.url}`} 
+  //     width="100%" 
+  //     height="500px"
+  //     frameBorder="0"
+
+  //   >
+  //   </iframe>
+  // );
+//  return( <div style={{ width: '100%', height: '500px' }}>
+//       <iframe
+//         src={`http://localhost:1337${pdf.url}`}
+//         width="100%"
+//         height="100%"
+//         style={{ border: 'none' }}
+//         title="PDF Viewer"
+//       />
+//     </div>)
+    // return (<embed src={`http://localhost:1337${pdf.url}`} width="100%" height="500px" type="application/pdf" />);
   };
 
   const renderBlobImages = () => {
@@ -423,13 +436,20 @@ else{
   };
 
   const renderBlobPDF = () => {
+        console.log("Blob PDF Object:", blobObject.pdf);
+
+    console.log("------------blobObject.pdf-- offligneee ---------------------------------");
+    console.log(blobObject.pdf);
+        console.log("------------blobObject-- offligneee ---------------------------------")
+        console.log(blobObject);
+    console.log("------------------------------------------------------");
 
     if (blobObject.pdf) {
+      console.log(blobObject.pdf);
       
       return (
         <div className="mt-4">
           <h3>PDF</h3>
-          
  <iframe
       src={blobObject.pdf}
       width="100%"
@@ -438,6 +458,7 @@ else{
       title="PDF Viewer"
       style={{ border: 'none' }}
     ></iframe>          
+          <PdfViewer  pdfUrl={blobObject.pdf}/>
         </div>
       );
     }
@@ -447,11 +468,10 @@ else{
    return (
     <>
          <TitleContainer>
-                <ToastContainer />
         <Title>{resource.nom}</Title>
        
         {isFromLink && (
- <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip">Sauvegarder la resource</Tooltip>}>
+ <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip">Save Resource</Tooltip>}>
           <SaveButton onClick={handleSaveResource}>
             <FaSave />
           </SaveButton>
@@ -475,9 +495,9 @@ else{
           </Col>
 
           <Col md={6}>
-            {isLocalUpdate && blobObject.video ? renderBlobVideo() : renderVideo(cachedVideo)}
-            {isLocalUpdate  && blobObject.audio? renderBlobAudio() : renderAudio(cachedAudio)}
-            {isLocalUpdate && blobObject.pdf ? renderBlobPDF() : renderPDF(cachedPDF)}
+            {isLocalUpdate ? renderBlobVideo() : renderVideo(cachedVideo)}
+            {isLocalUpdate ? renderBlobAudio() : renderAudio(cachedAudio)}
+            {isLocalUpdate ? renderBlobPDF() : renderPDF(cachedPDF)}
              {resource.referenceLivre && (
                 <InfoCard>
                   <InfoTitle>Référence du Livre:</InfoTitle>
@@ -502,10 +522,9 @@ else{
 )}
 
 {
-  isLocalUpdate && blobObject.images ? (
+  isLocalUpdate ? (
     <div className="mt-4">
       <SectionTitle>Images</SectionTitle>
-      <p>isLocalUpdate</p>
       <Row className="d-flex justify-content-center">
         {renderBlobImages()}
       </Row>
@@ -513,8 +532,6 @@ else{
   ) : cachedImages && cachedImages.length > 0 ? (
     <div className="mt-4">
       <SectionTitle>Images</SectionTitle>
-            <p>cachedImages && cachedImages.length</p>
-
       <Row className="d-flex justify-content-center">
         {cachedImages.map((image, index) => (
           <Col key={index}>

@@ -1,12 +1,10 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import Header from "./other-header";
-import SidebarHome from "./SidebarHome";
+
 import HeroSection from "./HeroSection";
 import ServicesSection from "./ServicesSection";
 import AboutSection from "./AboutSection";
 import WhySection from "./WhySection";
-import WhatSection from "./WhatSection";
 import ProudSection from "./ProudSection";
 import TestimonialSection from "./TestimonialSection";
 import CTASection from "./CTASection";

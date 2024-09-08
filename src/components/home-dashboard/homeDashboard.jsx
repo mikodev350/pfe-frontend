@@ -15,8 +15,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./homeDashboardStyle.css";
 import helloimg from "./Hello-cuate.png";
 import { FaBook } from "react-icons/fa"; // Icon for resources
-import { fetchNotes, fetchRecentAssignments } from "../../api/apiStudent";
+import { fetchNotes, fetchRecentResources } from "../../api/apiStudent";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const StyledCard = styled.div`
   background-color: #ffffff; /* White background */
@@ -64,10 +65,9 @@ const HomeDashboard = () => {
   useEffect(() => {
     const getRecentAssignments = async () => {
       try {
-        const assignments = await fetchRecentAssignments();
-        console.log(assignments);
+        const resources = await fetchRecentResources();
         
-        setRecentResources(assignments); // Set the fetched assignments as recent resources
+        setRecentResources(resources); // Set the fetched assignments as recent resources
       } catch (error) {
         console.error("Erreur lors de la récupération des assignations récentes:", error);
       }
@@ -95,6 +95,11 @@ const HomeDashboard = () => {
     setNote(event.target.value);
   };
 
+  console.log('====================================');
+    console.log("recentResources");
+
+  console.log(recentResources);
+  console.log('====================================');
   return (
     <StyledCard>
       <Row>
@@ -121,32 +126,42 @@ const HomeDashboard = () => {
             <Col md={7}>
               <Card className="mb-4 custom-card graph-card">
                 <Card.Body>
-                  <Card.Title>Performance par Module</Card.Title>
+                  <Card.Title>Performance</Card.Title>
                   <Bar data={chartData} options={{ responsive: true }} />
                 </Card.Body>
               </Card>
             </Col>
 
             {/* Recent Resources Section */}
-            <Col>
-              <Card className="mb-4 custom-card resources-card">
-                <Card.Body>
-                  <Card.Title>Ressources Récentes</Card.Title>
-                  <ul className="resources-list">
-                    {recentResources.map((resource) => (
-                      <li key={resource.id} className="resource-item">
-                        <FaBook className="resource-icon" />
-                        <div className="resource-text">
-                          <strong>{resource.nom}</strong>
-                          <em className="resource-date"> - {resource.date
-}</em>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </Card.Body>
-              </Card>
-            </Col>
+ <Col>
+  <Card className="mb-4 custom-card resources-card">
+    <Card.Body>
+      <Card.Title>Ressources Récentes</Card.Title>
+      {recentResources.length > 0 ? (
+        <ul className="resources-list">
+          {recentResources.map((resource) => (
+            <li key={resource.id} className="resource-item">
+              <FaBook className="resource-icon" />
+              <div className="resource-text">
+                {/* Utiliser Link pour créer un lien vers la prévisualisation de la ressource */}
+                <Link to={`/dashboard/resource-preview/${resource.id}`}>
+                  <strong>{resource.nom}</strong>
+                  <em className="resource-date"> - {resource.date}</em>
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <Card.Text className="text-center">
+          <em>Pas de ressources disponibles</em>
+        </Card.Text>
+      )}
+    </Card.Body>
+  </Card>
+</Col>
+
+
           </Row>
         </Col>
 

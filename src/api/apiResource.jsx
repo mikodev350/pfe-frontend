@@ -46,11 +46,6 @@ const urlToBlob = async (url) => {
 /************************************************************************************************/
 // Add or update a file in IndexedDB
 export const addFileInToIndexedDB = async (url,file) => {
-  // console.log("file-----------------------------------------------------");
-  //     console.log(file);
-
-  //   console.log("url-----------------------------------------------------");
-  //   console.log(url);
 
   const data = await db.files.add({
       name: file.name,
@@ -250,6 +245,7 @@ export const updateResource = async (id, data, token) => {
   const updatedData = {
     ...data,
     isLocal: true,
+    isLocalUpload:true,
     updatedAt: new Date().toISOString(),
   };
 
@@ -477,44 +473,58 @@ export const generateResourceLink = async (id, token) => {
 
 
 // apiResource.jsx
-export const getResourceById = async (id, token) => {
+export const getResourceById = async (id, token,type) => {
   try {
     if (!navigator.onLine) {
       console.log("Offline: Fetching resource from IndexedDB");
       const resource = await db.resources.get(Number(id));
-      if (resource) {
-        if (resource.isLocalUpload){
+      console.log("this  resource is offligne you need to check ittt first ");
+            console.log("!navigator.onLine");
 
+            console.log(resource);
+      if (resource) {
+        if (resource.isLocalUpload ){
 let imagesLink = []
 let audioLink ;
 
   for (let image of resource.images) {
     const fileFromDB = await db.files.get(image.id);
-    if (fileFromDB) {
+    if (fileFromDB && !type) {
 imagesLink.push(fileFromDB.url)
+    }else if (fileFromDB && type=== "update") {
+      imagesLink.push(fileFromDB)
+
     }
   }
   // Upload audio
   if (resource.audio) {
     const fileFromDB = await db.files.get(resource.audio.id);
-    if (fileFromDB) {
+    if (fileFromDB  && !type) {
     audioLink=fileFromDB.url;
+    }else if (fileFromDB && type=== "update") {
+      audioLink=fileFromDB
+      
     }
   }
 let pdfLink;
   // Upload PDF
-  if (resource.pdf) {
+  if (resource.pdf ) {
     const fileFromDB = await db.files.get(resource.pdf.id);
-    if (fileFromDB) {
+    if (fileFromDB && !type) {
    pdfLink=fileFromDB.url;
+    }else if (fileFromDB && type=== "update") {
+      pdfLink=fileFromDB
     }
   }
 let videoLink;
   // Upload video
   if (resource.video) {
      const fileFromDB = await db.files.get(resource.video.id);
-    if (fileFromDB) {
+    if (fileFromDB  && !type) {
    videoLink=fileFromDB.url;
+    }
+    else if (fileFromDB && type=== "update") {
+      pdfLink=fileFromDB
     }
   }
 
@@ -539,12 +549,15 @@ isLocalUpload:true
           //  console.log(resourceDataItem);
           return resourceDataItem
         }
-        console.log("********************************************************************************************");
-        console.log("this is resrouce ");
-        console.log(resource);
-                console.log("********************************************************************************************");
+
+                    console.log("after put if it the mixeuuurrr ");
+                console.log("resource");
+                
+                console.log(resource);
 
         return resource; // Resource already contains all necessary data
+
+        
       } else {
         throw new Error("Resource not found in IndexedDB");
       }
@@ -555,6 +568,10 @@ isLocalUpload:true
         Authorization: `Bearer ${token}`,
       },
     });
+
+
+    console.log("response.data");
+    console.log(response.data);
     
     return response.data;
   } catch (error) {
@@ -1078,6 +1095,7 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
       lessons: resource.lessons,
       note: resource.note,
       images: [],
+      isLocalUpload:false,
       audio: null,
       video: null,
       pdf: null,
@@ -1087,12 +1105,8 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
       updatedAt: resource.updatedAt,
     };
 
-    // // Mise en cache des fichiers si nécessaire
-    // if (resource.images && Array.isArray(resource.images)) {
-    //   resourceData.images = await Promise.all(resource.images.map(async (image) => {
-    //     return await cacheFile(`http://localhost:1337${image.url}`) || `http://localhost:1337${image.url}`;
-    //   }));
-    // }
+
+
 
     if (resource.images && Array.isArray(resource.images)) {
   resourceData.images = await Promise.all(resource.images.map(async (image) => {
@@ -1123,11 +1137,18 @@ const addOrUpdateResourceInIndexedDB = async (resource) => {
 
     // Stockage ou mise à jour de la ressource dans IndexedDB
     await db.transaction('rw', db.resources, async () => {
+     console.log("*****************************************************************************");
+            console.log("resourceData");
+      console.log(resourceData)
+     console.log("--------------------------------------------------------------------------------");
+     
       const existingResource = await db.resources.get(resource.id);
       if (!existingResource) {
+
         await db.resources.put(resourceData);
         console.log(`Resource ${resource.id} added to IndexedDB.`);
       } else {
+
         await db.resources.update(resource.id, resourceData);
         console.log(`Resource ${resource.id} updated in IndexedDB.`);
       }
@@ -1160,11 +1181,17 @@ export const fetchResources = async (page, pageSize, searchValue, token) => {
       console.log("Fetched resources from server:", response.data.data);
 
       // Store fetched data in IndexedDB
-      await db.transaction("rw", db.resources, async () => {
+       
         for (const resource of response.data.data) {
-          await addOrUpdateResourceInIndexedDB(resource);
-        }
-      });
+  try {
+    console.log("Traitement de la ressource :", resource);
+    await addOrUpdateResourceInIndexedDB(resource); // Ajout ou mise à jour dans IndexedDB
+    
+  } catch (error) {
+    console.error("Erreur lors de l'ajout/mise à jour de la ressource dans IndexedDB :", resource, error);
+  }
+}
+
 
       // Return fetched data
       return {

@@ -35,7 +35,8 @@ import AmisList from "../../../components/communaute-List/CommunauteList";
 import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
 import Note from "../../../components/result/Note";
 import Notifications from "../../notifications/Notifications";
-
+import { ToastContainer, } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Dashboard() {
   const queryClient = useQueryClient();
@@ -45,6 +46,7 @@ function Dashboard() {
 
   return (
     <Layout fullcontent={false}  backgroundColorIdentification={false}>
+      <ToastContainer />
       <Routes>
         {/* Routes common to all users */}
         <Route path="notifications" element={<Notifications/>} />
@@ -62,7 +64,6 @@ function Dashboard() {
         <Route path="parcours" element={<Parcours />} />
         <Route path="modules/:idParcours" element={<Module />} />
         <Route path="lessons/:idModule" element={<Lesson />} />
-        {/* <Route path="resource-detail/:resouceId" element={<ResourceDetail />} /> */}
         <Route path="custom-profile" element={<CreateProfile />} />
         <Route path="edit-profile" element={<DashboardProfile />} />
         <Route path="add-education" element={<AddEducation />} />

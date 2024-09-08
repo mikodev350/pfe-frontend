@@ -276,7 +276,7 @@ if (userRole === "TEACHER" && type === "TEACHER") {
                   onClick={handleCancelRequest}
                   className="custom-light-button"
                 >
-                  <IoClose size={19} /> Remove Relation
+                  <IoClose size={19} /> Supprimer la relation
                 </Button>
               ) : status.isRequestReceiver ? (
                 <>

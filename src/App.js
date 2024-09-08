@@ -18,6 +18,7 @@ import Socket from "./components/Socket/Socket";
 import Quizzes from "./pages/quiz/quiz/Quizzes";
 // import PrivateRoute from "./path/to/PrivateRoute"; // Assuming PrivateRoute is a custom component, provide the correct path
 // import DashboardStudent from "./path/to/DashboardStudent"; // Provide the correct path to DashboardStudent
+import { toast, ToastContainer } from "react-toastify";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -42,6 +43,8 @@ function App() {
       <Router>
         <Socket />
         <Notification />
+        <ToastContainer />
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<OnlyVisitorRoute element={Login} />} />

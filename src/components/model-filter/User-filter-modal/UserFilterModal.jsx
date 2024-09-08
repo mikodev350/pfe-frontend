@@ -65,15 +65,9 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
               value={filters.username}
               onChange={(e) => handleFilterChange('username', e.target.value)}
             />
+
           </Form.Group>
-          {/*<Form.Group>
-             <Form.Controlmikito
-              type="text"
-              placeholder="Rôle"
-              value={filters.role}
-              onChange={(e) => handleFilterChange('role', e.target.value)}
-            />
-          </Form.Group> */}
+         
           <Form.Group>
             <Form.Control
               as="select"
@@ -101,6 +95,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                   <option value="academique">Académique</option>
                   <option value="continue">Continue</option>
                 </Form.Control>
+                <br />
               </Form.Group>
               {filters.typeEtudes === 'academique' && (
                 <>
@@ -110,12 +105,49 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                       placeholder="Niveau d'enseignement"
                       onChange={(selectedOption) => handleFilterChange('niveauEtudes', selectedOption.value)}
                       value={niveauEtudesOptions.find((option) => option.value === filters.niveauEtudes)}
+                                         styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                     />
                   </Form.Group>
                   {['L1', 'L2', 'L3', 'M1', 'M2'].includes(filters.niveauEtudes) && (
                     <Form.Group>
                       <Form.Control
                         type="text"
+                        
                         placeholder="Spécialité"
                         value={filters.specialiteEnseigne}
                         onChange={(e) => handleFilterChange('specialiteEnseigne', e.target.value)}
@@ -139,14 +171,22 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
 
           {filters.role === 'teacher' && (
             <>
-              <Form.Group>
-                <Form.Control
-                  type="text"
-                  placeholder="Matières enseignées"
-                  value={filters.matieresEnseignees}
-                  onChange={(e) => handleFilterChange('matieresEnseignees', e.target.value)}
-                />
-              </Form.Group>
+          <Form.Group>
+  <Form.Control
+    type="text"
+    placeholder="Matières enseignées"
+    value={filters.matieresEnseignees}
+    onChange={(e) => {
+      let value = e.target.value.toUpperCase();
+
+      // Remplacer les espaces par des virgules
+      value = value.replace(/\s+/g, ',');
+
+      handleFilterChange('matieresEnseignees', value);
+    }} 
+  />
+</Form.Group>
+
               <Form.Group>
                 <Select
                   isMulti
@@ -196,6 +236,7 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                   )}
                 />
               </Form.Group>
+              <br />
               {filters.niveauEnseigne.includes('Université') && (
                 <Form.Group>
                   <Form.Control
@@ -204,7 +245,9 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
                     value={filters.specialiteEnseigne}
                     onChange={(e) => handleFilterChange('specialiteEnseigne', e.target.value)}
                   />
+                  <br />
                 </Form.Group>
+                
               )}
             </>
           )}
