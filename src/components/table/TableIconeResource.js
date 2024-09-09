@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { BiDetail, BiEdit, BiTrash } from "react-icons/bi";
 import { useMutation, useQueryClient } from "react-query";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import { deleteResource } from "../../api/apiResource";
 import { getToken } from "../../util/authUtils";
 import styled from "styled-components";
@@ -46,12 +45,19 @@ export default function TableIconeResource({ id, dataLabel }) {
   const mutation = useMutation(() => deleteResource(id, token), {
     onSuccess: () => {
       queryClient.invalidateQueries("resources");
-      toast.success("Ressource supprimée avec succès !");
+      Swal.fire({
+        icon: "success",
+        title: "Ressource supprimée avec succès !",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     },
     onError: (error) => {
-      toast.error(
-        `Erreur lors de la suppression de la ressource : ${error.message}`
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: `Erreur lors de la suppression de la ressource : ${error.message}`,
+      });
     },
   });
 

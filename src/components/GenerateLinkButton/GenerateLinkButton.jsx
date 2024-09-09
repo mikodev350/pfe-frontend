@@ -3,9 +3,9 @@ import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 import { FaShareAlt } from "react-icons/fa";
 import { generateResourceLink } from "../../api/apiResource";
 import { getToken } from "../../util/authUtils";
-import { toast, ToastContainer } from 'react-toastify';
 import styled from "styled-components";
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 
 const StyledButton = styled(Button)`
   background-color: #ffffff !important; /* White background */
@@ -33,16 +33,24 @@ const GenerateLinkButton = ({ resourceId }) => {
       const data = await generateResourceLink(resourceId, authToken);
       const link = data.link;
       navigator.clipboard.writeText(link);
-      toast.success("Link copied to clipboard!");
-    } catch (error) {
+  Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: 'Le lien a été copié dans le presse-papiers !',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+        } catch (error) {
       console.error("Error generating link:", error);
-      toast.error("Error generating link");
-    }
+ Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors de la génération du lien.',
+      });    }
   };
 
   return (
     <>
-      <ToastContainer />
       <OverlayTrigger
         placement="top"
         overlay={<Tooltip id="button-tooltip">Share</Tooltip>}

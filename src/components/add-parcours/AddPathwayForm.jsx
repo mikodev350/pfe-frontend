@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Button, Form, Container, Row, Col, ListGroup } from "react-bootstrap";
+import { Button, Form, Container, Row, Col, ListGroup, Spinner } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import AddModuleModal from "../AddModuleForm/AddModuleModal";
 import { getToken } from "../../util/authUtils";
 import { createPathway } from "../../api/ApiParcour";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from "sweetalert2"; // Import SweetAlert
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { BiArrowBack } from "react-icons/bi"
+import { BiArrowBack } from "react-icons/bi";
+
 // Styled Card Container
 const StyledCardContainer = styled.div`
   background-color: #ffffff; /* Fond blanc */
@@ -34,7 +34,7 @@ const StyledTitle = styled.h2`
 
 // Styled Back Button Container
 const BackButtonContainer = styled.div`
-width: 120px !important;
+  width: 120px !important;
   display: flex;
   align-items: center;
   margin-bottom: 20px;
@@ -69,7 +69,6 @@ width: 120px !important;
   }
 `;
 
-
 // Validation schema for the form
 const validationSchema = Yup.object({
   nom: Yup.string().required("Nom du parcours est requis"),
@@ -82,6 +81,7 @@ const AddPathwayForm = ({ onSave }) => {
   const [showModuleModal, setShowModuleModal] = useState(false);
   const [modules, setModules] = useState([]);
   const [editingModuleIndex, setEditingModuleIndex] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loader state
 
   // Get the token 
   const token = React.useMemo(() => getToken(), []);
@@ -98,6 +98,7 @@ const AddPathwayForm = ({ onSave }) => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      setIsLoading(true); // Show loader
       const pathwayData = { ...values, modules };
       console.log("Enregistrer le parcours:", pathwayData);
       
@@ -109,8 +110,13 @@ const AddPathwayForm = ({ onSave }) => {
           onSave(response);
         }
 
-        // Show success notification
-        toast.success("Parcours créé avec succès!");
+        // Show success notification with SweetAlert
+        Swal.fire({
+          title: 'Succès!',
+          text: 'Parcours créé avec succès!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
 
         // Redirect to the previous page or another page
         setTimeout(() => {
@@ -119,8 +125,15 @@ const AddPathwayForm = ({ onSave }) => {
       } catch (error) {
         console.error('Error creating pathway:', error);
 
-        // Show error notification
-        toast.error("Erreur lors de la création du parcours.");
+        // Show error notification with SweetAlert
+        Swal.fire({
+          title: 'Erreur!',
+          text: 'Erreur lors de la création du parcours.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      } finally {
+        setIsLoading(false); // Hide loader
       }
     },
   });
@@ -161,7 +174,7 @@ const AddPathwayForm = ({ onSave }) => {
         </BackButtonContainer>
         <Row >
           <Form className="mt-5" onSubmit={formik.handleSubmit}>
-      <StyledTitle>Ajouter un parcours</StyledTitle>
+            <StyledTitle>Ajouter un parcours</StyledTitle>
 
             <Form.Group className="mt-4" controlId="nom">
               <Form.Label>Nom du {formik.values.type === 'continue' ? 'domaine' : 'parcours'}</Form.Label>
@@ -260,18 +273,21 @@ const AddPathwayForm = ({ onSave }) => {
             </div>
             
             <Col md={{ span: 7, offset: 4 }}>
-              <Button 
-                variant="primary" 
-                type="submit" 
-                className="mt-4 w-100 w-md-auto" 
-                  style={{ 
-    height: "52px", 
-    maxWidth: "250px", // Ensures the button does not exceed 250px on larger screens
-    width: "100%" // Ensures the button takes the full width on smaller screens
-  }}
-              >
-                Enregistrer le {formik.values.type === 'continue' ? 'domaine' : 'parcours'}
-              </Button>
+              {isLoading ? (
+                <Button variant="primary" disabled className="mt-4 w-100 w-md-auto" style={{ height: "52px", maxWidth: "250px", width: "100%" }}>
+                  <Spinner animation="border" size="sm" role="status" aria-hidden="true" />
+                  <span className="sr-only">Chargement...</span>
+                </Button>
+              ) : (
+                <Button 
+                  variant="primary" 
+                  type="submit" 
+                  className="mt-4 w-100 w-md-auto" 
+                  style={{ height: "52px", maxWidth: "250px", width: "100%" }}
+                >
+                  Enregistrer le {formik.values.type === 'continue' ? 'domaine' : 'parcours'}
+                </Button>
+              )}
             </Col>
           </Form>
         </Row>
@@ -283,8 +299,6 @@ const AddPathwayForm = ({ onSave }) => {
           initialData={editingModuleIndex !== null ? modules[editingModuleIndex] : null}
           type={formik.values.type}  // Pass the type to the modal
         />
-
-        <ToastContainer />
       </StyledCardContainer>
     </Container>
   );

@@ -32,11 +32,9 @@ import AssignmentSubmit from "../../../components/assignment-submit/AssignmentSu
 import AllAssignationsDevoir from "../../../components/all-assignations-devoir/AllAssignationsDevoir";
 import ListeDesEnseignants from "../../../components/communaute-proffesseur/ListeDesEnseignants";
 import AmisList from "../../../components/communaute-List/CommunauteList";
-import SuiviPedagogique from "../../../components/liste-etudiants/suivi-edagogique";
+import SuiviPedagogique from "../../../components/liste-etudiants/suivi-pdagogique";
 import Note from "../../../components/result/Note";
 import Notifications from "../../notifications/Notifications";
-import { ToastContainer, } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 function Dashboard() {
   const queryClient = useQueryClient();
@@ -46,7 +44,6 @@ function Dashboard() {
 
   return (
     <Layout fullcontent={false}  backgroundColorIdentification={false}>
-      <ToastContainer />
       <Routes>
         {/* Routes common to all users */}
         <Route path="notifications" element={<Notifications/>} />

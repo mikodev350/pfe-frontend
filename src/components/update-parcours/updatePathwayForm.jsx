@@ -7,6 +7,7 @@ import { updatePathway, getPathwayById } from "../../api/ApiParcour";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Retour from "../retour-arriere/Retour";
+import Swal from "sweetalert2"; // Importer SweetAlert pour les notifications
 
 const validationSchema = Yup.object({
   nom: Yup.string().required("Nom du parcours est requis"),
@@ -125,7 +126,6 @@ const UpdatePathwayForm = () => {
         const response = await getPathwayById(pathwayId, token);
         if (response.data) {
           setInitialValues(response.data);
-          console.log("Initial values set:", response.data);
         }
       } catch (error) {
         console.error("Error fetching pathway:", error);
@@ -144,23 +144,34 @@ const UpdatePathwayForm = () => {
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log("Form submitted with values:", values);
       try {
         const response = await updatePathway(pathwayId, values, token);
         if (response.status === 'offline') {
-          console.log('Pathway updated offline');
+          Swal.fire({
+            title: 'Succès!',
+            text: 'Parcours mis à jour hors ligne.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
         } else {
-          console.log('Pathway updated successfully:', response);
+          Swal.fire({
+            title: 'Succès!',
+            text: 'Parcours mis à jour avec succès!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
         }
         navigate('/dashboard/parcours');
       } catch (error) {
-        console.error('Error updating pathway:', error);
+        Swal.fire({
+          title: 'Erreur!',
+          text: 'Erreur lors de la mise à jour du parcours.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
     },
   });
-
-  // Ajoutez cette ligne pour voir si les valeurs initiales sont correctement définies
-  console.log("formik errors:", formik.errors);
 
   return (
     <StyledCardContainer>
@@ -185,27 +196,22 @@ const UpdatePathwayForm = () => {
             )}
           </StyledFormGroup>
 
-
-{/* ***************************************************************** */}
-<Form.Group className="mt-4" controlId="type">
-              <Form.Label>Type de parcours</Form.Label>
-              <Form.Control
-                as="select"
-                name="type"
-                value={formik.values.type}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              >
-                <option value="académique">Académique</option>
-                <option value="continue">Continue</option>
-              </Form.Control>
-              {formik.touched.type && formik.errors.type && (
-                <div className="text-danger">{formik.errors.type}</div>
-              )}
-            </Form.Group>
-{/* *********************************************************************** */}
-
-
+          <Form.Group className="mt-4" controlId="type">
+            <Form.Label>Type de parcours</Form.Label>
+            <Form.Control
+              as="select"
+              name="type"
+              value={formik.values.type}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            >
+              <option value="académique">Académique</option>
+              <option value="continue">Continue</option>
+            </Form.Control>
+            {formik.touched.type && formik.errors.type && (
+              <div className="text-danger">{formik.errors.type}</div>
+            )}
+          </Form.Group>
 
           <StyledCheck
             type="checkbox"
@@ -233,10 +239,10 @@ const UpdatePathwayForm = () => {
             </StyledFormGroup>
           )}
           
-          <div class="d-flex justify-content-center">
-          <StyledButton type="submit">
-            Enregistrer le {formik.values.type === 'continue' ? 'domaine' : 'parcours'}
-          </StyledButton>
+          <div className="d-flex justify-content-center">
+            <StyledButton type="submit">
+              Enregistrer le {formik.values.type === 'continue' ? 'domaine' : 'parcours'}
+            </StyledButton>
           </div>
         </StyledForm>
       </Row>
@@ -245,5 +251,3 @@ const UpdatePathwayForm = () => {
 };
 
 export default UpdatePathwayForm;
-
-

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Button, Form, Container, Row, Col, Spinner } from "react-bootstrap";
+import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import Select, { components } from "react-select";
 import { useFormik } from "formik";
 import { validationSchema } from "../../validator/addResourceValidator";
@@ -12,7 +12,6 @@ import { uploadFile } from "../../api/apiUpload";
 import { useParams, useNavigate } from "react-router-dom";
 import { getResourceById, updateResource, addFileInToIndexedDB, syncOfflineChangesResource } from "../../api/apiResource";
 import { useQueryClient } from "react-query";
-import Swal from 'sweetalert2'; // Importation de SweetAlert
 
 import styled from "styled-components";
 import Zoom from "react-medium-image-zoom";
@@ -195,7 +194,6 @@ export default function UpdateResource() {
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
   }, [token, queryClient]);
-const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik({
   initialValues: {
@@ -215,23 +213,25 @@ const [isSubmitting, setIsSubmitting] = useState(false);
   },
   validationSchema: validationSchema,
   onSubmit: async (values) => {
-      setIsSubmitting(true); // Activer le loader
-
     try {
       const updatedValues = { ...values };
 
-
-     
+      console.log('====================================');
+            console.log("images uploadddd ");
+                        console.log("*****************images uploadddd ***************************");
+                                    console.log("images uploadddd ");
+                                    console.log('====================================');
+                                    console.log(images);
+                                    console.log('====================================');
+            console.log('====================================');
       // Gérer les images
-
-      const newImages = await Promise.all(updatedValues.images.map(async (image) => {
-        // alert(JSON.stringify(image));
-
+      const newImages = await Promise.all(images.map(async (image) => {
         if (image.raw) {
           if (!navigator.onLine) {
             const id = await addFileInToIndexedDB(image.preview, image.raw);
             return { id, offline: true };
           } else {
+            
             const uploadedImage = await uploadFile(image.raw, token);
             return { id: uploadedImage[0].id };
           }
@@ -239,13 +239,8 @@ const [isSubmitting, setIsSubmitting] = useState(false);
           return { id: image.id }; // Conserver l'identifiant de l'image existante
         }
       }));
-
-
-      console.log('************************************************');
-      console.log("**********newImages*******************");
-      console.log(newImages);
-      console.log('************************************************');
       updatedValues.images = newImages;
+
       // Gérer le fichier audio
       if (audioFile.raw) {
         if (!navigator.onLine) {
@@ -260,10 +255,6 @@ const [isSubmitting, setIsSubmitting] = useState(false);
       }
 
       // Gérer le fichier PDF
-                    console.log("pdfFile")
-
-              console.log(pdfFile)
-
       if (pdfFile.raw) {
         if (!navigator.onLine) {
           const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
@@ -291,13 +282,8 @@ const [isSubmitting, setIsSubmitting] = useState(false);
 
       // Soumettre les valeurs mises à jour
       const response = await updateResource(id, updatedValues, token);
-       if (response && response.data) {
-                  Swal.fire({
-            icon: 'success',
-            title: 'Ressource mise à jour avec succès !',
-            showConfirmButton: false,
-            timer: 1500
-          });
+      if (response && response.data) {
+        console.log("Resource updated successfully:", response);
         formik.resetForm();
         setImages([]);
         setAudioFile({ preview: "", id: null, raw: null });
@@ -307,18 +293,15 @@ const [isSubmitting, setIsSubmitting] = useState(false);
         setReferenceLivre("");
         setDisplayLinkInput(false);
         setDisplayBookInput(false);
- setIsSubmitting(false);
+
+         toast.success("Resource updated successfully!");
         navigate("/dashboard/resources"); // Navigate after success
       } else {
         throw new Error("Failed to update resource");
       }
     } catch (error) {
- Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'La mise à jour de la ressource a échoué. Veuillez réessayer.',
-        });        console.error("Error updating resource:", error);   
-       }
+toast.error("Error updating resource. Please try again."); // Show error notification
+        console.error("Error updating resource:", error);    }
   },
 });
 
@@ -332,7 +315,7 @@ useEffect(() => {
       setParcoursOptions(parcours.map((p) => ({ value: p.id, label: p.name })));
 
       const resource = await getResourceById(id, token, "update");
-      console.log("***********************resource*********************************************");
+
       console.log(resource);
 
       let cachedImages = [];
@@ -347,7 +330,7 @@ useEffect(() => {
             return { preview: cachedUrl || image, id: image.id, raw: null };
           })
         );
-        // alert(JSON.stringify(cachedImages))
+        alert(JSON.stringify(cachedImages))
         cachedAudioUrl = await fetchMediaFromCache(resource.audio?.url || resource.audio);
         cachedPdfUrl = await fetchMediaFromCache(resource.pdf?.url || resource.pdf);
         cachedVideoUrl = await fetchMediaFromCache(resource.video?.url || resource.video);
@@ -364,30 +347,13 @@ useEffect(() => {
         cachedVideoUrl = resource.video ? resource.video.url : null;
       }
 
-      
- if (cachedPdfUrl && !cachedPdfUrl.startsWith("blob")) {
-  try {
-    const response = await fetch(`http://localhost:1337${cachedPdfUrl}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch PDF");
-    }
-    const blob = await response.blob();
-    cachedPdfUrl = URL.createObjectURL(blob);
-  } catch (error) {
-    console.error("Error fetching PDF:", error);
-    cachedPdfUrl = null; // Reset cachedPdfUrl if there's an error
-  }
-}
-console.log("PDF URL:", cachedPdfUrl); // Check if the URL is correct
+      if (cachedPdfUrl && !cachedPdfUrl.startsWith("blob")) {
+        // Si le PDF n'est pas au format blob, on le convertit
+        const response = await fetch(`http://localhost:1337${cachedPdfUrl}`);
+        const blob = await response.blob();
+        cachedPdfUrl = URL.createObjectURL(blob);
+      }
 
-
-
-
-      console.log('====================================');
-            console.log("cachedImages");
-
-      console.log(cachedImages);
-      console.log('====================================');
       formik.setValues({
         nom: resource.nom || "",
         format: resource.format || "",
@@ -406,7 +372,6 @@ console.log("PDF URL:", cachedPdfUrl); // Check if the URL is correct
         referenceLivre: resource.referenceLivre || "",
       });
 
-
       if (cachedImages) {
  const imageData= resource.images.map((image)=>({
           preview:image.url,
@@ -414,22 +379,23 @@ console.log("PDF URL:", cachedPdfUrl); // Check if the URL is correct
          }))
          setImages(imageData)
       } 
-  if (cachedAudioUrl) {
-    setAudioFile({ preview: cachedAudioUrl, id: resource.audio.id, raw: null });
-} else if (resource.audio && resource.audio.url) {
-    setAudioFile({ preview: resource.audio.url, id: resource.audio.id, raw: null });
-}
-     if (cachedPdfUrl) {
-    setPdfFile({ preview: cachedPdfUrl, id: resource.pdf.id, raw: null });
-} else if (resource.pdf && resource.pdf.url) {
-    setPdfFile({ preview: resource.pdf.url, id: resource.pdf.id, raw: null });
-}
+      if (cachedAudioUrl) {
+        setAudioFile({ preview: cachedAudioUrl, id: resource.audio.id, raw: null });
+      } else {
+        setAudioFile({ preview: resource.audio.url, raw: resource.audio });
+      }
 
-     if (cachedVideoUrl) {
-    setVideoFile({ preview: cachedVideoUrl, id: resource.video.id, raw: null });
-} else if (resource.video && resource.video.url) {
-    setVideoFile({ preview: resource.video.url, id: resource.video.id, raw: null });
-}
+      if (cachedPdfUrl) {
+        setPdfFile({ preview: cachedPdfUrl, id: resource.pdf.id, raw: null });
+      } else {
+        setPdfFile({ preview: resource.pdf.url, raw: resource.pdf });
+      }
+
+      if (cachedVideoUrl) {
+        setVideoFile({ preview: cachedVideoUrl, id: resource.video.id, raw: null });
+      } else {
+        setVideoFile({ preview: resource.video.url, raw: resource.video });
+      }
 
       setLink(resource.link || "");
       setReferenceLivre(resource.referenceLivre || "");
@@ -907,39 +873,11 @@ const handleParcoursChange = (selectedParcours) => {
             )}
 
 
-            <ImagePreviewContainer>
-  {images.length > 0 &&
-  images.map((image, index) => (
-    <ImageCard key={index}>
-      <DeleteButton
-        variant="danger"
-        onClick={(e) => {
-          e.stopPropagation();
-          removeFile("image", index);
-        }}
-      >
-        <FiTrash2 size={16} />
-      </DeleteButton>
-      {image.preview && (
-        <Zoom>
-          <img
-            src={
-              image.preview.startsWith('http://localhost:1337') || image.preview.startsWith('blob:')
-                ? image.preview  // Si l'URL est déjà complète ou un blob, utilisez-la telle quelle
-                : `http://localhost:1337${image.preview}`  // Si l'URL est incomplète, ajoutez localhost
-            }
-            alt={`Preview ${index}`}
-          />
-        </Zoom>
-      )}
-    </ImageCard>
-  ))}
-</ImagePreviewContainer>
-
+            
 
     
 
-    {/* <ImagePreviewContainer>
+    <ImagePreviewContainer>
   {images.length > 0 &&
   images.map((image, index) => (
     <ImageCard key={index}>
@@ -968,7 +906,7 @@ const handleParcoursChange = (selectedParcours) => {
     </ImageCard>
   ))}
 
-</ImagePreviewContainer> */}
+</ImagePreviewContainer>
 
 
 
@@ -989,15 +927,16 @@ const handleParcoursChange = (selectedParcours) => {
       audioFile={
         audioFile.preview.startsWith('blob')
           ? audioFile.preview
-          : `http://localhost:1337${audioFile.preview}` // URL de l'audio si pas modifié
+          : `http://localhost:1337${audioFile.preview}`
       }
     />
-    <Button variant="outline-danger" onClick={() => removeFile("audio")}>
-      <FiTrash2 size={24} /> Supprimer l'audio
-    </Button>
+    <div className="d-flex justify-content-center">
+      <Button variant="outline-danger" onClick={() => removeFile("audio")}>
+        <FiTrash2 size={24} /> Supprimer l'audio
+      </Button>
+    </div>
   </div>
 )}
-
 
 {/* ********************************************************************************************* */}
             {/* {pdfFile.preview && (
@@ -1014,16 +953,21 @@ const handleParcoursChange = (selectedParcours) => {
   <div className="pdf-preview">
     <iframe
       title="PDF Preview"
-      src={pdfFile.preview.startsWith('blob') ? pdfFile.preview : `http://localhost:1337${pdfFile.preview}`}
+      src={
+        pdfFile.preview.startsWith('blob')
+          ? pdfFile.preview
+          : `http://localhost:1337${pdfFile.preview}`
+      }
       width="100%"
       height="500px"
     />
-    <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
-      <FiTrash2 size={24} /> Supprimer le PDF
-    </Button>
+    <div className="d-flex justify-content-center">
+      <Button variant="outline-danger" onClick={() => removeFile("pdf")}>
+        <FiTrash2 size={24} /> Supprimer le PDF
+      </Button>
+    </div>
   </div>
 )}
-
 
 {/* ************************************************************************* */}
             {/* {videoFile.preview && (
@@ -1034,12 +978,14 @@ const handleParcoursChange = (selectedParcours) => {
                 </Button>
               </div>
             )} */}
-
-
 {videoFile.preview && (
   <div className="video-preview">
     <video
-      src={videoFile.preview.startsWith('blob') ? videoFile.preview : `http://localhost:1337${videoFile.preview}`}
+      src={
+        videoFile.preview.startsWith('blob')
+          ? videoFile.preview
+          : `http://localhost:1337${videoFile.preview}`
+      }
       controls
       width="100%"
     />
@@ -1049,16 +995,13 @@ const handleParcoursChange = (selectedParcours) => {
   </div>
 )}
 
-
-
-
            <LargeButtonGroup>
               <LargeButton variant="secondary" onClick={() => navigate("/dashboard/resources")}>
                 Annuler
               </LargeButton>
 
-              <LargeButton type="submit" variant="primary" disabled={isSubmitting}>
-                {isSubmitting ? <Spinner animation="border" size="sm" /> : "Mettre à jour"}
+              <LargeButton type="submit" variant="primary">
+                Mettre à jour
               </LargeButton>
             </LargeButtonGroup>
           </Form>

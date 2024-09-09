@@ -167,14 +167,15 @@ const AmisList = () => {
                 
                 <div style={styles.actions}>
                   {/* Clickable chat icon */}
-                  <Button
+                  <Link
                     variant="link"
                     style={styles.button}
+                    
                     onClick={() => goToChat(friend.id)}  // Redirect to chat when clicked
                     title="Envoyer un message"
                   >
                     <FiMessageSquare size={20} />
-                  </Button>
+                  </Link>
 
                   {/* Remove friend button */}
                   <Button

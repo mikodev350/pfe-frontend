@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Form, Container, Row, Col } from "react-bootstrap";
+import { Button, Form, Container, Row, Col, Spinner } from "react-bootstrap";
 import Select, { components } from "react-select";
 import { useFormik } from "formik";
 import { validationSchema } from "../../validator/addResourceValidator";
@@ -14,8 +14,8 @@ import { uploadFile } from "../../api/apiUpload";
 import "react-medium-image-zoom/dist/styles.css";
 import Zoom from "react-medium-image-zoom";
 import "react-toastify/dist/ReactToastify.css";
-import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Importer SweetAlert2
 
 import styled from "styled-components";
 import Retour from "../../components/retour-arriere/Retour";
@@ -193,6 +193,7 @@ export default function AddResource() {
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
   }, [token, queryClient]);
+const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -212,6 +213,8 @@ export default function AddResource() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+        setIsSubmitting(true); // Activer le loader
+
       try {
         const formData = new FormData();
 
@@ -264,6 +267,14 @@ export default function AddResource() {
         if (!navigator.onLine) {
           // Save resource offline
           await saveResource(values, token);
+          // Après enregistrement réussi de la ressource
+Swal.fire({
+  title: "Succès",
+  text: "Ressource enregistrée avec succès !",
+  icon: "success",
+  confirmButtonText: "OK",
+});
+navigate("/dashboard/resources");
         } else {
           // Save resource online
           const response = await saveResource(values, token);
@@ -282,14 +293,26 @@ export default function AddResource() {
             setDisplayLinkInput(false);
             setDisplayBookInput(false);
 
-               toast.success("Ressource enregistrée avec succès !");
-        navigate("/dashboard/resources");
+// Après enregistrement réussi de la ressource
+Swal.fire({
+  title: "Succès",
+  text: "Ressource enregistrée avec succès !",
+  icon: "success",
+  confirmButtonText: "OK",
+});        navigate("/dashboard/resources");
           } else {
+            Swal.fire({
+  title: "Erreur",
+  text: "Erreur lors de l'enregistrement de la ressource.",
+  icon: "error",
+  confirmButtonText: "OK",
+});
             throw new Error("Failed to save resource");
-                    toast.error("Erreur lors de l'enregistrement de la ressource.");
 
           }
         }
+            setIsSubmitting(false); // Désactiver le loader après succès
+
       } catch (error) {
         console.error("Error saving resource:", error);
       }
@@ -409,7 +432,6 @@ const removeFile = (type, index) => {
   return (
  <StyledContainer className="mt-4">
   <Retour />
-   <ToastContainer />
       {/* <StyledCard>     */}
             <FormTitle>Ajouter une ressource</FormTitle>
 
@@ -837,9 +859,10 @@ const removeFile = (type, index) => {
                   <LargeButton variant="secondary" onClick={() => navigate("/dashboard/resources")}>
               Annuler
             </LargeButton>
-            <LargeButton type="submit" variant="primary">
-              Enregistrer 
-            </LargeButton>
+<LargeButton type="submit" variant="primary" disabled={isSubmitting}>
+  {isSubmitting ? <Spinner animation="border" size="sm" /> : "Enregistrer"}
+</LargeButton>
+
         </LargeButtonGroup>
       </Row>
     </Container>

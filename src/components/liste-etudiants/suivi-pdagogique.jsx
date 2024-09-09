@@ -7,6 +7,8 @@ import Tab from "react-bootstrap/Tab";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Select from "react-select";
+import Swal from 'sweetalert2';
+
 import {
   FiMessageSquare,
   FiFileText,
@@ -31,7 +33,7 @@ import { getToken } from "../../util/authUtils";
 import DevoirModal from "../DevoirModalSend/DevoirModal";
 import QuizModal from "../quiz-modal/QuizModal";
 import styled from "styled-components";
-import { getIdOfConverstation } from "../../api/apiConversation";
+// import { getIdOfConverstation } from "../../api/apiConversation";
 
 const StyledTabs = styled(Tabs)`
   display: flex;
@@ -255,12 +257,15 @@ React.useEffect(() => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  const goTochat = async (etudiantId) => {
-    const reponse = await getIdOfConverstation(etudiantId)
+  const goTochat = async (chatId) => {
+    alert(chatId)
     if (windowWidth < 900) {
-      navigate(`/chat/${reponse}`);
+      alert(chatId)
+      navigate(`/chat/${chatId}`);
     } else {
-      navigate(`/chat?id=${reponse}`);
+            alert("test sefe")
+      navigate(`/chat?id=${chatId}`);
+
     }
 
   }
@@ -311,8 +316,27 @@ React.useEffect(() => {
   };
 
   const handleDeleteGroup = (groupId) => {
-    deleteGroupMutation.mutate(groupId);
-  };
+  Swal.fire({
+    title: 'Êtes-vous sûr?',
+    text: "Cette action est irréversible!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Oui, supprimez-le!',
+    cancelButtonText: 'Annuler'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteGroupMutation.mutate(groupId); // Lancer la mutation de suppression après confirmation
+      Swal.fire(
+        'Supprimé!',
+        'Le groupe a été supprimé avec succès.',
+        'success'
+      );
+    }
+  });
+};
+
 
   return (
     <div style={{ padding: "20px" }}>
@@ -376,7 +400,7 @@ React.useEffect(() => {
                         </div>
                       </div>
                       <div style={styles.actions}>
-                        <Link to="#" style={styles.button} onClick={()=>{goTochat(student.id)}} title="Message">
+                        <Link to={windowWidth < 900 ?`/chat/${student.conversationId}`:`/chat?id=${student.conversationId}`} style={styles.button} title="Message">
                           <FiMessageSquare size={20} />
                         </Link>
                         <Button

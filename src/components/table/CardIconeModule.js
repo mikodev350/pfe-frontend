@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BiDetail, BiEdit, BiTrash } from "react-icons/bi";
 import { Button, Modal, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2"; // Importer SweetAlert
 import { useMutation, useQueryClient } from "react-query";
 import { deleteModule } from "../../api/apiModule";
 import { getToken } from "../../util/authUtils";
@@ -40,12 +39,23 @@ const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("modules");
-        toast.success("Module supprimé avec succès !");
+
+        // Remplacer toast.success par Swal
+        Swal.fire({
+          title: "Succès!",
+          text: "Module supprimé avec succès!",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
       },
       onError: (error) => {
-        toast.error(
-          `Erreur lors de la suppression du module : ${error.message}`
-        );
+        // Remplacer toast.error par Swal
+        Swal.fire({
+          title: "Erreur!",
+          text: `Erreur lors de la suppression du module : ${error.message}`,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       },
     }
   );
@@ -146,31 +156,6 @@ const CardIconeModule = ({ moduleId, moduleName, handleUpdateModule }) => {
             </Button>
           </div>
         </Modal.Body>
-        {/* <Modal.Footer>
-          <div className="d-flex justify-content-end mt-3">
-            <Button
-              variant="secondary"
-              onClick={handleClose}
-              style={{
-                width: "100% !important",
-                height: "42px !important",
-                marginRight: "10px",
-                backgroundColor: "#6c757d",
-                borderColor: "#6c757d",
-              }}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="primary"
-              type="submit"
-              style={{ backgroundColor: "#007bff", borderColor: "#007bff" }}
-            >
-              onClick={handleSave}
-              Enregistrer
-            </Button>
-          </div>
-        </Modal.Footer> */}
       </Modal>
     </>
   );

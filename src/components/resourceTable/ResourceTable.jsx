@@ -1,6 +1,6 @@
 // components/resourceTable/ResourceTable.js
 import React, { useState, useEffect } from "react";
-import { Card as BootstrapCard, Row, Col } from "react-bootstrap";
+import { Card, Row, Col } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
 import { useQuery, useQueryClient } from "react-query";
 import { fetchResources } from "../../api/apiResource";
@@ -147,16 +147,22 @@ const ResourceTable = ({ searchValue }) => {
   const token = React.useMemo(() => getToken(), []);
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error, refetch } = useQuery(
-    ["resources", currentPage, pageSize, searchValue],
-    () => fetchResources(currentPage, pageSize,searchValue, token),
-    { keepPreviousData: true }
-  );
+const { data, isLoading, isError, error, refetch, isFetching } = useQuery(
+  ["resources", currentPage, pageSize, searchValue],
+  () => fetchResources(currentPage, pageSize, searchValue, token),
+  {
+    keepPreviousData: true,
+    refetchOnWindowFocus: true, // Rafraîchit les données quand la fenêtre est refocalisée
+    refetchOnReconnect: true, // Rafraîchit les données quand la connexion est rétablie
+    refetchInterval: 500, // Rafraîchit toutes les 10 secondes (optionnel)
+  }
+);
 
   useEffect(() => {
     const handleOnline = async () => {
       // await syncOfflineChangesResource(token, queryClient);
       refetch();
+          // Recharger la page quand la connexion est de retour
     };
 
     window.addEventListener("online", handleOnline);
@@ -222,124 +228,3 @@ export default ResourceTable;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // components/resourceTable/ResourceTable.js
-// import React, { useState } from "react";
-// import { Row, Table } from "react-bootstrap";
-// import { format, parseISO } from "date-fns";
-// import { useQuery } from "react-query";
-// import { fetchResources } from "../../api/apiResource";
-// import Loader from "../loader/Loader";
-// import PaginationComponent from "../pagination/Pagination";
-// import TableRow from "../table/TableRow";
-// import TableCell from "../table/TableCell";
-// import TableBody from "../table/TableBody";
-// import { getToken } from "../../util/authUtils";
-// import { useNavigate } from "react-router-dom";
-// import TableIconeResource from "../table/TableIconeResource";
-
-// const header = ["#", "Name", "Type", "Date of Creation", "Action"];
-
-// const isValidDate = (dateString) => {
-//   const date = parseISO(dateString);
-//   return !isNaN(date.getTime());
-// };
-
-// const ResourceTable = ({ searchValue }) => {
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const pageSize = 5;
-//   const token = React.useMemo(() => getToken(), []);
-//   const navigate = useNavigate();
-//   const { data, isLoading, isError, error } = useQuery(
-//     ["resources", currentPage, pageSize, searchValue],
-//     () => fetchResources(currentPage, pageSize, "", searchValue, token),
-//     { keepPreviousData: true }
-//   );
-
-//   const totalPages = data?.totalPages || 1;
-
-//   const handlePageChange = (page) => {
-//     setCurrentPage(page);
-//   };
-
-//   if (isLoading) {
-//     return <Loader />;
-//   }
-
-//   if (isError) {
-//     return <div>Error fetching data: {error.message}</div>;
-//   }
-
-//   const resources = Array.isArray(data?.data) ? data.data : [];
-
-//   return (
-//     <Row>
-//       <Table className="text-center table-dashboard">
-//         <thead>
-//           <tr>
-//             {header.map((h, index) => (
-//               <th
-//                 key={index}
-//                 className={
-//                   index === 0
-//                     ? "border-table-right"
-//                     : index === header.length - 1
-//                     ? "border-table-left border-left-zero"
-//                     : ""
-//                 }
-//               >
-//                 {h}
-//               </th>
-//             ))}
-//           </tr>
-//         </thead>
-//         <TableBody>
-//           {resources.map((resource, index) => (
-//             <TableRow key={index}>
-//               <TableCell dataLabel={header[0]} item={index + 1} />
-//               <TableCell dataLabel={header[1]} item={resource.nom} />
-//               <TableCell dataLabel={header[2]} item={resource.format} />
-//               <TableCell
-//                 dataLabel={header[3]}
-//                 item={
-//                   isValidDate(resource.createdAt)
-//                     ? format(parseISO(resource.createdAt), "dd-MM-yyyy").toString()
-//                     : "Invalid Date"
-//                 }
-//               />
-//               <TableIconeResource dataLabel={header[4]} id={resource.id} />
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//       <div className="d-flex justify-content-center">
-//         <PaginationComponent
-//           totalPages={totalPages}
-//           currentPage={currentPage}
-//           onPageChange={handlePageChange}
-//         />
-//       </div>
-//     </Row>
-//   );
-// };
-
-// export default ResourceTable;

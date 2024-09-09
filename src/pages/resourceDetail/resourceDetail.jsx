@@ -7,7 +7,8 @@ import 'react-medium-image-zoom/dist/styles.css';
 import styled from 'styled-components';
 import { FaSave } from "react-icons/fa";
 import GenerateLinkButton from "../../components/GenerateLinkButton/GenerateLinkButton";
-import { toast, ToastContainer } from 'react-toastify';
+import Swal from 'sweetalert2'; // Import SweetAlert2
+
 import { cloneResource } from "../../api/apiResource";
 const StyledCard = styled(Card)`
   background-color: #ffffff !important;
@@ -207,12 +208,19 @@ const ResourceDetails = ({ resource , isFromLink, token}) => {
   const handleSaveResource = async () => {
     try {
       const newResource = await cloneResource(resource.id, token);
-      toast.success("Ressource sauvegardée avec succès !");
-      console.log("New Resource:", newResource); // For debugging purposes
+ Swal.fire({
+        icon: 'success',
+        title: 'Ressource sauvegardée avec succès !',
+        showConfirmButton: false,
+        timer: 1500,
+      });      console.log("New Resource:", newResource); // For debugging purposes
     } catch (error) {
       console.error("Error saving resource:", error);
-      toast.error("Error saving resource");
-    }
+ Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Une erreur est survenue lors de la sauvegarde de la ressource.',
+      });    }
   };
 
 
@@ -447,7 +455,6 @@ else{
    return (
     <>
          <TitleContainer>
-                <ToastContainer />
         <Title>{resource.nom}</Title>
        
         {isFromLink && (

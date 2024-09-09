@@ -9,16 +9,14 @@ import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/sign-up/SignUp";
 import "./components/table/Tables.css";
-import Quiz from "./pages/quiz/quiz/Quiz";
 import Profile from "./pages/Profile/Profile";
 import ChatApp from "./pages/chat/chatApp";
 import Conversation from "./pages/chat/Conversation";
 import Settings from "./pages/settings/settings";
 import Socket from "./components/Socket/Socket";
-import Quizzes from "./pages/quiz/quiz/Quizzes";
-// import PrivateRoute from "./path/to/PrivateRoute"; // Assuming PrivateRoute is a custom component, provide the correct path
-// import DashboardStudent from "./path/to/DashboardStudent"; // Provide the correct path to DashboardStudent
-import { toast, ToastContainer } from "react-toastify";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Assure-toi d'importer le style
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -40,10 +38,10 @@ function App() {
 
   return (
     <>
+      <ToastContainer />
       <Router>
         <Socket />
         <Notification />
-        <ToastContainer />
 
         <Routes>
           <Route path="/" element={<Home />} />
@@ -71,8 +69,6 @@ function App() {
             path="/settings/*"
             element={<PrivateRoute element={Settings} />}
           />
-          <Route path="/quiz" element={<PrivateRoute element={Quiz} />} />
-          <Route path="/quizzes" element={<PrivateRoute element={Quizzes} />} />
           <Route
             path="/settings"
             element={<PrivateRoute element={Settings} />}

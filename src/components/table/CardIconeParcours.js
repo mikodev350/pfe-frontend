@@ -4,7 +4,6 @@ import { BiArchive, BiEdit, BiTrash } from "react-icons/bi";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "react-query";
 import { deletePathway } from "../../api/ApiParcour";
 import { getToken } from "../../util/authUtils";
@@ -51,12 +50,20 @@ export default function CardIconeParcours({ parcoursId, parcoursName }) {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("parcours");
-        toast.success("Parcours supprimé avec succès !");
+
+        Swal.fire({
+          icon: "success",
+          title: "Parcours supprimé avec succès !",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       },
       onError: (error) => {
-        toast.error(
-          `Erreur lors de la suppression du parcours : ${error.message}`
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Erreur",
+          text: `Erreur lors de la suppression du parcours : ${error.message}`,
+        });
       },
     }
   );

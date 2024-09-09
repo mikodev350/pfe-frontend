@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Container, Row, Col } from "react-bootstrap";
+import { Card, Container, Row, Col, Spinner } from "react-bootstrap";
 import PaginationComponent from "../pagination/Pagination";
 import { useQuery, useQueryClient } from "react-query";
 import { fetchParcours, deletePathway, updatePathway } from "../../api/ApiParcour";
@@ -129,7 +129,7 @@ export const ParcoursTable = ({ searchValue, token }) => {
   };
 
   if (isLoading) {
-    return <div>Chargement...</div>;
+    return <div><Spinner /></div>;
   }
 
   if (isError) {

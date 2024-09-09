@@ -17,6 +17,9 @@ export const fetchStudents = async (searchValue = "", token) => {
       },
       params,
     });
+    console.log("response.data.students");
+
+    console.log(response.data.students);
 
     return response.data.students; // Retourne la liste des étudiants
   } catch (error) {
