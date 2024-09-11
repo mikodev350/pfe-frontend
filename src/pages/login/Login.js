@@ -9,6 +9,7 @@ import Layout from "../../components/layout/Layout";
 import { Helmet } from "react-helmet";
 import initializeCriticalData from "../../hooks/initializeCriticalData";
 import loginStyle from "./login.css";
+import ForgotPasswordModal from "../../components/ForgotPasswordModal/ForgotPasswordModal";
 // import loginImage from "./img/Mobile login-cuate.png"; // Importation de l'image
 
 // Schéma de validation du formulaire
@@ -19,6 +20,8 @@ const LoginSchema = Yup.object().shape({
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false); // Initialisation de l'état pour le modal
+
   const navigate = useNavigate();
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -184,7 +187,12 @@ const Login = () => {
                         <div className="text-center mt-2 forgot">
                           <p>
                             Vous avez des difficultés à vous connecter ?&nbsp;
-                            <Link to={"/"}>Mot de passe oublié ?</Link>
+                            <span
+                              style={{ cursor: "pointer", color: "blue" }}
+                              onClick={() => setShowForgotPasswordModal(true)} // Afficher le modal
+                            >
+                              Mot de passe oublié ?
+                            </span>
                           </p>
                         </div>
                         <hr />
@@ -203,6 +211,10 @@ const Login = () => {
             </Row>
           </div>
         </div>
+        <ForgotPasswordModal
+          show={showForgotPasswordModal}
+          handleClose={() => setShowForgotPasswordModal(false)}
+        />
       </Layout>
     </>
   );

@@ -78,8 +78,8 @@ const UserFilterModal = ({ show, handleClose, onFilterChange }) => {
             }
             >
               <option value="">Sélectionner le type d'utilisateur</option>
-              <option value="student">Étudiant</option>
-              <option value="teacher">Professeur</option>
+              <option value="student">Apprenant</option>
+              <option value="teacher">Enseignant</option>
             </Form.Control>
           </Form.Group>
 

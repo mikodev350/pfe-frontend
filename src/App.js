@@ -24,7 +24,7 @@ import "./custom-bootstrap.css";
 
 import Notification from "./components/Notifications";
 import Dashboard from "./pages/dashboard/dashboard/Dashboard";
-// import Dashboard from "./pages/dashboard/dashboard";
+import ResetPassword from "./components/handleResetPassword/handleResetPassword";
 function PrivateRoute({ element: Component }) {
   const token = window.localStorage.getItem("token");
   return token ? <Component /> : <Navigate to="/login" replace />;
@@ -73,6 +73,7 @@ function App() {
             path="/settings"
             element={<PrivateRoute element={Settings} />}
           />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </Router>
     </>

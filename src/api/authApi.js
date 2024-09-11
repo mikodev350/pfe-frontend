@@ -11,6 +11,7 @@ export const updateRole = async (role) => {
       throw new Error("Token non trouvé. Veuillez vous reconnecter.");
     }
 
+    alert(token);
     const response = await axios.put(
       `${API_BASE_URL}/user-custom/update-role`,
       { role },
@@ -57,10 +58,11 @@ export async function register(userData) {
       userData
     );
 
-    await updateRole(userData.type);
-
     localStorage.setItem("token", response.data.jwt);
-    localStorage.setItem("role", response.data.user.type.toUpperCase());
+    const updateElement = await updateRole(userData.type);
+
+    localStorage.setItem("role", updateElement.role.toUpperCase());
+
     return { ...response.data };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -127,3 +129,17 @@ export async function loginAPI(IdentifierData) {
     throw error;
   }
 }
+
+// delete the accournt  `
+export const deleteUser = async (userId, token) => {
+  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Erreur lors de la suppression du compte utilisateur");
+  }
+};

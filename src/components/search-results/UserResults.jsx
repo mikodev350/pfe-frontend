@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 // Styled Components
-// Styled Components
 const StyledCard = styled.div`
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -79,23 +78,21 @@ const StyledButton = styled(Link)`
   }
 `;
 
-
-
-const defaultImage = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixabay.com%2Fvectors%2Fblank-profile-picture-mystery-man-973460%2F&psig=AOvVaw2nTzxt4TdjVkA7fTgDK03g&ust=1718197455295000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNjXnbvO04YDFQAAAAAdAAAAABAE";
+const defaultImage = "http://localhost:1337/uploads/images_1_1f1e6e00bc.jpeg";
 
 const UserResults = ({ results }) => {
   if (!results || results.length === 0) {
     return <div>No results found.</div>;
   }
 
-return (
+  return (
     <Container>
       <Row>
         {results.map((user) => (
           <Col key={user.id} sm={12}>
             <StyledCard>
               <ProfileImage
-                src={`http://localhost:1337${user.profilePicture}` || defaultImage}
+                src={user.profilePicture ? `http://localhost:1337${user.profilePicture}` : defaultImage}
                 alt={user.username}
               />
               <CardBody>

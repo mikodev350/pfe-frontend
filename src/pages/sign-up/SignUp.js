@@ -50,7 +50,6 @@ const SignUp = () => {
     dateOfBirth: "",
     address: "",
     wilaya: "",
-
     gender: "",
     type: "",
   };
@@ -58,25 +57,21 @@ const SignUp = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await register(values);
+
+      console.log("====================================");
+      console.log(response); // Ajoutez ceci pour voir les données envoyées
+      console.log("====================================");
       if (response) {
-        const token = localStorage.getItem("token");
-        if (token) {
-          navigate("/dasboard/home");
-          // if (values.type === "STUDENT") {
-          //   navigate("/student/parcour");
-          // } else {
-          //   navigate("/teacher/parcour");
-          // }
-        } else {
-          toast.error("Token is missing, please login again.", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-        }
+        navigate("/dashboard/home");
+      } else {
+        toast.error("Token is missing, please login again.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
       toast.error("An error occurred, please try again.", {
@@ -176,7 +171,7 @@ const SignUp = () => {
                             style={{ borderColor: "#1e7fc9c2" }}
                           >
                             <option value="">Sélectionner le rôle</option>
-                            <option value="STUDENT">Étudiant</option>
+                            <option value="STUDENT">Apprenant</option>
                             <option value="TEACHER">Enseignant</option>
                           </Form.Control>
                           <Form.Control.Feedback type="invalid">

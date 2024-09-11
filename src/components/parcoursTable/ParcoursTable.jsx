@@ -25,14 +25,14 @@ const StyledCard = styled(Card)`
   }
 
   @media (max-width: 768px) {
-    height: auto; /* Let the height adjust based on content */
+    height: auto;
   }
 
   @media (max-width: 576px) {
     border-radius: 15px;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
-    padding: 15px; /* Reduced padding for mobile */
-    width: 100%; /* Take full width on mobile */
+    padding: 15px;
+    width: 100%;
   }
 `;
 
@@ -43,9 +43,9 @@ const CardBodyStyled = styled(Card.Body)`
   justify-content: space-between;
 
   @media (max-width: 576px) {
-    padding: 15px; /* Adjust padding on smaller screens */
-    flex-direction: column; /* Stack items vertically on mobile */
-    align-items: flex-start; /* Align items to the start */
+    padding: 15px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -61,7 +61,7 @@ const TitleStyled = styled.h5`
   color: #10266F !important;
 
   @media (max-width: 576px) {
-    font-size: 1.1rem; /* Adjust font size on mobile */
+    font-size: 1.1rem;
   }
 `;
 
@@ -71,7 +71,7 @@ const TextStyled = styled.p`
   font-size: 0.95rem;
 
   @media (max-width: 576px) {
-    font-size: 0.9rem; /* Adjust font size on mobile */
+    font-size: 0.9rem;
   }
 `;
 
@@ -79,16 +79,23 @@ export const ParcoursTable = ({ searchValue, token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const queryClient = useQueryClient();
-
+   
+  // Gestion de la connexion avec useQuery
   const { data, isLoading, isError, error, refetch } = useQuery(
     ["parcours", currentPage, searchValue],
     () => fetchParcours(currentPage, searchValue, token),
     {
       keepPreviousData: true,
+       refetchOnWindowFocus: true, // Rafraîchit les données quand la fenêtre est refocalisée
+    refetchOnReconnect: true, // Rafraîchit les données quand la connexion est rétablie
+        refetchInterval: 500, // Rafraîchit toutes les 5 secondes (optionnel)
+
       onSuccess: async (data) => {
+        // Stocker les parcours dans IndexedDB
         await db.parcours.bulkPut(data.data);
       },
       onError: async () => {
+        // Récupérer les parcours hors ligne depuis IndexedDB
         const localData = await db.parcours
           .filter((parcour) => parcour.nom.includes(searchValue))
           .offset((currentPage - 1) * pageSize)
@@ -99,9 +106,19 @@ export const ParcoursTable = ({ searchValue, token }) => {
     }
   );
 
+  // Gestion de la reconnexion
   useEffect(() => {
-    refetch();
-  }, [currentPage, searchValue, token, refetch]);
+    const handleOnline = async () => {
+      // Lorsque la connexion est rétablie, on rafraîchit les données
+      await refetch();
+    };
+
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+    };
+  }, [refetch]);
 
   const handleDelete = async (id) => {
     try {
@@ -136,8 +153,7 @@ export const ParcoursTable = ({ searchValue, token }) => {
     return <div>Erreur lors de la récupération des données : {error.message}</div>;
   }
 
-
- return (
+  return (
     <Container style={{ marginTop: "15px" }}>
       <Row>
         {data.data.map((item) => (

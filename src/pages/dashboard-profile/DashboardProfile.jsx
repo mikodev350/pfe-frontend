@@ -5,6 +5,10 @@ import styled from 'styled-components';
 import { deleteEducation, deleteExperience, getEducations, getExperiences } from '../../api/apiProfile';
 import { Link } from 'react-router-dom';
 import { getToken } from '../../util/authUtils';
+import { deleteUser } from '../../api/authApi';
+import Swal from 'sweetalert2'; // Import SweetAlert
+
+// Fonction pour supprimer le compte utilisateur
 
 const DashboardProfile = () => {
   const [educations, setEducations] = useState([]);
@@ -12,6 +16,105 @@ const DashboardProfile = () => {
   const [loading, setLoading] = useState(true);
 
   const token = React.useMemo(() => getToken(), []);
+ // Fonction pour supprimer le compte utilisateur
+
+
+ // Fonction pour supprimer le compte utilisateur
+const handleDeleteAccount = async () => {
+  const userId = localStorage.getItem('userId'); // Obtenir l'ID de l'utilisateur depuis le localStorage
+  if (!userId) {
+    console.error('Aucun ID utilisateur trouvé');
+    return;
+  }
+
+  // Alerte de confirmation avant de supprimer le compte
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: 'Vous ne pourrez pas annuler cette action !',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ff4d4d',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Oui, supprimer !'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        // Supprimer l'utilisateur
+        await deleteUser(userId, token);
+
+        // Supprimer le localStorage
+        localStorage.clear();
+
+        // Supprimer toutes les caches
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+
+        // Supprimer toutes les bases de données IndexedDB
+        const databases = await indexedDB.databases();
+        if (databases && databases.length > 0) {
+          databases.forEach(db => indexedDB.deleteDatabase(db.name));
+        }
+
+        // Rediriger vers la page de login après suppression
+        Swal.fire('Supprimé !', 'Votre compte et toutes les données ont été supprimés.', 'success').then(() => {
+          window.location.href = '/login'; // Rediriger vers la page de login
+        });
+      } catch (error) {
+        console.error('Erreur lors de la suppression du compte', error);
+        Swal.fire('Erreur', 'Une erreur est survenue lors de la suppression', 'error');
+      }
+    }
+  });
+};
+
+
+ const handleDeleteEducation = async (id) => {
+    // Alerte de confirmation avant de supprimer l'éducation
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: 'Cette éducation sera supprimée définitivement',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff4d4d',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer !'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteEducation(id, token);
+          setEducations(educations.filter(edu => edu.id !== id));
+          Swal.fire('Supprimé !', 'L\'éducation a été supprimée.', 'success');
+        } catch (error) {
+          console.error('Error deleting education', error);
+          Swal.fire('Erreur', 'Une erreur est survenue lors de la suppression', 'error');
+        }
+      }
+    });
+  };
+
+  const handleDeleteExperience = async (id) => {
+    // Alerte de confirmation avant de supprimer l'expérience
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: 'Cette expérience sera supprimée définitivement',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff4d4d',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer !'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteExperience(id, token);
+          setExperiences(experiences.filter(exp => exp.id !== id));
+          Swal.fire('Supprimé !', 'L\'expérience a été supprimée.', 'success');
+        } catch (error) {
+          console.error('Error deleting experience', error);
+          Swal.fire('Erreur', 'Une erreur est survenue lors de la suppression', 'error');
+        }
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,23 +132,8 @@ const DashboardProfile = () => {
     fetchData();
   }, [token]);
 
-  const handleDeleteEducation = async (id) => {
-    try {
-      await deleteEducation(id, token);
-      setEducations(educations.filter(edu => edu.id !== id));
-    } catch (error) {
-      console.error('Error deleting education', error);
-    }
-  };
+ 
 
-  const handleDeleteExperience = async (id) => {
-    try {
-      await deleteExperience(id, token);
-      setExperiences(experiences.filter(exp => exp.id !== id));
-    } catch (error) {
-      console.error('Error deleting experience', error);
-    }
-  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -138,8 +226,8 @@ const DashboardProfile = () => {
             </StyledTable>
           </Col>
         </Row>
-        <Row className="justify-content-center">
-          <CustomButton variant="danger" className="mt-4">Supprimer Mon Compte</CustomButton>
+ <Row className="justify-content-center">
+          <CustomButton variant="danger" className="mt-4" onClick={handleDeleteAccount}>Supprimer Mon Compte</CustomButton>
         </Row>
       </StyledCard>
     </Container>
