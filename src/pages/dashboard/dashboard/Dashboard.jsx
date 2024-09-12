@@ -45,7 +45,6 @@ function Dashboard() {
   return (
     <Layout fullcontent={false}  backgroundColorIdentification={false}>
       <Routes>
-        {/* Routes common to all users */}
         <Route path="notifications" element={<Notifications/>} />
         <Route path="home" element={<HomeDashboard />} />
         <Route path="resources" element={<Resource />} />
@@ -106,18 +105,6 @@ function Dashboard() {
           </>
         )}
 
-        {/* {role === "STUDENT" && (
-          <>
-            <Route
-              path="/communaute/mentorat"
-              element={<InvitationPage type="COACHING" />}
-            />
-          </>
-        )} */}
-        {/* <Route
-          path="/communaute/mentorat"
-          element={<InvitationPage type="COACHING" />}
-        /> */}
         <Route path="/notes" element={<Note />} />
 
         <Route

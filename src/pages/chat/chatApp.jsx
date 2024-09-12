@@ -28,7 +28,6 @@ const GROUP_IMAGE_URL = "http://localhost:1337/uploads/2352167_d7a8ed29e9.png";
 const AvatarWithName = (participants, type, id, title) => {
   let imageUrl = "";
   let name = title;
-  console.log(type);
 
   if (type === "PRIVATE") {
     const usersFiltered = participants.filter((item) => item.id !== id);

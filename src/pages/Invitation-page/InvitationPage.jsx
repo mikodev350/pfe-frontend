@@ -96,11 +96,6 @@ const InvitationPage = () => {
   );
 
 
-  console.log('====================================');
-  console.log("invitations");
-    console.log(invitations);
-
-  console.log('====================================');
   // Accept invitation mutation
   const acceptInvitationMutation = useMutation(
     (id) => acceptFriendRequest(id, getToken()),

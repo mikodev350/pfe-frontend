@@ -6,7 +6,7 @@ import Card from "react-bootstrap/Card";
 import { accordionStyles } from "../../../components/all-devoirs/devoirCss";
 import { getQuizTest } from "../../../api/apiQuiz";
 import styled from "styled-components";
-
+import Swal from "sweetalert2";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CountdownTimer from "../../../components/countdownTimer/CountdownTimer";
 import { useSelector } from "react-redux";
@@ -34,8 +34,17 @@ export default function Evaluation() {
       id: id,
     });
     if (result === "SESSION ENDED") {
-      alert("SESSION ENDED");
-      return navigate("/student/my-profile");
+      // Remplacer l'alerte par SweetAlert2
+      Swal.fire({
+        title: "Session Terminée",
+        text: "Votre session a expiré.",
+        icon: "warning",
+        confirmButtonText: "OK",
+      }).then(() => {
+        // Redirection après la confirmation de l'utilisateur
+        navigate("/student/my-profile");
+      });
+      return;
     }
     setQuiz(result);
   };

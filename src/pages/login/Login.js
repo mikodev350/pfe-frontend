@@ -46,7 +46,8 @@ const Login = () => {
         await initializeCriticalData(response.jwt);
 
         // Rediriger vers le tableau de bord
-        navigate("/dashboard/home");
+        // navigate("/dashboard/home");
+        window.location.href = "/dashboard/home";
       }
     } catch (error) {
       toast.error("An error occurred: " + error.message, {

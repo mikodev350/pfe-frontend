@@ -100,58 +100,6 @@ const apiUpload = async (file, token) => {
 
 const userRole = localStorage.getItem("role")?.toUpperCase();
 
-// Fonction pour soumettre le formulaire
-// const submitForm = async (values, profile, token, isUpdate, profileId) => {
-//   try {
-//     let photoProfilId = profile.photoProfil ? profile.photoProfil.id : null;
-
-//     // Si la photo de profil a été modifiée, la télécharger
-//     if (profile.photoProfil && profile.photoProfil instanceof File) {
-//       const uploadedPhoto = await apiUpload(profile.photoProfil, token);
-//       photoProfilId = uploadedPhoto.id;
-//     }
-
-//     if (userRole === "TEACHER") {
-//       values.typeEtudes = "teacher";
-//       values.niveauEtudes = "rien";
-//     }
-//     const payload = {
-//       ...values,
-//       competences: values.competences.split(",").map((comp) => comp.trim()), // Convertir les compétences en tableau
-//       matieresEnseignees: values.matieresEnseignees.split(",").map((mat) => mat.trim()), // Convertir les matières enseignées en tableau
-//       photoProfil: photoProfilId,
-//     };
-
-//     if (values.typeEtudes === "continue") {
-//       payload.niveauEtudes = "";
-//       payload.niveauSpecifique = "";
-//       payload.specialite = "";
-//     } else if (values.typeEtudes === "académique") {
-//       payload.nomFormation = "";
-//     }
-
-//     const url = isUpdate ? `http://localhost:1337/api/profils/${profileId}` : "http://localhost:1337/api/profils";
-//     const method = isUpdate ? "PUT" : "POST";
-
-//     console.log("Payload:", payload); // Log du payload pour débogage
-
-//     const response = await axios({
-//       method,
-//       url,
-//       data: payload,
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     console.log("Profile saved:", response.data);
-//     alert("Profile saved successfully");
-//   } catch (error) {
-//     console.error("Error saving profile:", error);
-//     alert("Error saving profile");
-//   }
-// };
 
 // Fonction pour soumettre le formulaire
 const submitForm = async (values, profile, token, isUpdate, profileId) => {

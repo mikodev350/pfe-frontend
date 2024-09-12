@@ -147,8 +147,6 @@ export default function Quiz() {
         [name]: value,
       }));
     } else {
-      console.log("rani fi else");
-
       let updateQuiz = quiz.map((item) => {
         if (
           name.startsWith("desc") &&
@@ -462,7 +460,6 @@ export default function Quiz() {
 function isNotChanged({ initData, newData }) {
   const data1 = trim(initData);
   const data2 = trim(newData);
-  console.log({ data1, data2 });
 
   return JSON.stringify(data1) === JSON.stringify(data2);
 }

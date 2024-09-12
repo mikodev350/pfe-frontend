@@ -58,9 +58,6 @@ const SignUp = () => {
     try {
       const response = await register(values);
 
-      console.log("====================================");
-      console.log(response); // Ajoutez ceci pour voir les données envoyées
-      console.log("====================================");
       if (response) {
         navigate("/dashboard/home");
       } else {
