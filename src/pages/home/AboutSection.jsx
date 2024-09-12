@@ -213,7 +213,7 @@ const TestimonialSection = () => {
           </SwiperSlide>
           <SwiperSlide>
             <ProfileCard
-              name="Kheznadar Meriem"
+              name="Khaznadar Meriem"
               position="IT Engineer"
               imgSrc={IconProfile}
             />

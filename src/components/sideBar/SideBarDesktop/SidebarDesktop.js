@@ -140,17 +140,21 @@ const SidebarDesktop = () => {
       {windowWidth < 900 && (
         <div
           style={{
-            marginTop: "70px",
-            position: "fixed", // Assurez-vous qu'il est fixe
-            top: "10px", // Ajustez cette valeur pour qu'il soit en haut
-            left: "10px", // Placez-le où vous voulez horizontalement
-            zIndex: 12220, // Assurez-vous qu'il a un z-index élevé pour être au-dessus du contenu
+            position: "fixed", // Le bouton restera en bas même avec le défilement
+            bottom: "20px", // Positionnement à 20px du bas
+            right: "20px", // Positionnement à 20px du bord droit
+            zIndex: 12220, // Assurez-vous qu'il est au-dessus du contenu
+            backgroundColor: "#10266F", // Utilisation de la couleur de fond demandée
+            borderRadius: "50%", // Le bouton est rond
+            padding: "10px", // Ajout de padding
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Ombre pour un effet moderne
           }}
         >
           <Hamburger
             toggled={isExpanded}
             toggle={setIsExpanded}
-            color="#10266F"
+            color="#ffffff" // Icône en blanc
+            size={24} // Taille du bouton Hamburger
           />
         </div>
       )}

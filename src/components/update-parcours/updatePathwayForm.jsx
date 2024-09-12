@@ -36,7 +36,15 @@ const StyledTitle = styled.h3`
   letter-spacing: 1.5px;
   border-bottom: 2px solid #3949ab;
   padding-bottom: 0.5rem;
+
+  @media (max-width: 576px) {  // Media query pour mobile (taille écran max 576px)
+    font-size: 1.8rem; // Réduire la taille du texte pour mobile
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+  }
 `;
+
 
 const StyledForm = styled(Form)`
   margin-top: 20px;
@@ -177,8 +185,9 @@ const UpdatePathwayForm = () => {
     <StyledCardContainer>
       <Retour />
       <Row>
-        <StyledTitle>Modifier le parcours</StyledTitle>
         <StyledForm onSubmit={formik.handleSubmit}>
+                  <StyledTitle>Modifier le parcours</StyledTitle>
+
           <StyledFormGroup controlId="nom">
             <Form.Label>
               Nom du {formik.values.type === 'continue' ? 'domaine' : 'parcours'}

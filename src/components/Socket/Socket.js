@@ -3,6 +3,9 @@ import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 import { initSocket, cleanup } from "../../redux/features/socket-slice";
 import Swal from "sweetalert2"; // Importation de SweetAlert2
+
+import beepSound from "./song/notification.mp3";
+
 // import sound from "../sounds/beep.mp3";
 import {
   newNotification,
@@ -13,6 +16,10 @@ import { useQueryClient } from "react-query";
 import { notifyUser } from "../../util/PopUpNotification";
 
 export default function Socket() {
+  const playNotificationSound = () => {
+    const audio = new Audio(beepSound);
+    audio.play();
+  };
   const navigate = useNavigate(); // Utilise le hook useNavigate de React Router
   const queryClient = useQueryClient();
   const [searchQuery] = useSearchParams();
@@ -59,6 +66,7 @@ export default function Socket() {
             });
           },
         });
+        playNotificationSound();
 
         notifyUser(
           `${notification.expediteur.username}  ${notification.notifText}`,
@@ -89,6 +97,8 @@ export default function Socket() {
               });
             },
           });
+
+          playNotificationSound();
 
           notifyUser("Vous avez reçu un nouveau message");
         } else if (id === conversationId) {

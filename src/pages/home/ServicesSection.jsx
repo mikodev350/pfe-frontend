@@ -16,6 +16,7 @@ const servicesItemStyle = {
   maxWidth: '200px',
   minWidth: '200px',
   transition: 'transform 0.3s ease-in-out',
+  height: "250px"
 };
 const serviceIconStyle = {
   fontSize: '2em', // Taille des icônes gardée
@@ -166,7 +167,7 @@ const ServicesSection = () => {
               </div>
               <div className="services__content">
                 <h3 className="services__title" style={serviceTitleStyle}>
-                  <a href="/about" style={serviceLinkStyle}>Travaux remis <br />(Quiz)</a>
+                  <a href="/about" style={serviceLinkStyle}>Travaux remis <br />(Quiz & Devoir)</a>
                 </h3>
                 <p>Soumettez et corrigez des travaux sous forme de quiz facilement.</p>
               </div>

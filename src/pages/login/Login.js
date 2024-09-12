@@ -130,7 +130,14 @@ const Login = () => {
                     handleSubmit,
                   }) => (
                     <Form onSubmit={handleSubmit} className="mt-5 ">
-                      <h2 className="text-center custom-heading">
+                      <h2
+                        className="text-center "
+                        style={{
+                          fontSize: "2rem",
+                          fontWeight: "bold",
+                          color: "#1e7fc9",
+                        }}
+                      >
                         {" "}
                         {"Se\u00A0connecter"}{" "}
                       </h2>

@@ -105,7 +105,7 @@ const ChatApp = () => {
           <Row>
             <Col md={3}>
               <StyledTabs defaultActiveKey="private">
-                <StyledTab eventKey="private" title="Private">
+                <StyledTab eventKey="private" title="Privé">
                   <StyledListGroup>
                     {dataPrivate?.conversations?.map((item) => (
                       <StyledListGroupItem
@@ -121,7 +121,7 @@ const ChatApp = () => {
                     ))}
                   </StyledListGroup>
                 </StyledTab>
-                <StyledTab eventKey="group" title="Group">
+                <StyledTab eventKey="group" title="Groupe">
                   <StyledListGroup>
                     <CreateModelGroupe
                       show={showCreateGroupModal}

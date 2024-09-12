@@ -106,9 +106,9 @@
 }
 
 
-@media (max-width: 450px) {
+@media (max-width: 575px) {
   section#why {
-    margin-top: 150px !important;
+    margin-top: 200px !important;
   }
 .Imge-why-Section{
   width: 300px !important;

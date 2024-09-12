@@ -151,45 +151,36 @@ const AmisList = () => {
           </div>
         ) : (
           <ListGroup variant="flush">
-            {friends.map((friend, index) => (
-              <ListGroup.Item
-                key={index}
-                style={styles.listItem}
-              >
-                <div style={styles.iconContainer}>
-                  <span>{friend.username.charAt(0)}</span>
-                </div>
-                
-                {/* Utiliser Link pour rediriger vers le profil */}
-                <Link to={`/dashboard/find-profil/${friend.id}`} style={styles.name}>
-                  {friend.username}
-                </Link>
-                
-                <div style={styles.actions}>
-                  {/* Clickable chat icon */}
-                  <Link
-                    variant="link"
-                    style={styles.button}
-                    
-                    onClick={() => goToChat(friend.id)}  // Redirect to chat when clicked
-                    title="Envoyer un message"
-                  >
-                    <FiMessageSquare size={20} />
-                  </Link>
+          {friends.map((friend, index) => (
+  <ListGroup.Item key={index} style={styles.listItem}>
+    <div style={styles.iconContainer}>
+      <span>{friend.username ? friend.username.charAt(0) : "?"}</span>
+    </div>
+    <Link to={`/dashboard/find-profil/${friend.id}`} style={styles.name}>
+      {friend.username || "Unknown Username"}
+    </Link>
+    <div style={styles.actions}>
+      <Link
+        variant="link"
+        style={styles.button}
+        onClick={() => goToChat(friend.id)}
+        title="Envoyer un message"
+      >
+        <FiMessageSquare size={20} />
+      </Link>
+      <Button
+        variant="link"
+        style={{ ...styles.button, color: '#dc3545' }}
+        onClick={() => handleRemoveFriend(friend.id)}
+        title="Retirer de la liste d'amis"
+        disabled={cancelFriendRequestMutation.isLoading}
+      >
+        <FiUserMinus size={20} />
+      </Button>
+    </div>
+  </ListGroup.Item>
+))}
 
-                  {/* Remove friend button */}
-                  <Button
-                    variant="link"
-                    style={{ ...styles.button, color: '#dc3545' }}
-                    onClick={() => handleRemoveFriend(friend.id)}
-                    title="Retirer de la liste d'amis"
-                    disabled={cancelFriendRequestMutation.isLoading}
-                  >
-                    <FiUserMinus size={20} />
-                  </Button>
-                </div>
-              </ListGroup.Item>
-            ))}
           </ListGroup>
         )}
       </Card>

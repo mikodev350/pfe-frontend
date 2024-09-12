@@ -749,6 +749,42 @@ const handleParcoursChange = (selectedParcours) => {
                 name="lessons"
                 onChange={handleLessonsChange}
                 classNamePrefix="select"
+                           styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? '#0066cc' : '#ced4da',
+                  borderRadius: '20px',
+                  height: '45px', // Reduced height
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#0056b3',
+                  },
+                }),
+                placeholder: (baseStyles) => ({
+                  ...baseStyles,
+                  color: '#6c757d',
+                  fontSize: '14px', // Slightly smaller font size
+                }),
+                multiValue: (baseStyles) => ({
+                  ...baseStyles,
+                  backgroundColor: '#e9ecef',
+                  borderRadius: '10px',
+                }),
+                menu: (baseStyles) => ({
+                  ...baseStyles,
+                  borderRadius: '20px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  backgroundColor: state.isFocused ? '#f8f9fa' : 'white',
+                  color: '#495057',
+                  '&:active': {
+                    backgroundColor: '#0066cc',
+                    color: 'white',
+                  },
+                }),
+              }}
                 components={{ Option: CheckboxOption }}
                 value={lessonOptions.filter((l) => formik.values.lessons.includes(l.value))}
               />

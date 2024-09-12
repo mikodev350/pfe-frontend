@@ -137,7 +137,7 @@ self.addEventListener("push", (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: "./img/icon-128x128.png", // chemin vers votre icône
+    icon: "./icon-144x144.png", // chemin vers votre icône
     data: {
       url: `http://localhost:3000${data.url}`, // Lien de redirection à partir du push
     },
