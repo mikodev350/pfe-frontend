@@ -39,7 +39,6 @@ const ResourcePreviewPageWithId = () => {
   return (
     <Container>
       <ToastContainer />
-      <h1 className="mt-5 mb-4">Aperçu de la Ressource</h1>
       {loading ? (
         <div className="text-center">
           <Spinner animation="border" variant="primary" />

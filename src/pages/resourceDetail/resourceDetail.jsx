@@ -520,7 +520,6 @@ else{
   ) : cachedImages && cachedImages.length > 0 ? (
     <div className="mt-4">
       <SectionTitle>Images</SectionTitle>
-            <p>cachedImages && cachedImages.length</p>
 
       <Row className="d-flex justify-content-center">
         {cachedImages.map((image, index) => (

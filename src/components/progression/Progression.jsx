@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Bar, Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
 import styled from 'styled-components';
 import { getToken } from '../../util/authUtils';
 import Loader from '../loader/Loader';
 import Retour from '../retour-arriere/Retour';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Styled components
 const Container = styled.div`
@@ -48,6 +48,7 @@ const ChartContainer = styled.div`
 
 const TableContainer = styled.div`
   margin-top: 30px;
+  overflow-x: auto;  /* Enable horizontal scroll on small screens */
 `;
 
 const StyledTable = styled.table`
@@ -56,6 +57,7 @@ const StyledTable = styled.table`
   margin: 20px 0;
   font-size: 1em;
   background-color: #f8f9fa;
+  min-width: 600px;  /* Ensures the table maintains a minimum width */
 
   th, td {
     padding: 12px 15px;
@@ -140,20 +142,6 @@ const Progression = () => {
     ],
   };
 
-  const lineChartData = {
-    labels: progressData ? progressData.modules : [],
-    datasets: [
-      {
-        label: 'Progression Over Time',
-        data: progressData ? (type.toUpperCase() === 'INDIVIDUEL' ? progressData.scores : progressData.students.map(student => student.scores.reduce((a, b) => a + b) / student.scores.length)) : [],
-        fill: true,
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        borderColor: 'rgba(75,192,192,1)',
-        tension: 0.4,
-      },
-    ],
-  };
-
   return (
     <Container>
       <Retour />
@@ -175,9 +163,6 @@ const Progression = () => {
             <ProgressText>Progression Moyenne: {progressData.average}%</ProgressText>
             <ChartContainer>
               <Bar data={barChartData} options={{ responsive: true }} />
-            </ChartContainer>
-            <ChartContainer>
-              <Line data={lineChartData} options={{ responsive: true }} />
             </ChartContainer>
             <TableContainer>
               <h5 style={{ color: '#007bff' }}>Notes</h5>

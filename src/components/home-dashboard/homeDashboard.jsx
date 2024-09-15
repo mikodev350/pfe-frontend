@@ -102,98 +102,96 @@ const HomeDashboard = () => {
   console.log('====================================');
   return (
     <StyledCard>
-      <Row>
-        <Col md={9}>
-          {/* Welcome Card */}
-          <Card className="mb-4 custom-card">
-            <Card.Body className="custom-card-content">
-              <div className="card-text-wrapper">
-                <Card.Title><h3>Bonjour</h3></Card.Title>
-                <Card.Text>
-                  Bienvenue dans votre tableau de bord ! Profitez d'un aperçu clair de vos activités et d'outils pour une gestion optimisée.
-                </Card.Text>
-              </div>
-              <img
-                src={helloimg}
-                alt="Description de l'image"
-                className="custom-image"
-              />
-            </Card.Body>
-          </Card>
+<Row className="flex-column-reverse flex-md-row">
+  <Col md={9} className="order-md-1 order-2">
+    {/* Carte de bienvenue */}
+    <Card className="mb-4 custom-card">
+      <Card.Body className="custom-card-content">
+        <div className="card-text-wrapper">
+          <Card.Title><h3>Bonjour</h3></Card.Title>
+          <Card.Text>
+            Bienvenue dans votre tableau de bord ! Profitez d'un aperçu clair de vos activités et d'outils pour une gestion optimisée.
+          </Card.Text>
+        </div>
+        <img
+          src={helloimg}
+          alt="Description de l'image"
+          className="custom-image"
+        />
+      </Card.Body>
+    </Card>
 
-          {/* Performance Chart Section */}
-          <Row>
-            <Col md={7}>
-              <Card className="mb-4 custom-card graph-card">
-                <Card.Body>
-                  <Card.Title>Performance</Card.Title>
-                  <Bar data={chartData} options={{ responsive: true }} />
-                </Card.Body>
-              </Card>
-            </Col>
+    {/* Graphiques de performance */}
+    <Row>
+      <Col md={7}>
+        <Card className="mb-4 custom-card graph-card">
+          <Card.Body>
+            <Card.Title>Performance</Card.Title>
+            <Bar data={chartData} options={{ responsive: true }} />
+          </Card.Body>
+        </Card>
+      </Col>
 
-            {/* Recent Resources Section */}
- <Col>
-  <Card className="mb-4 custom-card resources-card">
-    <Card.Body>
-      <Card.Title>Ressources Récentes</Card.Title>
-      {recentResources.length > 0 ? (
-        <ul className="resources-list">
-          {recentResources.map((resource) => (
-            <li key={resource.id} className="resource-item">
-              <FaBook className="resource-icon" />
-              <div className="resource-text">
-                {/* Utiliser Link pour créer un lien vers la prévisualisation de la ressource */}
-                <Link to={`/dashboard/resource-preview/${resource.id}`}>
-                  <strong>{resource.nom}</strong>
-                  <em className="resource-date"> - {resource.date}</em>
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <Card.Text className="text-center">
-          <em>Pas de ressources disponibles</em>
-        </Card.Text>
-      )}
-    </Card.Body>
-  </Card>
-</Col>
+      {/* Ressources récentes */}
+      <Col>
+        <Card className="mb-4 custom-card resources-card">
+          <Card.Body>
+            <Card.Title>Ressources Récentes</Card.Title>
+            {recentResources.length > 0 ? (
+              <ul className="resources-list">
+                {recentResources.map((resource) => (
+                  <li key={resource.id} className="resource-item">
+                    <FaBook className="resource-icon" />
+                    <div className="resource-text">
+                      <Link to={`/dashboard/resource-preview/${resource.id}`}>
+                        <strong>{resource.nom}</strong>
+                        <em className="resource-date"> - {resource.date}</em>
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Card.Text className="text-center">
+                <em>Pas de ressources disponibles</em>
+              </Card.Text>
+            )}
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
+  </Col>
 
+  {/* Section Calendrier et Notes */}
+  <Col md={3} className="side-column order-md-2 order-1">
+    <Card className="mb-4 custom-card-column">
+      <Card.Body className="custom-card-column-content">
+        <div className="custom-calendar-wrapper">
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date) => setSelectedDate(date)}
+            inline
+            calendarClassName="custom-calendar"
+            dayClassName={() => "custom-day"}
+          />
+        </div>
+        <div className="notes-wrapper">
+          <Card.Title>Notes</Card.Title>
+          <Form.Group controlId="noteTextArea">
+            <Form.Control
+              as="textarea"
+              rows={8}
+              value={note}
+              onChange={handleNoteChange}
+              className="note-textarea"
+            />
+          </Form.Group>
+        </div>
+      </Card.Body>
+    </Card>
+  </Col>
+</Row>
 
-          </Row>
-        </Col>
-
-        {/* Calendar and Notes Section */}
-        <Col md={3} className="side-column">
-          <Card className="mb-4 custom-card-column">
-            <Card.Body className="custom-card-column-content">
-              <div className="custom-calendar-wrapper">
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
-                  inline
-                  calendarClassName="custom-calendar"
-                  dayClassName={() => "custom-day"}
-                />
-              </div>
-              <div className="notes-wrapper">
-                <Card.Title>Notes</Card.Title>
-                <Form.Group controlId="noteTextArea">
-                  <Form.Control
-                    as="textarea"
-                    rows={8}
-                    value={note}
-                    onChange={handleNoteChange}
-                    className="note-textarea"
-                  />
-                </Form.Group>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
       </StyledCard>
   );
 };

@@ -142,6 +142,16 @@ export const saveFileToIndexedDBResource = async (url, name) => {
 
 // Handle data conflicts between IndexedDB and the server
 const handleConflict = (localData, remoteData) => {
+ 
+    console.log("localData")
+
+    console.log(localData)
+    const value = new Date(localData.updatedAt) > new Date(remoteData.updatedAt) ? localData : remoteData
+    console.log('====================================');
+        console.log("finall valueeee ")
+
+    console.log(value);
+    console.log('====================================');
   return new Date(localData.updatedAt) > new Date(remoteData.updatedAt) ? localData : remoteData;
 };
 
@@ -154,6 +164,7 @@ export const saveResource = async (resourceData, token) => {
   try {
     const userId = localStorage.getItem("userId");
 
+    
  
     let parcoursData = [];
     let modulesData = [];
@@ -241,20 +252,17 @@ export const saveResource = async (resourceData, token) => {
 
 
 // Function to update a resource
-export const updateResource = async (id, data, token) => {
+export const updateResource = async (id, data, token,isLocalUpload) => {
   const updatedData = {
     ...data,
     isLocal: true,
-    isLocalUpload:true,
+    isLocalUpload:isLocalUpload ? true :false,
     updatedAt: new Date().toISOString(),
   };
-
-  console.log("-----------------data--------------------------------------");
-  console.log(id);
-  console.log(updatedData);
-  console.log("-----------------------------------------------------------------");
+ 
 
   if (!navigator.onLine) {
+
     let parcoursData = [];
     let modulesData = [];
     let lessonsData = [];
@@ -299,7 +307,9 @@ export const updateResource = async (id, data, token) => {
     updatedData.lessons = lessonsData;
 
     try {
-      console.log(updatedData);
+
+updatedData.updatedAt=new Date();
+
       await db.transaction("rw", [db.resources, db.offlineChanges], async () => {
         const existingResource = await db.resources.get(Number(id));
         if (existingResource) {
@@ -763,6 +773,8 @@ export const syncOfflineChangesResource = async (token, queryClient,change) => {
       } else if (change.type === "update") {
         const { images, audio, pdf, video, ...resourceData } = change.data;
 
+
+
         let parcoursData = [];
         let modulesData = [];
         let lessonsData = [];
@@ -791,15 +803,52 @@ export const syncOfflineChangesResource = async (token, queryClient,change) => {
 
         const resolvedData = handleConflict(resourceData, remoteData);
 
-        resolvedData.images = await Promise.all(images.map(image => syncAndCacheFile(image.id, token, 'image')));
-        resolvedData.audio = audio ? await syncAndCacheFile(audio.id, token, 'audio') : null;
-        resolvedData.pdf = pdf ? await syncAndCacheFile(pdf.id, token, 'pdf') : null;
-        resolvedData.video = video ? await syncAndCacheFile(video.id, token, 'video') : null;
+   // Synchroniser et mettre en cache les fichiers
+        resolvedData.images = await Promise.all(images.map(image => {
+          
+            if (image.id && image.url && image.url.includes('/uploads')) {
+
+              // imagesExists.push()
+              return {id:image.id}
+            }else{
+              return  syncAndCacheFile(image.id, token, 'image')
+               
+}
+}
+        ))
+
+
+  resolvedData.audio = audio ? (
+  audio.id && audio.url && audio.url.includes('/uploads') 
+    ? { id: audio.id } 
+    : await syncAndCacheFile(audio.id, token, 'audio')
+) : null;
+
+
+
+// Gérer le PDF
+resolvedData.pdf = pdf ? (
+  pdf.id && pdf.url && pdf.url.includes('/uploads')
+    ? { id: pdf.id }
+    : await syncAndCacheFile(pdf.id, token, 'pdf')
+) : null;
+
+// Gérer la vidéo
+resolvedData.video = video ? (
+  video.id && video.url && video.url.includes('/uploads')
+    ? { id: video.id }
+    : await syncAndCacheFile(video.id, token, 'video')
+) : null;
+
+
+
 
         const cleanDataPush = removeCircularReferences({
           ...resolvedData,
           userId
         });
+
+
 
         const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, cleanDataPush, {
           headers: {
@@ -808,7 +857,7 @@ export const syncOfflineChangesResource = async (token, queryClient,change) => {
           },
         });
 
-        console.log("resolvedData")
+  
 
         console.log(resolvedData)
         if (response.data) {
@@ -834,191 +883,12 @@ export const syncOfflineChangesResource = async (token, queryClient,change) => {
         }
       }
       /******************************************************************************************/ 
-    else if (change.type === "update") {
-  const { images, audio, pdf, video, ...resourceData } = change.data;
 
-
-
-  
-
-  let parcoursData=[]
-  let modulesData=[]
-  let lessonsData=[]
-
-
-
-
-
-    // Problemm esttt icccc
-   for (let parcour of resourceData.parcours) {
-parcoursData.push(parcour.id)
-        }
-
-  
-        resourceData.parcours=parcoursData
-       
-            for (let module of resourceData.modules) {
-modulesData.push(module.id)
-        }
-            resourceData.modules = modulesData;
-   
-            console.log("resourceData.modules");
-            console.log(resourceData.modules);
-      for (let module of resourceData.modules) {
-parcoursData.push(module.id)
-        }
-        resourceData.parcours=resourceData
-
-          for (let lesson of resourceData.lessons) {
-lessonsData.push(lesson.id)
-        }
-            resourceData.lessons = lessonsData;
-
-/************************************************************/
-/************************************************************/ 
-
-
-  const remoteData = await axios
-    .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => response.data);
-
-
-  const resolvedData = handleConflict(resourceData, remoteData);
-
-
-  // Upload images
-  const uploadedImages = [];
-  
-
-  for (let image of images) {
-    const fileFromDB = await db.files.get(image.id);
-    if (fileFromDB) {
-      const file = await prepareDataForUpload(fileFromDB);
-      const uploadedImage = await uploadFileToStrapi(file, token);
-      // Mise à jour du fichier dans IndexedDB après l'upload
-      await db.files.update(fileFromDB.id, {
-        name: uploadedImage[0].name,
-        url: uploadedImage[0].url,
-        createdAt: new Date(),
-      });
-      await cacheFile(`http://localhost:1337${uploadedImage[0].url}`);
-
-      uploadedImages.push(uploadedImage[0]);
-
-    }
-  }
-  resolvedData.images = uploadedImages;
-
-  // Upload audio
-  if (audio) {
-    const fileFromDB = await db.files.get(audio.id);
-    if (fileFromDB) {
-      const file = await prepareDataForUpload(fileFromDB);
-      const uploadedAudio = await uploadFileToStrapi(file, token);
-
-      // Mise à jour du fichier dans IndexedDB après l'upload
-      await db.files.update(fileFromDB.id, {
-        name: uploadedAudio[0].name,
-        url: uploadedAudio[0].url,
-        createdAt: new Date(),
-      });
-
-            await cacheFile(`http://localhost:1337${uploadedAudio[0].url}`);
-
-      resolvedData.audio = uploadedAudio[0];
-    }
-  }
-
-  // Upload PDF
-  if (pdf) {
-    const fileFromDB = await db.files.get(pdf.id);
-    if (fileFromDB) {
-      const file = await prepareDataForUpload(fileFromDB);
-      const uploadedPdf = await uploadFileToStrapi(file, token);
-
-      // Mise à jour du fichier dans IndexedDB après l'upload
-      await db.files.update(fileFromDB.id, {
-        name: uploadedPdf[0].name,
-        url: uploadedPdf[0].url,
-        createdAt: new Date(),
-      });
-            await cacheFile(`http://localhost:1337${uploadedPdf[0].url}`);
-
-      resolvedData.pdf = uploadedPdf[0];
-    }
-  }
-
-  // Upload video
-  if (video) {
-    const fileFromDB = await db.files.get(video.id);
-    if (fileFromDB) {
-      const file = await prepareDataForUpload(fileFromDB);
-      const uploadedVideo = await uploadFileToStrapi(file, token);
-
-      // Mise à jour du fichier dans IndexedDB après l'upload
-      await db.files.update(fileFromDB.id, {
-        name: uploadedVideo[0].name,
-        url: uploadedVideo[0].url,
-        createdAt: new Date(),
-      });
-            await cacheFile(`http://localhost:1337${uploadedVideo[0].url}`);
-
-      resolvedData.video = uploadedVideo[0];
-    }
-  }
-
-  
-
-                const dataPush=
-                {
-                  ...resolvedData,
-                  userId:userId
-                }
-
-        try {
-  // Supprimer les références circulaires
-  const cleanDataPush = removeCircularReferences(dataPush);
-
-  const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, cleanDataPush, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  console.log("response", response);
-
-  // Assurez-vous que response.data est défini avant de l'utiliser
-  if (response.data) {
-    await db.transaction("rw", [db.resources], async () => {
-      const existingResource = await db.resources.get(Number(resolvedData.id));
-      if (existingResource) {
-        await db.resources.update(resolvedData.id, resolvedData);
-      } else {
-        console.error("Resource not found in IndexedDB for update after sync:", resolvedData.id);
-      }
-    });
-
-    queryClient.setQueryData(["resources"], (oldData) => {
-      return {
-        ...oldData,
-        data: oldData.data.map((item) =>
-          item.id === resolvedData.id ? resolvedData : item
-        ),
-      };
-    });
-  } else {
-    console.error("No data returned from server.");
-  }
-} catch (error) {
-  console.error("Error during axios.put:", error);
-}
-      }  else if (change.type === "delete") {
+      
+      
+      
+      
+      else if (change.type === "delete") {
         await axios.delete(`${API_BASE_URL}/resources/${change.data.id}`, {
           headers: {
             "Content-Type": "application/json",
@@ -1223,3 +1093,216 @@ export const fetchResources = async (page, pageSize, searchValue, token) => {
     totalPages: Math.ceil(totalLocalDataCount / pageSize),
   };
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     else if (change.type === "update") {
+//       console.log("change.data")
+
+//       console.log(change.data)
+//   const { images, audio, pdf, video, ...resourceData } = change.data;
+
+
+//   alert(JSON.stringify(images))
+//   let parcoursData=[]
+//   let modulesData=[]
+//   let lessonsData=[]
+
+//     // Problemm esttt icccc
+//    for (let parcour of resourceData.parcours) {
+// parcoursData.push(parcour.id)
+//         }
+
+  
+//         resourceData.parcours=parcoursData
+       
+//             for (let module of resourceData.modules) {
+// modulesData.push(module.id)
+//         }
+//             resourceData.modules = modulesData;
+   
+//             console.log("resourceData.modules");
+//             console.log(resourceData.modules);
+//       for (let module of resourceData.modules) {
+// parcoursData.push(module.id)
+//         }
+//         resourceData.parcours=resourceData
+
+//           for (let lesson of resourceData.lessons) {
+// lessonsData.push(lesson.id)
+//         }
+//             resourceData.lessons = lessonsData;
+
+// /************************************************************/
+// /************************************************************/ 
+
+
+//   const remoteData = await axios
+//     .get(`${API_BASE_URL}/resources/${resourceData.id}`, {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     })
+//     .then((response) => response.data);
+
+
+//   const resolvedData = handleConflict(resourceData, remoteData);
+
+
+ 
+//   // Upload images
+//   const uploadedImages = [];
+  
+
+//   console.log('====================================');
+//   console.log('====================================');
+//     console.log("start with images" );
+
+//   console.log(images);
+//   console.log('====================================');
+//   console.log('====================================');
+//   for (let image of images) {
+
+//       // Si l'image a déjà un id et une url qui commence par "/uploads", on n'a pas besoin de la récupérer ni de la ré-uploader
+//   if (image.id && image.url && image.url.includes('/uploads')) {
+//     uploadedImages.push(image.id); // Ajoute directement l'image existante
+//     alert(uploadedImages)
+//   } else {
+//     const fileFromDB = await db.files.get(image.id);
+//      if (fileFromDB) {
+//       const file = await prepareDataForUpload(fileFromDB);
+//       const uploadedImage = await uploadFileToStrapi(file, token);
+//       // Mise à jour du fichier dans IndexedDB après l'upload
+//       await db.files.update(fileFromDB.id, {
+//         name: uploadedImage[0].name,
+//         url: uploadedImage[0].url,
+//         createdAt: new Date(),
+//       });
+//       await cacheFile(`http://localhost:1337${uploadedImage[0].url}`);
+
+//       uploadedImages.push(uploadedImage[0]);
+
+//     }
+//   }
+//   }
+//   resolvedData.images = uploadedImages;
+
+//   // Upload audio
+//   if (audio) {
+//     const fileFromDB = await db.files.get(audio.id);
+//     if (fileFromDB) {
+//       const file = await prepareDataForUpload(fileFromDB);
+//       const uploadedAudio = await uploadFileToStrapi(file, token);
+
+//       // Mise à jour du fichier dans IndexedDB après l'upload
+//       await db.files.update(fileFromDB.id, {
+//         name: uploadedAudio[0].name,
+//         url: uploadedAudio[0].url,
+//         createdAt: new Date(),
+//       });
+
+//             await cacheFile(`http://localhost:1337${uploadedAudio[0].url}`);
+
+//       resolvedData.audio = uploadedAudio[0];
+//     }
+//   }
+
+//   // Upload PDF
+//   if (pdf) {
+//     const fileFromDB = await db.files.get(pdf.id);
+//     if (fileFromDB) {
+//       const file = await prepareDataForUpload(fileFromDB);
+//       const uploadedPdf = await uploadFileToStrapi(file, token);
+
+//       // Mise à jour du fichier dans IndexedDB après l'upload
+//       await db.files.update(fileFromDB.id, {
+//         name: uploadedPdf[0].name,
+//         url: uploadedPdf[0].url,
+//         createdAt: new Date(),
+//       });
+//             await cacheFile(`http://localhost:1337${uploadedPdf[0].url}`);
+
+//       resolvedData.pdf = uploadedPdf[0];
+//     }
+//   }
+
+//   // Upload video
+//   if (video) {
+//     const fileFromDB = await db.files.get(video.id);
+//     if (fileFromDB) {
+//       const file = await prepareDataForUpload(fileFromDB);
+//       const uploadedVideo = await uploadFileToStrapi(file, token);
+
+//       // Mise à jour du fichier dans IndexedDB après l'upload
+//       await db.files.update(fileFromDB.id, {
+//         name: uploadedVideo[0].name,
+//         url: uploadedVideo[0].url,
+//         createdAt: new Date(),
+//       });
+//             await cacheFile(`http://localhost:1337${uploadedVideo[0].url}`);
+
+//       resolvedData.video = uploadedVideo[0];
+//     }
+//   }
+
+  
+
+//                 const dataPush=
+//                 {
+//                   ...resolvedData,
+//                   userId:userId
+//                 }
+
+//         try {
+//   // Supprimer les références circulaires
+//   const cleanDataPush = removeCircularReferences(dataPush);
+
+//   const response = await axios.put(`${API_BASE_URL}/resources/${resolvedData.id}`, cleanDataPush, {
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//   });
+
+//   console.log("response", response);
+
+//   // Assurez-vous que response.data est défini avant de l'utiliser
+//   if (response.data) {
+//     await db.transaction("rw", [db.resources], async () => {
+//       const existingResource = await db.resources.get(Number(resolvedData.id));
+//       if (existingResource) {
+//         await db.resources.update(resolvedData.id, resolvedData);
+//       } else {
+//         console.error("Resource not found in IndexedDB for update after sync:", resolvedData.id);
+//       }
+//     });
+
+//     queryClient.setQueryData(["resources"], (oldData) => {
+//       return {
+//         ...oldData,
+//         data: oldData.data.map((item) =>
+//           item.id === resolvedData.id ? resolvedData : item
+//         ),
+//       };
+//     });
+//   } else {
+//     console.error("No data returned from server.");
+//   }
+// } catch (error) {
+//   console.error("Error during axios.put:", error);
+// }
+//       } 
+      

@@ -12,6 +12,16 @@ import loginStyle from "./login.css";
 import ForgotPasswordModal from "../../components/ForgotPasswordModal/ForgotPasswordModal";
 // import loginImage from "./img/Mobile login-cuate.png"; // Importation de l'image
 
+import styled from "styled-components";
+
+const CustomButton = styled(Button)`
+  background-color: #1e7fc9 !important;
+  border: none;
+  &:hover {
+    background-color: #1a6da5 !important;
+  }
+`;
+
 // Schéma de validation du formulaire
 const LoginSchema = Yup.object().shape({
   identifier: Yup.string().email("Email invalide").required("Email requis"),
@@ -136,7 +146,7 @@ const Login = () => {
                         style={{
                           fontSize: "2rem",
                           fontWeight: "bold",
-                          color: "#1e7fc9",
+                          color: "#1a6da5",
                         }}
                       >
                         {" "}
@@ -184,14 +194,14 @@ const Login = () => {
                         </Form.Control.Feedback>
                       </Form.Group>
                       <Form.Group className="mb-3 text-center">
-                        <Button
+                        <CustomButton
                           variant="primary"
                           type="submit"
                           disabled={isSubmitting}
                           className="button-Login  w-100 mt-3 mb-3"
                         >
                           {"Se\u00A0connecter"}
-                        </Button>
+                        </CustomButton>
                         <div className="text-center mt-2 forgot">
                           <p>
                             Vous avez des difficultés à vous connecter ?&nbsp;

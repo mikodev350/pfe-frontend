@@ -140,9 +140,7 @@ const fetchMediaFromCache = async (url) => {
     const cache = await caches.open('resource-files');
     const response = await cache.match(url);
 
-
-
-
+    alert(response)
     if (response) {
       const blobUrl = URL.createObjectURL(await response.blob());
       return blobUrl;
@@ -176,8 +174,6 @@ export default function UpdateResource() {
   const [referenceLivre, setReferenceLivre] = useState("");
   const [displayLinkInput, setDisplayLinkInput] = useState(false);
   const [displayBookInput, setDisplayBookInput] = useState(false);
-    const [resourceItem, setResourceItem] = useState(false);
-
 
   const hiddenFileInputImage = useRef(null);
   const hiddenFileInputAudio = useRef(null);
@@ -222,22 +218,21 @@ const [isSubmitting, setIsSubmitting] = useState(false);
   onSubmit: async (values) => {
       setIsSubmitting(true); // Activer le loader
 
-
-      // Initialisation du statut de isLocalUpload à false par défaut
-      let isLocalUpload = false;
     try {
       const updatedValues = { ...values };
   
+
+
       // Gérer les images
+
       const newImages = await Promise.all(
         updatedValues.images.map(async (image) => {
 
+
+          /*************************************************************************************/ 
         if (image.raw) {
-          // Initialisation du statut de isLocalUpload à false par défaut
           if (!navigator.onLine) {
             const id = await addFileInToIndexedDB(image.preview, image.raw);
-                   isLocalUpload = true;
-
             return { id, offline: true };
           } else {
             const uploadedImage = await uploadFile(image.raw, token);
@@ -257,97 +252,53 @@ const [isSubmitting, setIsSubmitting] = useState(false);
       }));
 
 
-
+    
       updatedValues.images = newImages;
       // Gérer le fichier audio
-
-
-
       if (audioFile.raw) {
-
         if (!navigator.onLine) {
-          isLocalUpload = true;
           const id = await addFileInToIndexedDB(audioFile.preview, audioFile.raw);
           updatedValues.audio = { id, offline: true };
         } else {
           const uploadedAudio = await uploadFile(audioFile.raw, token);
           updatedValues.audio = { preview: uploadedAudio[0].url, id: uploadedAudio[0].id };
         }
-      } else if (audioFile?.id=== resourceItem?.audio?.id) {
-        if(!navigator.onLine){
-        
-
-          updatedValues.audio = { url:resourceItem.audio.url, id:  resourceItem.audio.id };
-        }else{
-          updatedValues.audio = { id: audioFile.id }; // Conserver l'identifiant de l'audio existant
-        }
+      } else if (audioFile.id) {
+        updatedValues.audio = { id: audioFile.id }; // Conserver l'identifiant de l'audio existant
       }
 
+      // Gérer le fichier PDF
+                    console.log("pdfFile")
 
+              console.log(pdfFile)
 
-// Gérer le fichier PDF
-if (pdfFile.raw) {
-  if (!navigator.onLine) {
-    isLocalUpload = true;
-    const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
-    updatedValues.pdf = { id, offline: true };
-  } else {
-    const uploadedPdf = await uploadFile(pdfFile.raw, token);
-    updatedValues.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
-  }
-} else if (pdfFile?.id === resourceItem?.pdf?.id) {
-  if (!navigator.onLine) {
-    updatedValues.pdf = { url: resourceItem.pdf.url, id: resourceItem.pdf.id };
-  } else {
-    updatedValues.pdf = { id: pdfFile.id }; // Conserver l'identifiant du PDF existant
-  }
-}
+      if (pdfFile.raw) {
+        if (!navigator.onLine) {
+          const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
+          updatedValues.pdf = { id, offline: true };
+        } else {
+          const uploadedPdf = await uploadFile(pdfFile.raw, token);
+          updatedValues.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
+        }
+      } else if (pdfFile.id) {
+        updatedValues.pdf = { id: pdfFile.id }; // Conserver l'identifiant du PDF existant
+      }
 
-      // if (pdfFile.raw) {
-      //   if (!navigator.onLine) {
-      //     const id = await addFileInToIndexedDB(pdfFile.preview, pdfFile.raw);
-      //     updatedValues.pdf = { id, offline: true };
-      //   } else {
-      //     const uploadedPdf = await uploadFile(pdfFile.raw, token);
-      //     updatedValues.pdf = { preview: uploadedPdf[0].url, id: uploadedPdf[0].id };
-      //   }
-      // } else{
-
-      //   if (pdfFile.id === resourceItem.pdf.id ) {
-      //   updatedValues.pdf = { id: pdfFile.id,url:resourceItem.pdf.url }; // Conserver l'identifiant du PDF existant
-      // }
-
-      // }
-
-     
-
-
-/******************************************************************************************/
-// Gérer le fichier vidéo
-if (videoFile.raw) {
-  if (!navigator.onLine) {
-    isLocalUpload = true;
-    const id = await addFileInToIndexedDB(videoFile.preview, videoFile.raw);
-    updatedValues.video = { id, offline: true };
-  } else {
-    const uploadedVideo = await uploadFile(videoFile.raw, token);
-    updatedValues.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
-  }
-} else if (videoFile?.id === resourceItem?.video?.id) {
-  if (!navigator.onLine) {
-    updatedValues.video = { url: resourceItem.video.url, id: resourceItem.video.id };
-  } else {
-    updatedValues.video = { id: videoFile.id }; // Conserver l'identifiant de la vidéo existante
-  }
-}
-
-/******************************************************************************************/
-
-
-
+      // Gérer le fichier vidéo
+      if (videoFile.raw) {
+        if (!navigator.onLine) {
+          const id = await addFileInToIndexedDB(videoFile.preview, videoFile.raw);
+          updatedValues.video = { id, offline: true };
+        } else {
+          const uploadedVideo = await uploadFile(videoFile.raw, token);
+          updatedValues.video = { preview: uploadedVideo[0].url, id: uploadedVideo[0].id };
+        }
+      } else if (videoFile.id) {
+        updatedValues.video = { id: videoFile.id }; // Conserver l'identifiant de la vidéo existante
+      }
 
       // Soumettre les valeurs mises à jour
-      const response = await updateResource(id, updatedValues, token,isLocalUpload);
+      const response = await updateResource(id, updatedValues, token);
        if (response && response.data) {
                   Swal.fire({
             icon: 'success',
@@ -389,11 +340,9 @@ useEffect(() => {
       setParcoursOptions(parcours.map((p) => ({ value: p.id, label: p.name })));
 
       const resource = await getResourceById(id, token, "update");
-      setResourceItem(resource)
+      console.log("***********************resource*********************************************");
+      console.log(resource);
 
-
-
-    
       let cachedImages = [];
       let cachedAudioUrl = null;
       let cachedPdfUrl = null;
@@ -407,6 +356,7 @@ useEffect(() => {
             return { preview: cachedUrl || image, id: image.id, raw: null };
           })
         );
+        // alert(JSON.stringify(cachedImages))
         cachedAudioUrl = await fetchMediaFromCache(resource.audio?.url || resource.audio);
         cachedPdfUrl = await fetchMediaFromCache(resource.pdf?.url || resource.pdf);
         cachedVideoUrl = await fetchMediaFromCache(resource.video?.url || resource.video);
@@ -442,6 +392,11 @@ console.log("PDF URL:", cachedPdfUrl); // Check if the URL is correct
 
 
 
+      console.log('====================================');
+            console.log("cachedImages");
+
+      console.log(cachedImages);
+      console.log('====================================');
       formik.setValues({
         nom: resource.nom || "",
         format: resource.format || "",
